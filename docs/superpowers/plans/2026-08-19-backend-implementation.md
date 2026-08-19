@@ -13,7 +13,7 @@ Build a production-oriented Express + TypeScript API for the existing My Vet Nex
 - The existing Next.js 16 frontend remains at the repository root.
 - The API lives in `backend/` with its own `package.json` and lockfile.
 - The repository is **not** converted to a `frontend/` workspace. Root scripts use `npm --prefix backend` to run the API.
-- PostgreSQL development and test databases run through root `docker-compose.yml`.
+- Railway PostgreSQL is the deployment database. No Docker services are required for this implementation.
 
 ## Fixed architecture decisions
 
@@ -76,11 +76,11 @@ Additional global rules:
 
 ---
 
-## Task 0: Architecture, tooling, and local infrastructure
+## Task 0: Architecture, tooling, and Railway infrastructure
 
 **Files**
 
-- Create `docker-compose.yml`
+- Create `backend/railway.json`
 - Create `backend/package.json`
 - Create `backend/package-lock.json`
 - Create `backend/tsconfig.json`
@@ -97,10 +97,7 @@ Additional global rules:
 
 ### Steps
 
-- [ ] Add two PostgreSQL services:
-  - `postgres` on host port `5432`, database `myvet`
-  - `postgres-test` on host port `5433`, database `myvet_test`
-  - Add health checks, named volumes, explicit users/passwords for local development, and no production assumptions.
+- [ ] Configure Railway to build from `backend/`, run `prisma migrate deploy` as its pre-deploy command, start the compiled server, and health-check `/api/health`.
 - [ ] Initialize the backend as an ESM package with:
 
 ```json
@@ -180,14 +177,14 @@ export default defineConfig({
 - [ ] Add the initial `schema.prisma` skeleton with `provider = "prisma-client"`, required generated-client output, and `datasource db { provider = "postgresql" }`; Task 3 adds the product models.
 
 - [ ] Configure Vitest to run unit tests without a database and integration tests serially against `DATABASE_URL_TEST`. Tests must fail fast if the test URL is missing or points at the development database. Add one tooling smoke test so `vitest run` never relies on a no-tests-success option.
-- [ ] Document startup commands in the root README: start Docker, copy env examples, migrate, seed, then run both apps.
+- [ ] Document Railway service-root, variables, migration, build, start, and non-destructive smoke-test commands in the root README.
 
 ### Acceptance criteria
 
-- `docker compose up -d` reports both databases healthy.
 - `npm install` in `backend/` produces a reproducible lockfile.
 - `npm run typecheck` and an empty `npm test` invocation succeed.
 - Prisma config resolves `DATABASE_URL` without a datasource URL inside `schema.prisma`.
+- Railway configuration runs committed migrations before the new deployment receives traffic.
 
 ### Commit
 
@@ -418,7 +415,7 @@ The datasource block remains because it declares the provider. Only the connecti
 
 ### Migration verification
 
-- [ ] Generate and apply the migration to both development and test databases.
+- [ ] Generate a committed migration without mutating production; Railway applies it with `prisma migrate deploy` during pre-deploy.
 - [ ] Run `prisma validate`, `prisma generate`, and `npm run typecheck`.
 - [ ] Add a schema integration test for all required uniqueness constraints.
 
@@ -1229,9 +1226,8 @@ git commit -m "feat: connect Next frontend to the backend API"
 
 ### Final verification
 
-- [ ] `docker compose up -d`
 - [ ] Clean install at root and in `backend/`
-- [ ] `prisma validate`, generate, migrate reset on test DB, and deploy migration on a clean development DB
+- [ ] `prisma validate`, generate, and inspect committed migration SQL; never reset or seed the Railway production database
 - [ ] Backend typecheck, lint, unit tests, integration tests, and build
 - [ ] Frontend lint and production build
 - [ ] Seed twice and confirm idempotency

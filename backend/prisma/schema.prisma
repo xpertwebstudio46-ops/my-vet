@@ -1,0 +1,765 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PET_OWNER
+  VET
+  ADMIN
+}
+
+enum PracticeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+  ARCHIVED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  RESCHEDULED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  REPLIED
+  CLOSED
+}
+
+enum SubscriptionStatus {
+  FREE
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELLED
+  INCOMPLETE
+}
+
+enum FeaturedListingStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum NotificationCategory {
+  APPOINTMENT
+  REVIEW
+  PRACTICE
+  SUBSCRIPTION
+  FEATURED_LISTING
+  SYSTEM
+}
+
+enum ContactActionType {
+  PHONE
+  EMAIL
+  WEBSITE
+  DIRECTIONS
+  BOOKING
+}
+
+enum PricingKind {
+  SERVICE
+  HEALTH_PACKAGE
+}
+
+enum BillingPeriod {
+  ONE_OFF
+  MONTHLY
+  YEARLY
+}
+
+enum UploadPurpose {
+  AVATAR
+  PET
+  PRACTICE_LOGO
+  PRACTICE_BANNER
+  GALLERY
+  BLOG
+  SPONSORSHIP
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String
+  role                 Role                 @default(PET_OWNER)
+  firstName            String
+  lastName             String
+  phone                 String?
+  avatar                String?
+  bio                   String?
+  address               String?
+  city                  String?
+  postcode              String?
+  emailNotifications    Boolean              @default(true)
+  pushNotifications     Boolean              @default(true)
+  marketingEmails       Boolean              @default(false)
+  language              String               @default("en")
+  twoFactorEnabled      Boolean              @default(false)
+  deletedAt             DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  practice              Practice?
+  pets                  Pet[]
+  appointments          Appointment[]
+  reviews               Review[]              @relation("ReviewAuthor")
+  moderatedReviews      Review[]              @relation("ReviewModerator")
+  helpfulVotes          HelpfulVote[]
+  savedPractices        SavedPractice[]
+  notifications         Notification[]
+  refreshTokens         RefreshToken[]
+  passwordResetTokens   PasswordResetToken[]
+  uploadedAssets        UploadedAsset[]        @relation("UserUploadedAssets")
+  profileViews          ProfileView[]
+  contactActions        ContactAction[]
+  authoredBlogPosts     BlogPost[]
+  repliedEnquiries      ContactEnquiry[]       @relation("ContactReplyUser")
+  adminSettings         AdminSettings?
+  auditEntries          AuditLog[]             @relation("AuditActor")
+
+  @@index([role, deletedAt])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id           String        @id @default(cuid())
+  hashedToken  String        @unique
+  family       String
+  userId       String
+  expiresAt    DateTime
+  usedAt       DateTime?
+  revokedAt    DateTime?
+  replacedById String?       @unique
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replacedBy   RefreshToken? @relation("TokenReplacement", fields: [replacedById], references: [id], onDelete: SetNull)
+  replaces     RefreshToken? @relation("TokenReplacement")
+
+  @@index([userId])
+  @@index([family])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id          String    @id @default(cuid())
+  hashedToken String    @unique
+  userId      String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Practice {
+  id                     String             @id @default(cuid())
+  ownerId                String             @unique
+  slug                   String             @unique
+  name                   String
+  description            String?
+  addressLine1           String
+  addressLine2           String?
+  city                   String
+  county                 String?
+  postcode               String
+  phone                  String
+  email                  String
+  website                String?
+  logoUrl                String?
+  bannerUrl              String?
+  timezone               String             @default("Europe/London")
+  latitude               Decimal?           @db.Decimal(10, 7)
+  longitude              Decimal?           @db.Decimal(10, 7)
+  status                 PracticeStatus     @default(PENDING)
+  moderationReason       String?
+  rating                 Decimal            @default(0) @db.Decimal(3, 2)
+  reviewCount            Int                @default(0)
+  isFeatured             Boolean            @default(false)
+  featuredUntil          DateTime?
+  stripeCustomerId       String?            @unique
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  owner                  User               @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  services               Service[]
+  animalTypes            PracticeAnimalType[]
+  facilities             Facility[]
+  teamMembers            TeamMember[]
+  openingHours           OpeningHours[]
+  holidayHours           HolidayHours[]
+  emergencyHours         EmergencyHours?
+  uploadedAssets         UploadedAsset[]     @relation("PracticeUploadedAssets")
+  galleryMedia           GalleryMedia[]
+  pricing                Pricing[]
+  appointments           Appointment[]
+  reviews                Review[]
+  subscriptions          Subscription[]
+  subscriptionInvoices   SubscriptionInvoice[]
+  featuredListings       FeaturedListing[]
+  savedBy                SavedPractice[]
+  profileViews           ProfileView[]
+  contactActions         ContactAction[]
+
+  @@index([status])
+  @@index([rating])
+  @@index([createdAt])
+  @@index([city, status])
+}
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  services    Service[]
+}
+
+model Service {
+  id          String           @id @default(cuid())
+  practiceId  String
+  categoryId  String?
+  name        String
+  description String?
+  price       Decimal?         @db.Decimal(10, 2)
+  currency    String           @default("GBP")
+  active      Boolean          @default(true)
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  practice    Practice         @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  category    ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@unique([practiceId, name])
+  @@index([practiceId, active])
+  @@index([categoryId])
+}
+
+model AnimalType {
+  id          String               @id @default(cuid())
+  name        String               @unique
+  slug        String               @unique
+  icon        String?
+  active      Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  practices   PracticeAnimalType[]
+  pets        Pet[]
+}
+
+model PracticeAnimalType {
+  practiceId  String
+  animalTypeId String
+  createdAt   DateTime   @default(now())
+  practice    Practice   @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  animalType  AnimalType @relation(fields: [animalTypeId], references: [id], onDelete: Cascade)
+
+  @@id([practiceId, animalTypeId])
+  @@index([animalTypeId])
+}
+
+model Facility {
+  id          String   @id @default(cuid())
+  practiceId  String
+  name        String
+  description String?
+  icon        String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@unique([practiceId, name])
+  @@index([practiceId, active])
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  practiceId  String
+  name        String
+  role        String
+  bio         String?
+  imageUrl    String?
+  qualifications String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@index([practiceId, active])
+}
+
+model OpeningHours {
+  id          String   @id @default(cuid())
+  practiceId  String
+  dayOfWeek   Int
+  isClosed    Boolean  @default(false)
+  opensAt     String?
+  closesAt    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@unique([practiceId, dayOfWeek])
+  @@index([practiceId])
+}
+
+model HolidayHours {
+  id          String   @id @default(cuid())
+  practiceId  String
+  date        DateTime @db.Date
+  isClosed    Boolean  @default(true)
+  opensAt     String?
+  closesAt    String?
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@unique([practiceId, date])
+  @@index([practiceId])
+}
+
+model EmergencyHours {
+  id          String   @id @default(cuid())
+  practiceId  String   @unique
+  enabled     Boolean  @default(false)
+  phone       String?
+  instructions String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+}
+
+model UploadedAsset {
+  id           String        @id @default(cuid())
+  key          String        @unique
+  url          String
+  mimeType     String
+  size         Int
+  purpose      UploadPurpose
+  ownerUserId  String?
+  practiceId   String?
+  attachedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  ownerUser    User?         @relation("UserUploadedAssets", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  practice     Practice?     @relation("PracticeUploadedAssets", fields: [practiceId], references: [id], onDelete: Cascade)
+  galleryMedia GalleryMedia?
+  petImages    Pet[]         @relation("PetImageAsset")
+
+  @@index([ownerUserId])
+  @@index([practiceId])
+  @@index([createdAt, attachedAt])
+}
+
+model GalleryMedia {
+  id          String    @id @default(cuid())
+  practiceId  String
+  assetId     String    @unique
+  key         String    @unique
+  url         String
+  mediaType   MediaType @default(IMAGE)
+  altText     String?
+  caption     String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  practice    Practice  @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  asset       UploadedAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@index([practiceId, sortOrder])
+}
+
+model Pricing {
+  id            String         @id @default(cuid())
+  practiceId    String
+  kind          PricingKind
+  section       String
+  name          String
+  description   String?
+  price         Decimal        @db.Decimal(10, 2)
+  currency      String         @default("GBP")
+  billingPeriod BillingPeriod?
+  sortOrder     Int            @default(0)
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  practice      Practice       @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@unique([practiceId, kind, section, name])
+  @@index([practiceId, kind, active])
+}
+
+model Pet {
+  id           String         @id @default(cuid())
+  userId       String
+  animalTypeId String?
+  imageAssetId String?
+  name         String
+  species      String
+  breed        String?
+  sex          String?
+  dateOfBirth  DateTime?      @db.Date
+  weightKg     Decimal?       @db.Decimal(6, 2)
+  microchip    String?
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animalType   AnimalType?    @relation(fields: [animalTypeId], references: [id], onDelete: SetNull)
+  imageAsset   UploadedAsset? @relation("PetImageAsset", fields: [imageAssetId], references: [id], onDelete: SetNull)
+  appointments Appointment[]
+
+  @@index([userId])
+  @@index([animalTypeId])
+}
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  userId             String
+  practiceId         String
+  petId              String?
+  date               DateTime          @db.Date
+  time               String
+  reason             String
+  notes              String?
+  status             AppointmentStatus @default(PENDING)
+  cancellationReason String?
+  confirmedAt        DateTime?
+  cancelledAt        DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  user               User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  practice           Practice          @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+  pet                Pet?              @relation(fields: [petId], references: [id], onDelete: SetNull)
+  review             Review?
+
+  @@unique([practiceId, date, time])
+  @@index([userId])
+  @@index([practiceId])
+  @@index([status])
+  @@index([date])
+}
+
+model Review {
+  id            String       @id @default(cuid())
+  userId        String
+  practiceId    String
+  appointmentId String?      @unique
+  moderatedById String?
+  rating        Int
+  title         String?
+  comment       String
+  status        ReviewStatus @default(PENDING)
+  reply         String?
+  repliedAt     DateTime?
+  moderatedAt   DateTime?
+  helpfulCount  Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation("ReviewAuthor", fields: [userId], references: [id], onDelete: Restrict)
+  practice      Practice     @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  moderatedBy   User?        @relation("ReviewModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  helpfulVotes  HelpfulVote[]
+
+  @@unique([userId, practiceId])
+  @@index([status])
+  @@index([practiceId])
+  @@index([createdAt])
+  @@index([moderatedById])
+}
+
+model HelpfulVote {
+  userId    String
+  reviewId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@id([userId, reviewId])
+  @@index([reviewId])
+}
+
+model SubscriptionPlan {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String?
+  price         Decimal        @db.Decimal(10, 2)
+  currency      String         @default("GBP")
+  billingPeriod BillingPeriod  @default(MONTHLY)
+  stripePriceId String?        @unique
+  features      Json
+  active        Boolean        @default(true)
+  sortOrder     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  practiceId           String
+  planId               String
+  status               SubscriptionStatus @default(FREE)
+  stripeSubscriptionId String?            @unique
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  cancelledAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  practice             Practice           @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+  plan                 SubscriptionPlan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+  invoices             SubscriptionInvoice[]
+
+  @@unique([practiceId])
+  @@index([planId])
+  @@index([status])
+}
+
+model SubscriptionInvoice {
+  id              String       @id @default(cuid())
+  stripeInvoiceId String       @unique
+  subscriptionId  String
+  practiceId      String
+  amountPaid      Decimal      @db.Decimal(12, 2)
+  currency        String
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  paidAt          DateTime
+  createdAt       DateTime     @default(now())
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  practice        Practice     @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+
+  @@index([subscriptionId])
+  @@index([practiceId, paidAt])
+  @@index([paidAt])
+}
+
+model ProcessedStripeEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}
+
+model FeaturedListingPlan {
+  id            String            @id @default(cuid())
+  name          String
+  tier          String            @unique
+  durationDays  Int
+  price         Decimal           @db.Decimal(10, 2)
+  currency      String            @default("GBP")
+  stripePriceId String?           @unique
+  active        Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  listings      FeaturedListing[]
+}
+
+model FeaturedListing {
+  id                    String                @id @default(cuid())
+  practiceId            String
+  planId                String
+  status                FeaturedListingStatus @default(PENDING)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  stripeSessionId       String?               @unique
+  stripePaymentIntentId String?               @unique
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  practice              Practice              @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+  plan                  FeaturedListingPlan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([practiceId, status])
+  @@index([status, endsAt])
+}
+
+model BlogPost {
+  id          String     @id @default(cuid())
+  authorId    String
+  slug        String     @unique
+  title       String
+  excerpt     String?
+  content     String
+  coverUrl    String?
+  status      BlogStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+}
+
+model Sponsorship {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  websiteUrl  String?
+  startsAt    DateTime
+  endsAt      DateTime
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, startsAt, endsAt])
+}
+
+model ContactEnquiry {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  status      EnquiryStatus @default(NEW)
+  reply       String?
+  repliedAt   DateTime?
+  repliedById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  repliedBy   User?         @relation("ContactReplyUser", fields: [repliedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([repliedById])
+}
+
+model Notification {
+  id        String               @id @default(cuid())
+  userId    String
+  category  NotificationCategory
+  title     String
+  message   String
+  actionUrl String?
+  readAt    DateTime?
+  createdAt DateTime             @default(now())
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, readAt, createdAt])
+}
+
+model SavedPractice {
+  userId     String
+  practiceId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practice   Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, practiceId])
+  @@index([practiceId])
+  @@index([userId, createdAt])
+}
+
+model ProfileView {
+  id           String   @id @default(cuid())
+  practiceId   String
+  userId       String?
+  source       String?
+  visitorHash  String?
+  date         DateTime @default(now())
+  practice     Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([practiceId, date])
+  @@index([userId])
+}
+
+model ContactAction {
+  id          String            @id @default(cuid())
+  practiceId  String
+  userId      String?
+  type        ContactActionType
+  source      String?
+  visitorHash String?
+  date        DateTime          @default(now())
+  practice    Practice          @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  user        User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([practiceId, date])
+  @@index([userId])
+  @@index([type, date])
+}
+
+model SearchEvent {
+  id         String   @id @default(cuid())
+  query      String?
+  city       String?
+  resultCount Int
+  visitorHash String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([city, createdAt])
+}
+
+model AdminSettings {
+  id                    String   @id @default(cuid())
+  adminUserId           String   @unique
+  backupEmail           String?
+  locale                String   @default("en-GB")
+  emailNotifications    Boolean  @default(true)
+  moderationNotifications Boolean @default(true)
+  billingNotifications  Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  adminUser             User     @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  reason     String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

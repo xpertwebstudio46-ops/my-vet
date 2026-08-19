@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Vet
 
-## Getting Started
+My Vet is a Next.js 16 veterinary directory and management application with a production-oriented Express 5 API in [`backend/`](backend/).
 
-First, run the development server:
+## Frontend
 
-```bash
+```powershell
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The frontend runs at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+cd backend
+Copy-Item .env.example .env
+npm ci
+npm run db:generate
+npm run dev
+```
 
-## Learn More
+The API defaults to `http://localhost:5000`. A PostgreSQL `DATABASE_URL` and both JWT secrets are required. Docker is not part of this setup.
 
-To learn more about Next.js, take a look at the following resources:
+Run safe local checks with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```powershell
+cd backend
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Integration tests and database resets require an isolated `DATABASE_URL_TEST`. They refuse to run in production or against the configured application database. The development seed also refuses to run when `NODE_ENV=production`.
 
-## Deploy on Vercel
+## Railway deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create a Railway service from this repository and configure:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Root directory: `/backend`
+- Config file: `/railway.json` (relative to the service root)
+- PostgreSQL service with `DATABASE_URL` available to the API service
+- All required values from [`backend/.env.example`](backend/.env.example)
+
+[`backend/railway.json`](backend/railway.json) builds the TypeScript service, runs `prisma migrate deploy` as a pre-deploy command, starts `dist/server.js`, and checks `/api/health`. Do not add the seed command to deployment.
+
+After deployment, run only non-destructive checks:
+
+```powershell
+cd backend
+$env:API_URL='https://your-api.up.railway.app'
+npm run smoke
+```
+
+See [`backend/README.md`](backend/README.md) for environment and operations details and [`backend/docs/api-endpoints.md`](backend/docs/api-endpoints.md) for the endpoint inventory.
