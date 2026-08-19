@@ -1,0 +1,87 @@
+import Link from "next/link";
+import Image from "next/image";
+import { Heart, Star, MapPin } from "lucide-react";
+
+export interface VetCardData {
+  slug: string;
+  name: string;
+  image: string;
+  location: string;
+  rating: number;
+  reviewCount: number;
+  tags: string[];
+  featured?: boolean;
+}
+
+export default function VetCard({ vet }: { vet: VetCardData }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+      {/* Image */}
+      <div className="relative w-full h-[160px]">
+        <Image
+          src={vet.image}
+          alt={vet.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 320px"
+          className="object-cover"
+        />
+        {vet.featured && (
+          <span
+            className="absolute top-3 left-3 rounded-full px-2.5 py-1 text-[10px] font-semibold text-white"
+            style={{ backgroundColor: "#13b8a8" }}
+          >
+            Featured
+          </span>
+        )}
+        <button
+          type="button"
+          aria-label="Save to favorites"
+          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90"
+        >
+          <Heart className="h-3.5 w-3.5 text-slate-500" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-5">
+        <h3 className="text-base font-bold text-slate-900">{vet.name}</h3>
+
+        <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-500">
+          <span className="flex items-center gap-1">
+            <Star className="h-3.5 w-3.5" fill="#f5a623" stroke="#f5a623" />
+            <span className="font-semibold text-slate-900">
+              {vet.rating.toFixed(1)}
+            </span>
+            <span>({vet.reviewCount} reviews)</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <MapPin className="h-3.5 w-3.5" style={{ color: "#13b8a8" }} />
+            {vet.location}
+          </span>
+        </div>
+
+        <ul className="mt-3 flex flex-col gap-1.5 flex-1">
+          {vet.tags.map((tag) => (
+            <li
+              key={tag}
+              className="flex items-center gap-2 text-xs text-slate-600"
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: "#13b8a8" }}
+              />
+              {tag}
+            </li>
+          ))}
+        </ul>
+
+        <Link
+          href={`/vet-search/${vet.slug}`}
+          className="mt-4 inline-flex items-center justify-center rounded-full bg-[#163B6D] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#0F2E56]"
+        >
+          View Profile
+        </Link>
+      </div>
+    </div>
+  );
+}
