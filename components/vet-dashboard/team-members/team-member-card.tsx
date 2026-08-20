@@ -16,11 +16,10 @@ export function TeamMemberCard({
       <div className="flex items-start gap-4">
         <span className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
           <Image
-            src={member.image}
+            src={member.imageUrl || '/placeholder.svg'}
             alt={member.name}
             fill
             sizes="64px"
-            unoptimized={member.image.startsWith('blob:')}
             className="object-cover"
           />
         </span>
@@ -34,12 +33,12 @@ export function TeamMemberCard({
           </p>
           <div className="mt-3 space-y-1 text-sm leading-5">
             <p className="flex flex-wrap gap-x-2">
-              <span className="font-semibold text-[#01AEAD]">Experience</span>
-              <span className="text-slate-500">{member.experience}</span>
+              <span className="font-semibold text-[#01AEAD]">Qualifications</span>
+              <span className="text-slate-500">{member.qualifications || 'Not listed'}</span>
             </p>
             <p className="flex flex-wrap gap-x-2">
-              <span className="font-semibold text-[#01AEAD]">Focus</span>
-              <span className="text-slate-500">{member.focus}</span>
+              <span className="font-semibold text-[#01AEAD]">Bio</span>
+              <span className="line-clamp-2 text-slate-500">{member.bio || 'No bio added'}</span>
             </p>
           </div>
         </div>

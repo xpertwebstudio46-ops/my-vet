@@ -1,142 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card } from '@/components/dashboard/ui'
+import { apiClient, ApiClientError } from '@/lib/api/client'
+import { discardUpload, uploadImage } from '@/lib/api/uploads'
 import { AdminPageBanner } from '../shared/admin-page-banner'
 import { ConfirmDeleteModal } from '../shared/confirm-delete-modal'
-import { CategoryCard, type CategoryCardItem } from './category-card'
+import { CategoryCard, type CategoryCardItem, type CategoryInput } from './category-card'
 import { CategoryFormModal } from './category-form-modal'
 
-const initialServices: CategoryCardItem[] = [
-  {
-    id: 'service-1',
-    name: 'Vaccinations',
-    description: 'Preventive vaccines and routine booster appointments.',
-    image: '/images/icon-1.png',
-    active: true,
-    count: 1220,
-  },
-  {
-    id: 'service-2',
-    name: 'Dental Care',
-    description: 'Dental cleaning, oral checks and tooth treatment services.',
-    image: '/images/icon-2.png',
-    active: true,
-    count: 842,
-  },
-  {
-    id: 'service-3',
-    name: 'Diagnostics',
-    description: 'Testing, imaging and lab diagnostics for faster care.',
-    image: '/images/icon-3.png',
-    active: true,
-    count: 736,
-  },
-  {
-    id: 'service-4',
-    name: 'Surgery',
-    description: 'Routine and advanced surgical care from listed practices.',
-    image: '/images/icon-4.png',
-    active: true,
-    count: 418,
-  },
-  {
-    id: 'service-5',
-    name: 'Emergency Care',
-    description: 'Urgent treatment and out-of-hours veterinary support.',
-    image: '/images/icon-5.png',
-    active: false,
-    count: 265,
-  },
-  {
-    id: 'service-6',
-    name: 'Grooming',
-    description: 'Bathing, clipping and coat-care appointments.',
-    image: '/images/icon-6.png',
-    active: true,
-    count: 514,
-  },
-  {
-    id: 'service-7',
-    name: 'Microchipping',
-    description: 'Pet identification and registration support.',
-    image: '/images/check.png',
-    active: false,
-    count: 389,
-  },
-]
+const path = '/api/admin/service-categories'
 
 export function ServicesManagementPage() {
-  const [services, setServices] = useState(initialServices)
-  const [addOpen, setAddOpen] = useState(false)
-  const [deletingService, setDeletingService] =
-    useState<CategoryCardItem | null>(null)
+  const [items, setItems] = useState<CategoryCardItem[]>([])
+  const [editing, setEditing] = useState<CategoryCardItem | null>(null)
+  const [formOpen, setFormOpen] = useState(false)
+  const [deleting, setDeleting] = useState<CategoryCardItem | null>(null)
+  const [error, setError] = useState('')
 
-  return (
-    <div className="space-y-6">
-      <AdminPageBanner
-        title="Services Management"
-        description="Manage service categories and see how many practices offer each one."
-        action={{
-          label: 'Add Service',
-          icon: 'plus',
-          tone: 'teal',
-          onClick: () => setAddOpen(true),
-        }}
-      />
+  useEffect(() => { void apiClient<CategoryCardItem[]>(path).then(setItems).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Service categories could not be loaded.')) }, [])
 
-      <Card className="overflow-hidden p-0">
-        <div>
-          {services.map((service) => (
-            <CategoryCard
-              key={service.id}
-              item={service}
-              countLabel={`${service.count?.toLocaleString()} practices`}
-              onToggle={() =>
-                setServices((current) =>
-                  current.map((item) =>
-                    item.id === service.id
-                      ? { ...item, active: !item.active }
-                      : item,
-                  ),
-                )
-              }
-              onDelete={() =>
-                setDeletingService(service)
-              }
-            />
-          ))}
-        </div>
-      </Card>
+  async function save(input: CategoryInput) {
+    const asset = input.file ? await uploadImage(input.file, 'TAXONOMY') : null
+    try {
+      const item = await apiClient<CategoryCardItem>(editing ? `${path}/${editing.id}` : path, { method: editing ? 'PUT' : 'POST', body: JSON.stringify({ name: input.name, description: input.description, active: input.active, ...(asset ? { imageAssetId: asset.id } : {}) }) })
+      setItems((current) => editing ? current.map((value) => value.id === item.id ? item : value) : [...current, item])
+    } catch (caught) { if (asset) await discardUpload(asset); throw caught }
+    setEditing(null); setFormOpen(false)
+  }
 
-      {addOpen && (
-        <CategoryFormModal
-          title="Add service category"
-          defaultImage="/images/icon-1.png"
-          showCount
-          countLabel="Practice count"
-          submitLabel="Add service"
-          onClose={() => setAddOpen(false)}
-          onAdd={(service) => {
-            setServices((current) => [...current, service])
-            setAddOpen(false)
-          }}
-        />
-      )}
+  async function updateActive(item: CategoryCardItem) { try { const updated = await apiClient<CategoryCardItem>(`${path}/${item.id}`, { method: 'PUT', body: JSON.stringify({ active: !item.active }) }); setItems((current) => current.map((value) => value.id === updated.id ? updated : value)) } catch (caught) { setError(caught instanceof ApiClientError ? caught.message : 'Category could not be updated.') } }
+  async function remove(item: CategoryCardItem) { try { await apiClient(`${path}/${item.id}`, { method: 'DELETE' }); setItems((current) => current.filter((value) => value.id !== item.id)) } catch (caught) { setError(caught instanceof ApiClientError ? caught.message : 'Category could not be deleted.') } finally { setDeleting(null) } }
 
-      {deletingService && (
-        <ConfirmDeleteModal
-          title="Delete service?"
-          description={`This will remove ${deletingService.name} from service management.`}
-          onClose={() => setDeletingService(null)}
-          onConfirm={() => {
-            setServices((current) =>
-              current.filter((item) => item.id !== deletingService.id),
-            )
-            setDeletingService(null)
-          }}
-        />
-      )}
-    </div>
-  )
+  return <div className="space-y-6"><AdminPageBanner title="Services Management" description="Manage service categories available to practices." action={{ label: 'Add Service', icon: 'plus', tone: 'teal', onClick: () => { setEditing(null); setFormOpen(true) } }} />{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}<Card className="overflow-hidden p-0">{items.map((item) => <CategoryCard key={item.id} item={item} onToggle={() => void updateActive(item)} onEdit={() => { setEditing(item); setFormOpen(true) }} onDelete={() => setDeleting(item)} />)}</Card>{formOpen && <CategoryFormModal title={editing ? 'Edit service category' : 'Add service category'} item={editing} defaultImage="/images/icon-1.png" submitLabel="Save service" onClose={() => { setEditing(null); setFormOpen(false) }} onSave={save} />}{deleting && <ConfirmDeleteModal title="Delete service?" description={`This permanently removes ${deleting.name} and its R2 image.`} onClose={() => setDeleting(null)} onConfirm={() => void remove(deleting)} />}</div>
 }

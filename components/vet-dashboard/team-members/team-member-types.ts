@@ -1,9 +1,12 @@
 export type TeamMember = {
   id: string
-  image: string
+  imageUrl: string | null
   name: string
   role: string
-  experience: string
-  focus: string
   bio: string
+  qualifications: string | null
+  active: boolean
+  sortOrder: number
 }
+
+export type TeamMemberInput = Omit<TeamMember, 'id' | 'imageUrl'> & { file?: File }

@@ -7,6 +7,7 @@ import { validateBody, validateParams } from '../../shared/middleware/validate.j
 import { ApiError } from '../../shared/utils/api-error.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
 import { deleteR2Object } from '../upload/upload.service.js'
+import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
 
 const idParams = z.object({ id: z.string().min(1) })
@@ -30,10 +31,14 @@ const teamSchema = z.object({
   name: z.string().trim().min(1).max(150),
   role: z.string().trim().min(1).max(150),
   bio: z.string().trim().max(3_000).nullable().optional(),
-  imageUrl: z.url().nullable().optional(),
+  imageAssetId: z.string().min(1).nullable().optional(),
   qualifications: z.string().trim().max(1_000).nullable().optional(),
   active: z.boolean().default(true),
   sortOrder: z.number().int().min(0).default(0),
+})
+const practiceMediaSchema = z.object({
+  kind: z.enum(['logo', 'banner']),
+  assetId: z.string().min(1).nullable(),
 })
 const hoursItemSchema = z
   .object({
@@ -151,7 +156,76 @@ function registerCrud(
 
 registerCrud('/services', serviceSchema, 'service')
 registerCrud('/facilities', facilitySchema, 'facility')
-registerCrud('/team-members', teamSchema, 'teamMember')
+
+vetRouter.get('/team-members', async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  sendSuccess(response, await prisma.teamMember.findMany({ where: { practiceId: practice.id }, orderBy: { createdAt: 'asc' } }))
+})
+
+vetRouter.post('/team-members', validateBody(teamSchema), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof teamSchema>
+  const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'TEAM_MEMBER', { practiceId: practice.id }) : null
+  const item = await prisma.$transaction(async (transaction) => {
+    const created = await transaction.teamMember.create({ data: { ...body, imageUrl: asset?.url ?? null, practiceId: practice.id } })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return created
+  })
+  sendSuccess(response, item, 'Team member created', 201)
+})
+
+vetRouter.put('/team-members/:id', validateParams(idParams), validateBody(teamSchema.partial()), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const existing = await prisma.teamMember.findFirst({ where: { id, practiceId: practice.id } })
+  if (!existing) throw new ApiError(404, 'TEAM_MEMBER_NOT_FOUND', 'Team member was not found')
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof teamSchema>
+  const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'TEAM_MEMBER', { practiceId: practice.id }) : null
+  const item = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.teamMember.update({
+      where: { id },
+      data: { ...body, ...(imageAssetId !== undefined ? { imageUrl: asset?.url ?? null } : {}) },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return updated
+  })
+  if (imageAssetId !== undefined && existing.imageUrl !== item.imageUrl) {
+    await deleteUploadedAssetByUrl(existing.imageUrl, ['TEAM_MEMBER'], { practiceId: practice.id }).catch(() => undefined)
+  }
+  sendSuccess(response, item, 'Team member updated')
+})
+
+vetRouter.delete('/team-members/:id', validateParams(idParams), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const existing = await prisma.teamMember.findFirst({ where: { id, practiceId: practice.id } })
+  if (!existing) throw new ApiError(404, 'TEAM_MEMBER_NOT_FOUND', 'Team member was not found')
+  await prisma.teamMember.delete({ where: { id } })
+  await deleteUploadedAssetByUrl(existing.imageUrl, ['TEAM_MEMBER'], { practiceId: practice.id }).catch(() => undefined)
+  sendSuccess(response, { deleted: true }, 'Team member deleted')
+})
+
+vetRouter.put('/practice-media', validateBody(practiceMediaSchema), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { kind, assetId } = request.validatedBody as z.infer<typeof practiceMediaSchema>
+  const purpose = kind === 'logo' ? 'PRACTICE_LOGO' : 'PRACTICE_BANNER'
+  const oldUrl = kind === 'logo' ? practice.logoUrl : practice.bannerUrl
+  const asset = assetId ? await requireUploadForAttachment(assetId, purpose, { practiceId: practice.id }) : null
+  const updated = await prisma.$transaction(async (transaction) => {
+    const result = await transaction.practice.update({
+      where: { id: practice.id },
+      data: kind === 'logo' ? { logoUrl: asset?.url ?? null } : { bannerUrl: asset?.url ?? null },
+      select: { id: true, logoUrl: true, bannerUrl: true },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return result
+  })
+  const newUrl = kind === 'logo' ? updated.logoUrl : updated.bannerUrl
+  if (oldUrl !== newUrl) {
+    await deleteUploadedAssetByUrl(oldUrl, [purpose], { practiceId: practice.id }).catch(() => undefined)
+  }
+  sendSuccess(response, updated, 'Practice image updated')
+})
 
 vetRouter.get('/opening-hours', async (request, response) => {
   const practice = await getOwnedPractice(request.user!.userId)

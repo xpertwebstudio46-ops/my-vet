@@ -7,12 +7,13 @@ import { invalidateAuthUser } from '../auth/user-auth-cache.js'
 import { validateBody } from '../../shared/middleware/validate.js'
 import { ApiError } from '../../shared/utils/api-error.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
+import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 
 const profileSchema = z.object({
   firstName: z.string().trim().min(1).max(80).optional(),
   lastName: z.string().trim().min(1).max(80).optional(),
   phone: z.string().trim().max(30).nullable().optional(),
-  avatar: z.url().nullable().optional(),
+  avatarAssetId: z.string().min(1).nullable().optional(),
   bio: z.string().trim().max(1_000).nullable().optional(),
   address: z.string().trim().max(200).nullable().optional(),
   city: z.string().trim().max(100).nullable().optional(),
@@ -64,11 +65,24 @@ usersRouter.get('/me/profile', async (request, response) => {
 })
 
 usersRouter.put('/me/profile', validateBody(profileSchema), async (request, response) => {
-  const user = await prisma.user.update({
-    where: { id: request.user!.userId },
-    data: request.validatedBody as z.infer<typeof profileSchema>,
-    select: safeProfileSelect,
+  const userId = request.user!.userId
+  const body = request.validatedBody as z.infer<typeof profileSchema>
+  const { avatarAssetId, ...profile } = body
+  const previous = await prisma.user.findUnique({ where: { id: userId }, select: { avatar: true } })
+  if (!previous) throw new ApiError(404, 'USER_NOT_FOUND', 'User was not found')
+  const asset = avatarAssetId ? await requireUploadForAttachment(avatarAssetId, 'AVATAR', { ownerUserId: userId }) : null
+  const user = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.user.update({
+      where: { id: userId },
+      data: { ...profile, ...(avatarAssetId !== undefined ? { avatar: asset?.url ?? null } : {}) },
+      select: safeProfileSelect,
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return updated
   })
+  if (avatarAssetId !== undefined && previous.avatar !== user.avatar) {
+    await deleteUploadedAssetByUrl(previous.avatar, ['AVATAR'], { ownerUserId: userId }).catch(() => undefined)
+  }
   sendSuccess(response, user, 'Profile updated')
 })
 

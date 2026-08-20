@@ -12,6 +12,7 @@ import { toSlug } from '../../shared/utils/slug.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import { mailService } from '../../shared/services/mail.service.js'
 import { recalculatePracticeRating } from '../reviews/review-rating.service.js'
+import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const statusQuery = paginationSchema.extend({ status: z.string().trim().max(40).optional(), q: z.string().trim().max(100).optional() })
@@ -27,19 +28,20 @@ const taxonomySchema = z.object({
   name: z.string().trim().min(1).max(100),
   description: z.string().trim().max(1_000).nullable().optional(),
   active: z.boolean().default(true),
+  imageAssetId: z.string().min(1).nullable().optional(),
 })
 const animalTypeSchema = taxonomySchema.extend({ icon: z.string().trim().max(100).nullable().optional() })
 const blogSchema = z.object({
   title: z.string().trim().min(3).max(180),
   excerpt: z.string().trim().max(500).nullable().optional(),
   content: z.string().trim().min(20).max(100_000),
-  coverUrl: z.url().nullable().optional(),
+  coverAssetId: z.string().min(1).nullable().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
 })
 const sponsorshipFields = z.object({
   name: z.string().trim().min(2).max(150),
   description: z.string().trim().max(2_000).nullable().optional(),
-  imageUrl: z.url().nullable().optional(),
+  imageAssetId: z.string().min(1).nullable().optional(),
   websiteUrl: z.url().nullable().optional(),
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
@@ -192,6 +194,7 @@ adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBod
 interface TaxonomyDelegate {
   findMany(args: { orderBy: { name: 'asc' } }): Promise<unknown[]>
   create(args: { data: Record<string, unknown> }): Promise<unknown>
+  findFirst(args: { where: { id: string }; select: { id: true; imageUrl: true } }): Promise<{ id: string; imageUrl: string | null } | null>
   update(args: { where: { id: string }; data: Record<string, unknown> }): Promise<unknown>
   delete(args: { where: { id: string } }): Promise<unknown>
 }
@@ -200,19 +203,42 @@ function taxonomyRoutes(path: string, schema: z.ZodObject, delegateName: 'animal
   const delegate = prisma[delegateName] as unknown as TaxonomyDelegate
   adminRouter.get(path, async (_request, response) => sendSuccess(response, await delegate.findMany({ orderBy: { name: 'asc' } })))
   adminRouter.post(path, validateBody(schema), async (request, response) => {
-    const body = request.validatedBody as Record<string, unknown> & { name: string }
-    const item = await delegate.create({ data: { ...body, slug: toSlug(body.name) } })
+    const { imageAssetId, ...body } = request.validatedBody as Record<string, unknown> & { name: string; imageAssetId?: string | null }
+    const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'TAXONOMY', { ownerUserId: request.user!.userId }) : null
+    const item = await prisma.$transaction(async (transaction) => {
+      const transactionDelegate = transaction[delegateName] as unknown as TaxonomyDelegate
+      const created = await transactionDelegate.create({ data: { ...body, imageUrl: asset?.url ?? null, slug: toSlug(body.name) } })
+      if (asset) await markUploadAttached(transaction, asset.id)
+      return created
+    })
     sendSuccess(response, item, 'Created', 201)
   })
   adminRouter.put(`${path}/:id`, validateParams(idParams), validateBody(schema.partial()), async (request, response) => {
     const { id } = request.validatedParams as z.infer<typeof idParams>
-    const body = request.validatedBody as Record<string, unknown> & { name?: string }
-    const item = await delegate.update({ where: { id }, data: { ...body, ...(body.name ? { slug: toSlug(body.name) } : {}) } })
+    const existing = await delegate.findFirst({ where: { id }, select: { id: true, imageUrl: true } })
+    if (!existing) throw new ApiError(404, 'NOT_FOUND', 'Record was not found')
+    const { imageAssetId, ...body } = request.validatedBody as Record<string, unknown> & { name?: string; imageAssetId?: string | null }
+    const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'TAXONOMY', { ownerUserId: request.user!.userId }) : null
+    const item = await prisma.$transaction(async (transaction) => {
+      const transactionDelegate = transaction[delegateName] as unknown as TaxonomyDelegate
+      const updated = await transactionDelegate.update({
+        where: { id },
+        data: { ...body, ...(imageAssetId !== undefined ? { imageUrl: asset?.url ?? null } : {}), ...(body.name ? { slug: toSlug(body.name) } : {}) },
+      })
+      if (asset) await markUploadAttached(transaction, asset.id)
+      return updated
+    })
+    if (imageAssetId !== undefined) {
+      await deleteUploadedAssetByUrl(existing.imageUrl, ['TAXONOMY'], {}).catch(() => undefined)
+    }
     sendSuccess(response, item, 'Updated')
   })
   adminRouter.delete(`${path}/:id`, validateParams(idParams), async (request, response) => {
     const { id } = request.validatedParams as z.infer<typeof idParams>
+    const existing = await delegate.findFirst({ where: { id }, select: { id: true, imageUrl: true } })
+    if (!existing) throw new ApiError(404, 'NOT_FOUND', 'Record was not found')
     await delegate.delete({ where: { id } })
+    await deleteUploadedAssetByUrl(existing.imageUrl, ['TAXONOMY'], {}).catch(() => undefined)
     sendSuccess(response, { deleted: true })
   })
 }
@@ -222,40 +248,82 @@ taxonomyRoutes('/service-categories', taxonomySchema, 'serviceCategory')
 
 adminRouter.get('/blog', async (_request, response) => sendSuccess(response, await prisma.blogPost.findMany({ orderBy: { createdAt: 'desc' } })))
 adminRouter.post('/blog', validateBody(blogSchema), async (request, response) => {
-  const body = request.validatedBody as z.infer<typeof blogSchema>
-  const post = await prisma.blogPost.create({
-    data: { ...body, slug: toSlug(body.title), authorId: request.user!.userId, publishedAt: body.status === 'PUBLISHED' ? new Date() : null },
+  const { coverAssetId, ...body } = request.validatedBody as z.infer<typeof blogSchema>
+  const asset = coverAssetId ? await requireUploadForAttachment(coverAssetId, 'BLOG', { ownerUserId: request.user!.userId }) : null
+  const post = await prisma.$transaction(async (transaction) => {
+    const created = await transaction.blogPost.create({
+      data: { ...body, coverUrl: asset?.url ?? null, slug: toSlug(body.title), authorId: request.user!.userId, publishedAt: body.status === 'PUBLISHED' ? new Date() : null },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return created
   })
   sendSuccess(response, post, 'Blog post created', 201)
 })
 adminRouter.put('/blog/:id', validateParams(idParams), validateBody(blogSchema.partial()), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
-  const body = request.validatedBody as z.infer<typeof blogSchema>
-  const post = await prisma.blogPost.update({
-    where: { id },
-    data: { ...body, ...(body.title ? { slug: toSlug(body.title) } : {}), ...(body.status === 'PUBLISHED' ? { publishedAt: new Date() } : {}) },
+  const existing = await prisma.blogPost.findUnique({ where: { id }, select: { coverUrl: true } })
+  if (!existing) throw new ApiError(404, 'BLOG_NOT_FOUND', 'Blog post was not found')
+  const { coverAssetId, ...body } = request.validatedBody as z.infer<typeof blogSchema>
+  const asset = coverAssetId ? await requireUploadForAttachment(coverAssetId, 'BLOG', { ownerUserId: request.user!.userId }) : null
+  const post = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.blogPost.update({
+      where: { id },
+      data: { ...body, ...(coverAssetId !== undefined ? { coverUrl: asset?.url ?? null } : {}), ...(body.title ? { slug: toSlug(body.title) } : {}), ...(body.status === 'PUBLISHED' ? { publishedAt: new Date() } : {}) },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return updated
   })
+  if (coverAssetId !== undefined && existing.coverUrl !== post.coverUrl) {
+    await deleteUploadedAssetByUrl(existing.coverUrl, ['BLOG'], {}).catch(() => undefined)
+  }
   sendSuccess(response, post, 'Blog post updated')
 })
 adminRouter.delete('/blog/:id', validateParams(idParams), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
-  await prisma.blogPost.update({ where: { id }, data: { status: 'ARCHIVED' } })
-  sendSuccess(response, { archived: true })
+  const existing = await prisma.blogPost.findUnique({ where: { id }, select: { coverUrl: true } })
+  if (!existing) throw new ApiError(404, 'BLOG_NOT_FOUND', 'Blog post was not found')
+  await prisma.blogPost.delete({ where: { id } })
+  await deleteUploadedAssetByUrl(existing.coverUrl, ['BLOG'], {}).catch(() => undefined)
+  sendSuccess(response, { deleted: true })
 })
 
 adminRouter.get('/sponsorships', async (_request, response) => sendSuccess(response, await prisma.sponsorship.findMany({ orderBy: { createdAt: 'desc' } })))
 adminRouter.post('/sponsorships', validateBody(sponsorshipSchema), async (request, response) => {
-  const item = await prisma.sponsorship.create({ data: request.validatedBody as z.infer<typeof sponsorshipSchema> })
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof sponsorshipFields>
+  const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'SPONSORSHIP', { ownerUserId: request.user!.userId }) : null
+  const item = await prisma.$transaction(async (transaction) => {
+    const created = await transaction.sponsorship.create({ data: { ...body, imageUrl: asset?.url ?? null } })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return created
+  })
   sendSuccess(response, item, 'Sponsorship created', 201)
 })
 adminRouter.put('/sponsorships/:id', validateParams(idParams), validateBody(updateSponsorshipSchema), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
-  sendSuccess(response, await prisma.sponsorship.update({ where: { id }, data: request.validatedBody as z.infer<typeof sponsorshipSchema> }), 'Sponsorship updated')
+  const existing = await prisma.sponsorship.findUnique({ where: { id } })
+  if (!existing) throw new ApiError(404, 'SPONSORSHIP_NOT_FOUND', 'Sponsorship was not found')
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof sponsorshipFields>
+  const asset = imageAssetId ? await requireUploadForAttachment(imageAssetId, 'SPONSORSHIP', { ownerUserId: request.user!.userId }) : null
+  const item = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.sponsorship.update({
+      where: { id },
+      data: { ...body, ...(imageAssetId !== undefined ? { imageUrl: asset?.url ?? null } : {}) },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return updated
+  })
+  if (imageAssetId !== undefined && existing.imageUrl !== item.imageUrl) {
+    await deleteUploadedAssetByUrl(existing.imageUrl, ['SPONSORSHIP'], {}).catch(() => undefined)
+  }
+  sendSuccess(response, item, 'Sponsorship updated')
 })
 adminRouter.delete('/sponsorships/:id', validateParams(idParams), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
-  await prisma.sponsorship.update({ where: { id }, data: { active: false } })
-  sendSuccess(response, { deactivated: true })
+  const existing = await prisma.sponsorship.findUnique({ where: { id } })
+  if (!existing) throw new ApiError(404, 'SPONSORSHIP_NOT_FOUND', 'Sponsorship was not found')
+  await prisma.sponsorship.delete({ where: { id } })
+  await deleteUploadedAssetByUrl(existing.imageUrl, ['SPONSORSHIP'], {}).catch(() => undefined)
+  sendSuccess(response, { deleted: true })
 })
 
 adminRouter.get('/enquiries', validateQuery(statusQuery), async (request, response) => {

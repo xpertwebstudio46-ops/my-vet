@@ -1,127 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import Image from 'next/image'
+import { ImagePlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Modal } from '@/components/dashboard/modal'
-import type { BlogPost, BlogStatus, BlogTab } from './blog-types'
+import { ApiClientError } from '@/lib/api/client'
+import type { BlogPost, BlogPostInput, BlogStatus } from './blog-types'
 
-type BlogFormModalProps = {
-  activeTab: BlogTab
-  post?: BlogPost | null
-  onClose: () => void
-  onSave: (post: BlogPost) => void
-}
-
-export function BlogFormModal({
-  activeTab,
-  post,
-  onClose,
-  onSave,
-}: BlogFormModalProps) {
+export function BlogFormModal({ post, onClose, onSave }: { post?: BlogPost | null; onClose: () => void; onSave: (post: BlogPostInput) => Promise<void> }) {
   const [title, setTitle] = useState(post?.title ?? '')
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? '')
-  const [category, setCategory] = useState(post?.category ?? '')
-  const [money, setMoney] = useState(post?.money ?? '')
-  const [views, setViews] = useState(post?.views ?? '')
-  const [comments, setComments] = useState(String(post?.comments ?? 0))
-  const [status, setStatus] = useState<BlogStatus>(post?.status ?? 'Draft')
+  const [content, setContent] = useState(post?.content ?? '')
+  const [status, setStatus] = useState<BlogStatus>(post?.status ?? 'DRAFT')
+  const [file, setFile] = useState<File>()
+  const [preview, setPreview] = useState(post?.coverUrl ?? '/placeholder.svg')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
-  function handleSave() {
-    if (!title.trim()) return
+  useEffect(() => () => { if (preview.startsWith('blob:')) URL.revokeObjectURL(preview) }, [preview])
 
-    onSave({
-      id: post?.id ?? `blog-${Date.now()}`,
-      tab: post?.tab ?? activeTab,
-      title: title.trim(),
-      excerpt: excerpt.trim() || 'Short blog summary for dashboard preview.',
-      category: category.trim() || 'Small pets',
-      money: money.trim() || '£0',
-      views: views.trim() || '0',
-      comments: Number(comments) || 0,
-      status,
-    })
+  async function handleSave() {
+    if (!title.trim() || content.trim().length < 20) { setError('Add a title and at least 20 characters of content.'); return }
+    setSaving(true); setError('')
+    try { await onSave({ title: title.trim(), excerpt: excerpt.trim() || null, content: content.trim(), status, file }) }
+    catch (caught) { setError(caught instanceof ApiClientError ? caught.message : 'Blog post could not be saved.'); setSaving(false) }
   }
 
   return (
-    <Modal
-      open
-      onClose={onClose}
-      title={post ? 'Edit blog' : 'Add blog'}
-      className="max-w-2xl"
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <BlogInput label="Blog name" value={title} onChange={setTitle} />
-        <BlogInput label="Category" value={category} onChange={setCategory} />
-        <BlogInput label="Money" value={money} onChange={setMoney} />
-        <BlogInput label="Views" value={views} onChange={setViews} />
-        <BlogInput
-          label="Comments"
-          type="number"
-          value={comments}
-          onChange={setComments}
-        />
-        <label className="block text-sm font-medium text-black">
-          Status
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as BlogStatus)}
-            className="mt-2 h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#01AEAD] focus:ring-3 focus:ring-[#01AEAD]/15"
-          >
-            <option value="Published">Published</option>
-            <option value="Draft">Draft</option>
-            <option value="Archived">Archived</option>
-          </select>
+    <Modal open onClose={onClose} title={post ? 'Edit blog' : 'Add blog'} className="max-w-2xl">
+      <div className="grid gap-4">
+        <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-gray-300 p-3 hover:border-[#01AEAD] hover:bg-[#EEF7F5]">
+          <span className="relative h-20 w-32 overflow-hidden rounded-md bg-slate-100"><Image src={preview} alt="Cover preview" fill sizes="128px" unoptimized={preview.startsWith('blob:')} className="object-cover" /></span>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#064071]"><ImagePlus className="size-4 text-[#01AEAD]" />Upload cover image</span>
+          <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const selected = event.target.files?.[0]; if (selected) { setFile(selected); setPreview(URL.createObjectURL(selected)) } }} />
         </label>
-        <label className="block text-sm font-medium text-black sm:col-span-2">
-          Little paragraph
-          <textarea
-            value={excerpt}
-            onChange={(event) => setExcerpt(event.target.value)}
-            rows={3}
-            className="mt-2 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#01AEAD] focus:ring-3 focus:ring-[#01AEAD]/15"
-          />
-        </label>
+        <label className="block text-sm font-medium text-black">Title<input value={title} onChange={(event) => setTitle(event.target.value)} className="mt-2 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-[#01AEAD]" /></label>
+        <label className="block text-sm font-medium text-black">Excerpt<textarea value={excerpt} onChange={(event) => setExcerpt(event.target.value)} rows={2} className="mt-2 w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#01AEAD]" /></label>
+        <label className="block text-sm font-medium text-black">Content<textarea value={content} onChange={(event) => setContent(event.target.value)} rows={8} className="mt-2 w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#01AEAD]" /></label>
+        <label className="block text-sm font-medium text-black">Status<select value={status} onChange={(event) => setStatus(event.target.value as BlogStatus)} className="mt-2 h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm"><option value="DRAFT">Draft</option><option value="PUBLISHED">Published</option><option value="ARCHIVED">Archived</option></select></label>
       </div>
-
-      <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 px-4 text-sm font-semibold text-[#064071] hover:bg-slate-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          className="inline-flex h-10 items-center justify-center rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white hover:bg-[#019594]"
-        >
-          Save blog
-        </button>
-      </div>
+      {error && <p role="alert" className="mt-4 text-sm text-red-600">{error}</p>}
+      <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" onClick={onClose} className="h-10 rounded-md border border-gray-200 px-4 text-sm font-semibold text-[#064071]">Cancel</button><button type="button" onClick={() => void handleSave()} disabled={saving} className="h-10 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white disabled:opacity-60">{saving ? 'Savingâ€¦' : 'Save blog'}</button></div>
     </Modal>
-  )
-}
-
-function BlogInput({
-  label,
-  value,
-  onChange,
-  type = 'text',
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  type?: 'text' | 'number'
-}) {
-  return (
-    <label className="block text-sm font-medium text-black">
-      {label}
-      <input
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-[#01AEAD] focus:ring-3 focus:ring-[#01AEAD]/15"
-      />
-    </label>
   )
 }

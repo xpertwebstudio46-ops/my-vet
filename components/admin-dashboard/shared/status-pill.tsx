@@ -7,6 +7,9 @@ type StatusPillValue =
   | 'Archived'
   | 'Replied'
   | 'New'
+  | 'PUBLISHED'
+  | 'DRAFT'
+  | 'ARCHIVED'
 
 export function StatusPill({ status }: { status: StatusPillValue }) {
   const styles: Record<StatusPillValue, string> = {
@@ -18,6 +21,9 @@ export function StatusPill({ status }: { status: StatusPillValue }) {
     Archived: 'bg-slate-100 text-slate-600',
     Replied: 'bg-[#EEF7F5] text-[#01AEAD]',
     New: 'bg-amber-100 text-amber-700',
+    PUBLISHED: 'bg-[#EEF7F5] text-[#01AEAD]',
+    DRAFT: 'bg-slate-100 text-slate-600',
+    ARCHIVED: 'bg-slate-100 text-slate-600',
   }
 
   return (

@@ -2,14 +2,15 @@
 
 import Image from 'next/image'
 import { ImagePlus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Modal } from '@/components/dashboard/modal'
-import type { TeamMember } from './team-member-types'
+import { ApiClientError } from '@/lib/api/client'
+import type { TeamMember, TeamMemberInput } from './team-member-types'
 
 type TeamMemberFormModalProps = {
   member?: TeamMember | null
   onClose: () => void
-  onSave: (member: TeamMember) => void
+  onSave: (member: TeamMemberInput) => Promise<void>
 }
 
 export function TeamMemberFormModal({
@@ -17,30 +18,33 @@ export function TeamMemberFormModal({
   onClose,
   onSave,
 }: TeamMemberFormModalProps) {
-  const [image, setImage] = useState(member?.image ?? '/images/person-1.png')
+  const [file, setFile] = useState<File>()
+  const [image, setImage] = useState(member?.imageUrl ?? '/placeholder.svg')
   const [name, setName] = useState(member?.name ?? '')
   const [role, setRole] = useState(member?.role ?? '')
-  const [experience, setExperience] = useState(member?.experience ?? '')
-  const [focus, setFocus] = useState(member?.focus ?? '')
   const [bio, setBio] = useState(member?.bio ?? '')
+  const [qualifications, setQualifications] = useState(member?.qualifications ?? '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => () => { if (image.startsWith('blob:')) URL.revokeObjectURL(image) }, [image])
 
   function handleImageChange(file?: File) {
     if (!file) return
+    setFile(file)
     setImage(URL.createObjectURL(file))
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!name.trim()) return
-
-    onSave({
-      id: member?.id ?? `member-${Date.now()}`,
-      image,
-      name: name.trim(),
-      role: role.trim() || 'Veterinary surgeon',
-      experience: experience.trim() || '5 years',
-      focus: focus.trim() || 'Soft tissue surgery',
-      bio: bio.trim() || 'Team member profile summary.',
-    })
+    setSaving(true)
+    setError('')
+    try {
+      await onSave({ name: name.trim(), role: role.trim() || 'Veterinary surgeon', bio: bio.trim(), qualifications: qualifications.trim() || null, active: true, sortOrder: member?.sortOrder ?? 0, file })
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : 'Team member could not be saved.')
+      setSaving(false)
+    }
   }
 
   return (
@@ -85,12 +89,7 @@ export function TeamMemberFormModal({
         <div className="grid gap-4 sm:grid-cols-2">
           <TeamInput label="Name" value={name} onChange={setName} />
           <TeamInput label="Role" value={role} onChange={setRole} />
-          <TeamInput
-            label="Years of experience"
-            value={experience}
-            onChange={setExperience}
-          />
-          <TeamInput label="Focus" value={focus} onChange={setFocus} />
+          <TeamInput label="Qualifications" value={qualifications} onChange={setQualifications} />
         </div>
 
         <label className="block text-sm font-medium text-black">
@@ -104,6 +103,8 @@ export function TeamMemberFormModal({
         </label>
       </div>
 
+      {error && <p role="alert" className="mt-4 text-sm text-red-600">{error}</p>}
+
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button
           type="button"
@@ -115,9 +116,10 @@ export function TeamMemberFormModal({
         <button
           type="button"
           onClick={handleSave}
+          disabled={saving}
           className="inline-flex h-10 items-center justify-center rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white hover:bg-[#019594]"
         >
-          Save member
+          {saving ? 'Savingâ€¦' : 'Save member'}
         </button>
       </div>
     </Modal>

@@ -103,9 +103,11 @@ enum UploadPurpose {
   PET
   PRACTICE_LOGO
   PRACTICE_BANNER
+  TEAM_MEMBER
   GALLERY
   BLOG
   SPONSORSHIP
+  TAXONOMY
 }
 
 model User {
@@ -244,6 +246,7 @@ model ServiceCategory {
   name        String    @unique
   slug        String    @unique
   description String?
+  imageUrl    String?
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -275,6 +278,8 @@ model AnimalType {
   name        String               @unique
   slug        String               @unique
   icon        String?
+  description String?
+  imageUrl    String?
   active      Boolean              @default(true)
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt

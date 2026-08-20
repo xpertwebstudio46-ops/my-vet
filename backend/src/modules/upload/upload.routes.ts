@@ -12,7 +12,7 @@ import { deleteR2Object, uploadImages } from './upload.service.js'
 const purposeSchema = z.enum(UploadPurpose)
 
 async function ownerFor(userId: string, role: string, purpose: UploadPurpose) {
-  const practicePurposes: UploadPurpose[] = ['PRACTICE_LOGO', 'PRACTICE_BANNER', 'GALLERY']
+  const practicePurposes: UploadPurpose[] = ['PRACTICE_LOGO', 'PRACTICE_BANNER', 'TEAM_MEMBER', 'GALLERY']
   if (practicePurposes.includes(purpose)) {
     if (role !== 'VET') throw new ApiError(403, 'FORBIDDEN', 'This upload purpose requires a vet account')
     const practice = await prisma.practice.findUnique({ where: { ownerId: userId }, select: { id: true } })
@@ -22,7 +22,7 @@ async function ownerFor(userId: string, role: string, purpose: UploadPurpose) {
   if (purpose === 'PET' && role !== 'PET_OWNER') {
     throw new ApiError(403, 'FORBIDDEN', 'Only pet owners may upload pet images')
   }
-  if (purpose === 'BLOG' || purpose === 'SPONSORSHIP') {
+  if (purpose === 'BLOG' || purpose === 'SPONSORSHIP' || purpose === 'TAXONOMY') {
     if (role !== 'ADMIN') throw new ApiError(403, 'FORBIDDEN', 'This upload purpose requires an admin account')
   }
   return { userId }
@@ -65,7 +65,7 @@ uploadRouter.delete('/*key', async (request, response) => {
   const ownedByUser = asset.ownerUserId === request.user!.userId
   const ownedPractice = asset.practice?.ownerId === request.user!.userId
   if (!ownedByUser && !ownedPractice) throw new ApiError(403, 'FORBIDDEN', 'You do not own this asset')
-  if (asset.galleryMedia || asset._count.petImages) {
+  if (asset.attachedAt || asset.galleryMedia || asset._count.petImages) {
     throw new ApiError(409, 'ASSET_IN_USE', 'Detach this asset before deleting it')
   }
   await deleteR2Object(asset.key)

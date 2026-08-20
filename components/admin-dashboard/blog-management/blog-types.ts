@@ -1,15 +1,15 @@
 export type BlogTab = 'All Post' | 'Categories' | 'Comments'
-
-export type BlogStatus = 'Published' | 'Draft' | 'Archived'
+export type BlogStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
 
 export type BlogPost = {
   id: string
-  tab: BlogTab
   title: string
-  excerpt: string
-  category: string
-  money: string
-  views: string
-  comments: number
+  excerpt: string | null
+  content: string
+  coverUrl: string | null
   status: BlogStatus
+  publishedAt: string | null
+  createdAt: string
 }
+
+export type BlogPostInput = Pick<BlogPost, 'title' | 'excerpt' | 'content' | 'status'> & { file?: File }
