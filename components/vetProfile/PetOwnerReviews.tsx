@@ -9,27 +9,6 @@ export interface Review {
   avatarInitial: string;
 }
 
-const defaultReviews: Review[] = [
-  {
-    id: "1",
-    name: "David H.",
-    timeAgo: "2 weeks ago",
-    rating: 5,
-    comment:
-      "Absolutely fantastic team. They saved my dog's life when her medication was diagnosed too late. Forever grateful for their care.",
-    avatarInitial: "D",
-  },
-  {
-    id: "2",
-    name: "Sophie L.",
-    timeAgo: "1 month ago",
-    rating: 5,
-    comment:
-      "Very gentle with my nervous rescue cat. The experts set exciting made a brilliant plan.",
-    avatarInitial: "S",
-  },
-];
-
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5">
@@ -46,13 +25,13 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function PetOwnerReviews({
-  reviews = defaultReviews,
-  averageRating = 4.9,
-  totalReviews = 124,
+  reviews,
+  averageRating,
+  totalReviews,
 }: {
-  reviews?: Review[];
-  averageRating?: number;
-  totalReviews?: number;
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
 }) {
   return (
     <div>
@@ -95,6 +74,11 @@ export default function PetOwnerReviews({
             </p>
           </div>
         ))}
+        {!reviews.length && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
+            This listing has a historical aggregate rating, but no individual approved reviews have been published on MY VET yet.
+          </div>
+        )}
       </div>
     </div>
   );

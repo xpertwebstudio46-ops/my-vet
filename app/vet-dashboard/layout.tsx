@@ -1,5 +1,6 @@
 import { Bebas_Neue, Inter, Outfit } from 'next/font/google'
 import { VetDashboardShell } from '@/components/vet-dashboard/vet-dashboard-shell'
+import { RequireAuth } from '@/components/auth/RequireAuth'
 
 const dashboardSans = Inter({
   subsets: ['latin'],
@@ -29,7 +30,9 @@ export default function VetDashboardLayout({
     <div
       className={`${dashboardSans.variable} ${dashboardHeading.variable} ${dashboardOutfit.variable}`}
     >
-      <VetDashboardShell>{children}</VetDashboardShell>
+      <RequireAuth roles={['VET']}>
+        <VetDashboardShell>{children}</VetDashboardShell>
+      </RequireAuth>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { DM_Sans, Manrope } from "next/font/google";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", "font-sans", manrope.variable, dmSans.variable)}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

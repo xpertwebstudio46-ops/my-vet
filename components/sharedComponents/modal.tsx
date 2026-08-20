@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { dashboardForRole, useAuth } from "@/components/auth/AuthProvider";
+import { ApiClientError } from "@/lib/api/client";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -9,7 +14,29 @@ interface LoginModalProps {
 }
 
 const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
+  const { login } = useAuth();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   if (!isOpen) return null;
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    try {
+      const user = await login(email, password);
+      onClose();
+      router.push(dashboardForRole(user.role));
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : "Login failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div
@@ -50,7 +77,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
               Login with Email
             </p>
 
-            <div className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label className="mb-2 block text-sm font-medium">
                   Email Id
@@ -58,6 +85,10 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
                 <input
                   type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none"
                 />
               </div>
@@ -69,20 +100,29 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
                 <input
                   type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   className="w-full rounded-md border border-gray-300 px-4 py-3 outline-none"
                 />
               </div>
 
               <div className="text-right">
-                <button className="text-sm text-gray-500">
+                <Link href="/forgot-password" onClick={onClose} className="text-sm text-gray-500 hover:text-[#064071]">
                   Forgot your password?
-                </button>
+                </Link>
               </div>
 
-              <button className="w-full rounded-md bg-[#064071] py-3 font-semibold text-white">
-                Login
+              {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+
+              <button disabled={submitting} className="w-full rounded-md bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">
+                {submitting ? "Signing in…" : "Login"}
               </button>
-            </div>
+              <p className="text-center text-sm text-gray-500">
+                New here? <Link href="/register" onClick={onClose} className="font-semibold text-[#064071]">Create an account</Link>
+              </p>
+            </form>
           </div>
         </div>
       </div>

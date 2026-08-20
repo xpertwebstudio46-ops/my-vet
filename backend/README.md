@@ -65,6 +65,21 @@ npm run db:migrate         # development schema work only
 npm run db:seed            # non-production development data only
 ```
 
+## One-time production bootstrap
+
+After the first successful Railway migration, create the initial administrator and import the eight listings previously displayed as frontend-only cards. Run this once from a shell attached to the **backend** service:
+
+```powershell
+$env:CONFIRM_PRODUCTION_BOOTSTRAP='IMPORT_MY_VET_DATA'
+$env:BOOTSTRAP_ADMIN_EMAIL='your-admin@example.com'
+$env:BOOTSTRAP_ADMIN_PASSWORD='replace-with-a-strong-password'
+npm run bootstrap:production
+```
+
+On Railway, add those three values temporarily to the backend service variables, redeploy, then run `npm run bootstrap:production` in its service shell. Remove `BOOTSTRAP_ADMIN_PASSWORD` and the confirmation variable immediately afterward.
+
+The command is idempotent. It imports the historical rating totals separately from future verified review rows, creates locked non-login owners for the legacy listings, and refuses to overwrite a slug owned by another account. If the admin email already exists, its current password is preserved. Set `BOOTSTRAP_ADMIN_RESET_PASSWORD=true` only when an intentional password reset is required.
+
 External-service notes:
 
 - Configure the Stripe webhook URL as `https://YOUR_API/api/subscriptions/webhook` and subscribe to Checkout Session, Subscription, and Invoice events used by the API.

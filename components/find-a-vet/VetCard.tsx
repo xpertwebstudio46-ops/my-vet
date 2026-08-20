@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
-import type { Vet } from "@/data/card";
+import type { PracticeCardData } from "@/lib/practice-cards";
 
 interface VetCardProps {
-  vet: Vet;
+  vet: PracticeCardData;
 }
 
 const VetCard = ({ vet }: VetCardProps) => {
@@ -42,8 +42,7 @@ const VetCard = ({ vet }: VetCardProps) => {
             <span className="font-sans text-[14px] font-normal text-[#64748B]">{vet.location}</span>
           </div>
           <span className="font-sans text-[14px] font-normal text-[#64748B]">
-            .
-            {vet.miles}
+            · UK listing
           </span>
         </div>
 
@@ -75,7 +74,7 @@ const VetCard = ({ vet }: VetCardProps) => {
             ({vet.reviewCount} Reviews)
           </span>
           <Link
-            href={vet.href}
+            href={`/vet-search/${vet.slug}`}
             className="inline-flex rounded-full bg-[#163B6D] px-4 py-2 font-medium text-white transition hover:bg-[#0F2E56]"
           >
             View Profile

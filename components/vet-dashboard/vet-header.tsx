@@ -194,9 +194,11 @@ export function VetHeader({ onOpenSidebar, onLogout }: VetHeaderProps) {
 export function VetLogoutModal({
   open,
   onClose,
+  onLogout,
 }: {
   open: boolean
   onClose: () => void
+  onLogout: () => void
 }) {
   return (
     <Modal
@@ -215,7 +217,7 @@ export function VetLogoutModal({
         </button>
         <button
           type="button"
-          onClick={onClose}
+          onClick={onLogout}
           className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700"
         >
           Log out

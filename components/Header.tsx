@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import LoginModal from "@/components/sharedComponents/modal";
+import { dashboardForRole, useAuth } from '@/components/auth/AuthProvider'
 
 const navLinks = [
     { label: 'Home', href: '/' },
@@ -15,6 +16,7 @@ const navLinks = [
 
 const Header = () => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const { user } = useAuth()
 
     return (
         <>
@@ -44,13 +46,22 @@ const Header = () => {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3 shrink-0">
-                    <button
-                        type="button"
-                        onClick={() => setIsLoginOpen(true)}
-                        className="px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
-                    >
-                        Login
-                    </button>
+                    {user ? (
+                        <Link
+                            href={dashboardForRole(user.role)}
+                            className="px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
+                        >
+                            My account
+                        </Link>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setIsLoginOpen(true)}
+                            className="px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
+                        >
+                            Login
+                        </button>
+                    )}
                     <Link
                         href="/register-practice"
                         className="px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"

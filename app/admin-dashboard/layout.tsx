@@ -1,5 +1,6 @@
 import { AdminDashboardShell } from '@/components/admin-dashboard/dashboard-shell'
 import { Bebas_Neue, Inter, Outfit } from 'next/font/google'
+import { RequireAuth } from '@/components/auth/RequireAuth'
 
 const dashboardSans = Inter({
   subsets: ['latin'],
@@ -29,7 +30,9 @@ export default function AdminDashboardRouteLayout({
     <div
       className={`${dashboardSans.variable} ${dashboardHeading.variable} ${dashboardOutfit.variable}`}
     >
-      <AdminDashboardShell>{children}</AdminDashboardShell>
+      <RequireAuth roles={['ADMIN']}>
+        <AdminDashboardShell>{children}</AdminDashboardShell>
+      </RequireAuth>
     </div>
   )
 }

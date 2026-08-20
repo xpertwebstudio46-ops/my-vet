@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, Pencil, Star, ThumbsUp, Trash2 } from 'lucide-react'
+import { MessageSquare, Pencil, Star, Trash2 } from 'lucide-react'
 import { reviews as initialReviews, type Review } from '@/lib/dashboard-data'
 import { Card, PageHeader, Rating } from '@/components/dashboard/ui'
 import { EmptyState } from '@/components/dashboard/feedback'

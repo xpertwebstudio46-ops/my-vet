@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { apiClient, ApiClientError } from "@/lib/api/client";
 const socialLinks = [
   { icon: "images/grp-1.png", href: "#", label: "Facebook" },
   { icon: "images/grp-2.png", href: "#", label: "Twitter" },
@@ -17,6 +18,8 @@ export default function StayConnectedSection() {
     practiceType: "",
     message: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -25,9 +28,28 @@ export default function StayConnectedSection() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      await apiClient<{ id: string }>("/api/contact", {
+        method: "POST",
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone || null,
+          subject: formData.practiceType || "General enquiry",
+          message: formData.message,
+        }),
+      }, { authenticated: false });
+      setFeedback({ type: "success", message: "Thanks — your message has been received." });
+      setFormData({ firstName: "", lastName: "", email: "", phone: "", practiceType: "", message: "" });
+    } catch (caught) {
+      setFeedback({ type: "error", message: caught instanceof ApiClientError ? caught.message : "Your message could not be sent." });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -66,6 +88,7 @@ export default function StayConnectedSection() {
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder="First Name"
+                    required
                     className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -79,6 +102,7 @@ export default function StayConnectedSection() {
                     value={formData.lastName}
                     onChange={handleChange}
                     placeholder="Last Name"
+                    required
                     className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -95,6 +119,7 @@ export default function StayConnectedSection() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter Your Email"
+                    required
                     className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -136,17 +161,22 @@ export default function StayConnectedSection() {
                   value={formData.message}
                   onChange={handleChange}
                   placeholder="Tell Us About Your Goals And How We Can Help..."
+                  required
+                  minLength={10}
                   rows={4}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
 
+              {feedback && <p role={feedback.type === "error" ? "alert" : "status"} className={`text-sm ${feedback.type === "error" ? "text-red-600" : "text-emerald-700"}`}>{feedback.message}</p>}
+
               <button
                 type="submit"
-                className="mt-2 w-full rounded-lg py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                disabled={submitting}
+                className="mt-2 w-full rounded-lg py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 style={{ backgroundColor: "#0d2e5e" }}
               >
-                Send Message
+                {submitting ? "Sending…" : "Send Message"}
               </button>
             </form>
           </div>

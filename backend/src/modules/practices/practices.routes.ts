@@ -52,8 +52,12 @@ function publicInclude() {
 }
 
 function practiceDto<T extends { rating: Prisma.Decimal; services?: Array<{ price: Prisma.Decimal | null }>; pricing?: Array<{ price: Prisma.Decimal }> }>(practice: T) {
+  const publicPractice = { ...practice } as Record<string, unknown>
+  for (const privateField of ['ownerId', 'stripeCustomerId', 'moderationReason', 'legacyRatingTotal', 'legacyReviewCount']) {
+    delete publicPractice[privateField]
+  }
   return {
-    ...practice,
+    ...publicPractice,
     rating: practice.rating.toString(),
     ...(practice.services ? { services: practice.services.map((service) => ({ ...service, price: service.price?.toString() ?? null })) } : {}),
     ...(practice.pricing ? { pricing: practice.pricing.map((item) => ({ ...item, price: item.price.toString() })) } : {}),
@@ -83,7 +87,15 @@ practicesRouter.get('/', validateQuery(searchSchema), async (request, response) 
     query.sort === 'newest' ? { createdAt: 'desc' } : query.sort === 'name' ? { name: 'asc' } : { rating: 'desc' }
 
   const [items, total] = await Promise.all([
-    prisma.practice.findMany({ where, orderBy, ...paginationToPrisma(query.page, query.limit) }),
+    prisma.practice.findMany({
+      where,
+      orderBy,
+      ...paginationToPrisma(query.page, query.limit),
+      include: {
+        services: { where: { active: true }, orderBy: { sortOrder: 'asc' } },
+        animalTypes: { include: { animalType: true } },
+      },
+    }),
     prisma.practice.count({ where }),
   ])
   sendSuccess(response, paginated(items.map(practiceDto), total, query.page, query.limit))

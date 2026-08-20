@@ -1,5 +1,6 @@
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { Bebas_Neue, Inter, Outfit } from 'next/font/google'
+import { RequireAuth } from '@/components/auth/RequireAuth'
 
 const dashboardSans = Inter({
   subsets: ['latin'],
@@ -29,7 +30,9 @@ export default function DashboardRouteLayout({
     <div
       className={`${dashboardSans.variable} ${dashboardHeading.variable} ${dashboardOutfit.variable}`}
     >
-      <DashboardShell>{children}</DashboardShell>
+      <RequireAuth roles={['PET_OWNER']}>
+        <DashboardShell>{children}</DashboardShell>
+      </RequireAuth>
     </div>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Header } from './header'
 import { Modal } from './modal'
@@ -9,6 +10,8 @@ import { Sidebar } from './sidebar'
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { logout } = useAuth()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [routeLoading, setRouteLoading] = useState(false)
@@ -72,7 +75,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <Button
             size="lg"
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={() => setLogoutOpen(false)}
+            onClick={() => void logout().then(() => router.replace('/'))}
           >
             Log out
           </Button>

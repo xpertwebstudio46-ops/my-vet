@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/dashboard/modal'
 import { AdminHeader } from './header'
@@ -13,6 +14,8 @@ export function AdminDashboardShell({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { logout } = useAuth()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [logoutOpen, setLogoutOpen] = useState(false)
   const [routeLoading, setRouteLoading] = useState(false)
@@ -76,7 +79,7 @@ export function AdminDashboardShell({
           <Button
             size="lg"
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={() => setLogoutOpen(false)}
+            onClick={() => void logout().then(() => router.replace('/'))}
           >
             Log out
           </Button>

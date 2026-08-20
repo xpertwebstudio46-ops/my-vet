@@ -3,33 +3,37 @@ import FindVetFilters from "@/components/find-a-vet/FindVetFilters";
 import FindVetToolbar from "@/components/find-a-vet/FindVetToolbar";
 import VetGrid from "@/components/find-a-vet/VetGrid";
 import FindVetPagination from "@/components/find-a-vet/FindVetPagination";
+import { getPractices } from "@/lib/api/server";
+import { toPracticeCard } from "@/lib/practice-cards";
 
-const Page = () => {
+export const dynamic = "force-dynamic";
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, Number(Array.isArray(params.page) ? params.page[0] : params.page) || 1);
+  const sortValue = Array.isArray(params.sort) ? params.sort[0] : params.sort;
+  const sort = sortValue === "newest" || sortValue === "name" ? sortValue : "rating";
+  const result = await getPractices({ page, limit: 12, sort });
+
   return (
     <>
       <Hero />
-
       <section className="py-16">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="grid gap-8 lg:grid-cols-[280px_1fr] items-start">
-            
-            {/* Left Sidebar */}
             <FindVetFilters />
-
-            {/* Right Content */}
             <div className="space-y-8">
-              <FindVetToolbar />
-
-              <VetGrid />
-
-              <FindVetPagination />
+              <FindVetToolbar total={result.total} />
+              <VetGrid practices={result.items.map(toPracticeCard)} />
+              <FindVetPagination page={result.page} totalPages={result.totalPages} sort={sort} />
             </div>
-
           </div>
         </div>
       </section>
     </>
   );
-};
-
-export default Page;
+}

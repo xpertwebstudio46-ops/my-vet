@@ -6,7 +6,9 @@ import type { ChangeEvent, FormEvent } from "react";
 export type PracticeDetailsFormData = {
   practiceName: string;
   veterinaryType: string;
-  fullAddress: string;
+  addressLine1: string;
+  city: string;
+  postcode: string;
   email: string;
   phone: string;
   website: string;
@@ -15,16 +17,22 @@ export type PracticeDetailsFormData = {
 type PracticeDetailsFormProps = {
   price?: string;
   onSubmit?: (formData: PracticeDetailsFormData) => void | Promise<void>;
+  submitting?: boolean;
+  feedback?: { type: "success" | "error"; message: string } | null;
 };
 
 export default function PracticeDetailsForm({
   price = "GBP 29",
   onSubmit,
+  submitting = false,
+  feedback = null,
 }: PracticeDetailsFormProps) {
   const [formData, setFormData] = useState<PracticeDetailsFormData>({
     practiceName: "",
     veterinaryType: "",
-    fullAddress: "",
+    addressLine1: "",
+    city: "",
+    postcode: "",
     email: "",
     phone: "",
     website: "",
@@ -80,17 +88,28 @@ export default function PracticeDetailsForm({
 
         <div>
           <label className="block text-[14px] font-sans font-medium text-black mb-1">
-            Full Address *
+            Address line 1 *
           </label>
           <input
             type="text"
-            name="fullAddress"
-            value={formData.fullAddress}
+            name="addressLine1"
+            value={formData.addressLine1}
             onChange={handleChange}
-            placeholder="Street, City, Postcode"
+            placeholder="Street and building"
             required
             className="w-full rounded-lg border border-slate-200 px-3 py-2 font-sans text-[16px] font-normal text-[#9CA3AF] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[14px] font-sans font-medium text-black mb-1">City *</label>
+            <input type="text" name="city" value={formData.city} onChange={handleChange} required className="w-full rounded-lg border border-slate-200 px-3 py-2 font-sans text-[16px] font-normal text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
+          <div>
+            <label className="block text-[14px] font-sans font-medium text-black mb-1">Postcode *</label>
+            <input type="text" name="postcode" value={formData.postcode} onChange={handleChange} required className="w-full rounded-lg border border-slate-200 px-3 py-2 font-sans text-[16px] font-normal text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -139,11 +158,14 @@ export default function PracticeDetailsForm({
           />
         </div>
 
+        {feedback && <p role={feedback.type === "error" ? "alert" : "status"} className={`text-sm ${feedback.type === "error" ? "text-red-600" : "text-emerald-700"}`}>{feedback.message}</p>}
+
         <button
           type="submit"
-          className="mt-2 w-full rounded-lg bg-teal-500 py-3 text-sm font-semibold text-white hover:bg-teal-600 transition-colors"
+          disabled={submitting}
+          className="mt-2 w-full rounded-lg bg-teal-500 py-3 text-sm font-semibold text-white hover:bg-teal-600 transition-colors disabled:opacity-60"
         >
-          Register Practice ({price})
+          {submitting ? "Submitting…" : `Register Practice (${price})`}
         </button>
 
         <p className="text-center text-xs text-slate-400">

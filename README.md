@@ -11,6 +11,13 @@ npm run dev
 
 The frontend runs at `http://localhost:3000`.
 
+Copy `.env.example` to `.env.local` and set both API URLs. On Railway, configure these on the frontend service before building:
+
+```text
+API_URL=https://your-backend.up.railway.app
+NEXT_PUBLIC_API_URL=https://your-backend.up.railway.app
+```
+
 ## Backend
 
 ```powershell
@@ -45,6 +52,8 @@ Create a Railway service from this repository and configure:
 - All required values from [`backend/.env.example`](backend/.env.example)
 
 [`backend/railway.json`](backend/railway.json) builds the TypeScript service, runs `prisma migrate deploy` as a pre-deploy command, starts `dist/server.js`, and checks `/api/health`. Do not add the seed command to deployment.
+
+The frontend service uses repository root `/`; the backend service uses `/backend`. The production bootstrap is a deliberate one-time operation, not a deploy hook. See [`backend/README.md`](backend/README.md) before importing initial listings.
 
 After deployment, run only non-destructive checks:
 

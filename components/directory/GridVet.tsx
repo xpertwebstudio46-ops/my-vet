@@ -1,24 +1,12 @@
 import VetCard from "./CardVet";
-
-// components/find-a-vet/VetCard.tsx
-export interface VetCardData {
-  slug: string;
-  name: string;
-  image: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  tags: string[];
-  featured?: boolean;
-}
-
+import type { PracticeCardData } from "@/lib/practice-cards";
 
 export default function VetGrid({
   vets,
   onLoadMore,
   hasMore = false,
 }: {
-  vets: VetCardData[];
+  vets: PracticeCardData[];
   onLoadMore?: () => void;
   hasMore?: boolean;
 }) {

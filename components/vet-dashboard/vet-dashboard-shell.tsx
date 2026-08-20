@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
 import { VetHeader, VetLogoutModal } from './vet-header'
 import { VetSidebar } from './vet-sidebar'
 
 export function VetDashboardShell({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [logoutOpen, setLogoutOpen] = useState(false)
+  const router = useRouter()
+  const { logout } = useAuth()
 
   return (
     <div className="dashboard-font flex min-h-screen bg-[#F5F6FB]">
@@ -29,7 +33,11 @@ export function VetDashboardShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      <VetLogoutModal open={logoutOpen} onClose={() => setLogoutOpen(false)} />
+      <VetLogoutModal
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        onLogout={() => void logout().then(() => router.replace('/'))}
+      />
     </div>
   )
 }

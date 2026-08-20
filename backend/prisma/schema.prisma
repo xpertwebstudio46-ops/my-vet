@@ -206,6 +206,8 @@ model Practice {
   moderationReason       String?
   rating                 Decimal            @default(0) @db.Decimal(3, 2)
   reviewCount            Int                @default(0)
+  legacyRatingTotal      Decimal            @default(0) @db.Decimal(14, 2)
+  legacyReviewCount      Int                @default(0)
   isFeatured             Boolean            @default(false)
   featuredUntil          DateTime?
   stripeCustomerId       String?            @unique

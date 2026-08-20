@@ -1,19 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Star, MapPin } from "lucide-react";
+import type { PracticeCardData } from "@/lib/practice-cards";
 
-export interface VetCardData {
-  slug: string;
-  name: string;
-  image: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  tags: string[];
-  featured?: boolean;
-}
-
-export default function VetCard({ vet }: { vet: VetCardData }) {
+export default function VetCard({ vet }: { vet: PracticeCardData }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden flex flex-col">
       {/* Image */}
