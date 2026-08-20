@@ -69,7 +69,7 @@ async function applySubscription(transaction: PrismaTypes.TransactionClient, sub
     category: 'SUBSCRIPTION',
     title: 'Subscription updated',
     message: `Your subscription is now ${record.status.toLowerCase().replace('_', ' ')}`,
-    actionUrl: '/vet/subscription',
+    actionUrl: '/vet-dashboard/subscription',
   })
   return [notification]
 }
@@ -114,7 +114,7 @@ async function applyInvoice(transaction: PrismaTypes.TransactionClient, invoice:
     category: 'SUBSCRIPTION',
     title: paid ? 'Subscription payment received' : 'Subscription payment failed',
     message: paid ? 'Your subscription payment was successful' : 'Please update your payment method',
-    actionUrl: '/vet/subscription',
+    actionUrl: '/vet-dashboard/subscription',
   })
   return [notification]
 }
@@ -143,7 +143,7 @@ async function applyCheckout(transaction: PrismaTypes.TransactionClient, session
     category: 'FEATURED_LISTING',
     title: 'Featured listing activated',
     message: `Your featured listing is active until ${endsAt.toISOString().slice(0, 10)}`,
-    actionUrl: '/vet/featured-listing',
+    actionUrl: '/vet-dashboard/featured-listing',
   })
   return [notification]
 }

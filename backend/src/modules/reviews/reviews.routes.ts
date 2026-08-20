@@ -90,7 +90,7 @@ reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBod
         category: 'REVIEW',
         title: 'New review submitted',
         message: 'A new review is awaiting moderation',
-        actionUrl: '/vet/reviews',
+        actionUrl: '/vet-dashboard/reviews',
       })
       return { review, notification }
     })
@@ -145,7 +145,7 @@ reviewsRouter.post('/:id/reply', requireRole('VET'), validateParams(idParams), v
       category: 'REVIEW',
       title: 'Practice replied to your review',
       message: reply,
-      actionUrl: '/dashboard/reviews',
+      actionUrl: '/my-reviews',
     })
     return { updated, notification }
   })

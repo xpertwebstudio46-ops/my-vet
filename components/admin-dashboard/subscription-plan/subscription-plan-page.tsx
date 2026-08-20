@@ -1,126 +1,19 @@
-import { CreditCard, PoundSterling, TrendingUp } from 'lucide-react'
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Card } from '@/components/dashboard/ui'
+import { apiClient, ApiClientError } from '@/lib/api/client'
 import { AdminPageBanner } from '../shared/admin-page-banner'
 
-const stats = [
-  {
-    label: 'Subscribed practices',
-    value: '186',
-    icon: CreditCard,
-  },
-  {
-    label: 'Monthly recurring revenue',
-    value: '£24.8k',
-    icon: PoundSterling,
-  },
-  {
-    label: 'Free -> paid conversion',
-    value: '18.4%',
-    icon: TrendingUp,
-  },
-]
-
-const plans = [
-  {
-    name: 'Free Plan',
-    price: '£0',
-    features: [
-      'Basic practice profile',
-      'Directory search visibility',
-      'Owner contact information',
-      'Limited review management',
-    ],
-  },
-  {
-    name: 'Professional Plan',
-    price: '£49',
-    features: [
-      'Enhanced practice profile',
-      'Priority directory placement',
-      'Full review response tools',
-      'Monthly performance insights',
-    ],
-  },
-  {
-    name: 'Premium Plan',
-    price: '£129',
-    features: [
-      'Featured listing eligibility',
-      'Advanced analytics dashboard',
-      'Sponsor and boost options',
-      'Dedicated account support',
-    ],
-  },
-]
+type Plan = { id: string; name: string; description: string | null; price: string; currency: string; billingPeriod: 'ONE_OFF' | 'MONTHLY' | 'YEARLY'; stripePriceId: string | null; features: unknown; active: boolean; sortOrder: number }
+type Form = { name: string; description: string; price: string; currency: string; billingPeriod: Plan['billingPeriod']; stripePriceId: string; features: string; active: boolean; sortOrder: number }
+const empty: Form = { name: '', description: '', price: '0', currency: 'GBP', billingPeriod: 'MONTHLY', stripePriceId: '', features: '', active: true, sortOrder: 0 }
+function featureText(value: unknown) { if (Array.isArray(value)) return value.join(', '); if (value && typeof value === 'object' && 'items' in value && Array.isArray((value as { items: unknown }).items)) return (value as { items: string[] }).items.join(', '); return '' }
 
 export function SubscriptionPlanPage() {
-  return (
-    <div className="space-y-6">
-      <AdminPageBanner
-        title="Subscription Plan"
-        description="Review subscription health and manage pricing plan features."
-      />
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-
-          return (
-            <Card key={stat.label} className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p className="mt-3 text-2xl font-semibold text-black">
-                    {stat.value}
-                  </p>
-                </div>
-                <span className="flex size-11 items-center justify-center rounded-xl bg-[#EEF7F5] text-[#01AEAD]">
-                  <Icon className="size-5" />
-                </span>
-              </div>
-            </Card>
-          )
-        })}
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-3">
-        {plans.map((plan) => (
-          <Card key={plan.name} className="flex flex-col p-5">
-            <div className="border-b border-gray-200/80 pb-5">
-              <h2 className="dashboard-outfit text-[18px] font-semibold text-black">
-                {plan.name}
-              </h2>
-              <p className="mt-4 text-4xl font-semibold text-[#064071]">
-                {plan.price}
-                <span className="ml-1 text-sm font-medium text-muted-foreground">
-                  / month
-                </span>
-              </p>
-            </div>
-
-            <ul className="flex-1 space-y-3 py-5">
-              {plan.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="flex items-start gap-2 text-sm text-muted-foreground"
-                >
-                  <span className="mt-1 size-2 rounded-full bg-[#01AEAD]" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-transparent px-4 text-sm font-semibold text-black hover:bg-slate-50"
-            >
-              Edit plan features
-            </button>
-          </Card>
-        ))}
-      </section>
-    </div>
-  )
+  const [items, setItems] = useState<Plan[]>([]); const [form, setForm] = useState<Form>(empty); const [editing, setEditing] = useState<string | null>(null); const [error, setError] = useState('')
+  useEffect(() => { void apiClient<Plan[]>('/api/admin/subscription-plans').then(setItems).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Plans could not be loaded.')) }, [])
+  async function save(event: React.FormEvent) { event.preventDefault(); try { const plan = await apiClient<Plan>(editing ? `/api/admin/subscription-plans/${editing}` : '/api/admin/subscription-plans', { method: editing ? 'PUT' : 'POST', body: JSON.stringify({ name: form.name, description: form.description || null, price: Number(form.price), currency: form.currency, billingPeriod: form.billingPeriod, stripePriceId: form.stripePriceId || null, features: { items: form.features.split(',').map((item) => item.trim()).filter(Boolean) }, active: form.active, sortOrder: form.sortOrder }) }); setItems((current) => editing ? current.map((item) => item.id === plan.id ? plan : item) : [...current, plan]); setEditing(null); setForm(empty) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Plan could not be saved.') } }
+  function edit(plan: Plan) { setEditing(plan.id); setForm({ name: plan.name, description: plan.description ?? '', price: plan.price, currency: plan.currency, billingPeriod: plan.billingPeriod, stripePriceId: plan.stripePriceId ?? '', features: featureText(plan.features), active: plan.active, sortOrder: plan.sortOrder }) }
+  return <div className="space-y-6"><AdminPageBanner title="Subscription Plans" description="Create and update the plans shown to veterinary practices." />{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}<form onSubmit={(event) => void save(event)} className="grid gap-3 rounded-2xl bg-white p-5 shadow-lg md:grid-cols-2"><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Plan name" className="h-10 rounded-md border px-3 text-sm" /><input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" className="h-10 rounded-md border px-3 text-sm" /><input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Price" className="h-10 rounded-md border px-3 text-sm" /><select value={form.billingPeriod} onChange={(e) => setForm({ ...form, billingPeriod: e.target.value as Form['billingPeriod'] })} className="h-10 rounded-md border px-3 text-sm"><option value="MONTHLY">Monthly</option><option value="YEARLY">Yearly</option><option value="ONE_OFF">One off</option></select><input value={form.stripePriceId} onChange={(e) => setForm({ ...form, stripePriceId: e.target.value })} placeholder="Stripe price ID (paid plans)" className="h-10 rounded-md border px-3 text-sm" /><input value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} placeholder="Features, comma separated" className="h-10 rounded-md border px-3 text-sm" /><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />Active</label><div className="flex justify-end gap-2"><button type="button" onClick={() => { setEditing(null); setForm(empty) }} className="rounded-md border px-4 text-sm">Clear</button><button className="rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white">{editing ? 'Update plan' : 'Create plan'}</button></div></form><section className="grid gap-4 lg:grid-cols-3">{items.map((plan) => <Card key={plan.id} className="flex flex-col p-5"><div className="flex items-start justify-between"><div><h2 className="font-semibold">{plan.name}</h2><p className="mt-2 text-3xl font-semibold text-[#064071]">{plan.currency} {Number(plan.price).toLocaleString()}<span className="text-sm text-muted-foreground"> / {plan.billingPeriod.toLowerCase()}</span></p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs">{plan.active ? 'Active' : 'Inactive'}</span></div><p className="mt-3 flex-1 text-sm text-muted-foreground">{plan.description}</p><button onClick={() => edit(plan)} className="mt-5 h-10 rounded-md border text-sm font-semibold">Edit plan</button></Card>)}</section></div>
 }

@@ -109,6 +109,17 @@ vetRouter.get('/dashboard', async (request, response) => {
   })
 })
 
+vetRouter.get('/reviews', async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const items = await prisma.review.findMany({
+    where: { practiceId: practice.id, status: 'APPROVED' },
+    include: { user: { select: { id: true, firstName: true, lastName: true, avatar: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+  })
+  sendSuccess(response, items)
+})
+
 function registerCrud(
   path: string,
   schema: z.ZodObject,

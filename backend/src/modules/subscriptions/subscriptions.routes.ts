@@ -38,7 +38,7 @@ subscriptionsRouter.post('/checkout', validateBody(checkoutSchema), async (reque
         category: 'SUBSCRIPTION',
         title: 'Plan activated',
         message: `${plan.name} is now active`,
-        actionUrl: '/vet/subscription',
+        actionUrl: '/vet-dashboard/subscription',
       })
       return { subscription, notification }
     })

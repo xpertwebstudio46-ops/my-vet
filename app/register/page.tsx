@@ -27,7 +27,7 @@ export default function RegisterPage() {
         password: String(form.get("password")),
         role,
       });
-      router.push(dashboardForRole(user.role));
+      router.push(user.role === 'VET' ? '/register-practice' : dashboardForRole(user.role));
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : "Account creation failed.");
     } finally {

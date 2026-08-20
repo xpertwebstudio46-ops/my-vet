@@ -142,7 +142,7 @@ appointmentsRouter.post('/', requireRole('PET_OWNER'), validateBody(createSchema
         category: 'APPOINTMENT',
         title: 'New appointment request',
         message: `A new appointment was requested for ${body.date} at ${body.time}`,
-        actionUrl: '/vet/appointments',
+        actionUrl: '/vet-dashboard',
       })
       return { appointment, notification }
     })
@@ -179,7 +179,7 @@ appointmentsRouter.put('/:id', requireRole('PET_OWNER'), validateParams(idParams
         category: 'APPOINTMENT',
         title: 'Appointment rescheduled',
         message: `An appointment was moved to ${dateText} at ${time}`,
-        actionUrl: '/vet/appointments',
+        actionUrl: '/vet-dashboard',
       })
       return { updated, notification }
     })
@@ -215,7 +215,7 @@ appointmentsRouter.patch('/:id/cancel', validateParams(idParams), validateBody(c
       category: 'APPOINTMENT',
       title: 'Appointment cancelled',
       message: reason,
-      actionUrl: isOwner ? '/vet/appointments' : '/dashboard/appointments',
+      actionUrl: isOwner ? '/vet-dashboard' : '/appointment-history',
     })
     return { updated, notification }
   })
@@ -249,7 +249,7 @@ async function vetTransition(
       category: 'APPOINTMENT',
       title: status === 'CONFIRMED' ? 'Appointment confirmed' : 'Appointment completed',
       message: status === 'CONFIRMED' ? 'Your appointment has been confirmed' : 'Your appointment has been completed',
-      actionUrl: '/dashboard/appointments',
+      actionUrl: '/appointment-history',
     })
     return { updated, notification }
   })

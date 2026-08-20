@@ -1,223 +1,241 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { HealthPackagesCard } from './health-packages-card'
-import { PricingBanner } from './pricing-banner'
-import { PricingCard } from './pricing-card'
-import { PricingItemModal } from './pricing-item-modal'
-import { PricingNote } from './pricing-note'
-import { ConfirmDeleteModal } from '../team-members/confirm-delete-modal'
-import type { HealthPackage, PriceItem, PricingSection } from './pricing-types'
+import { useEffect, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { Card } from "@/components/dashboard/ui";
+import { apiClient, ApiClientError } from "@/lib/api/client";
 
-const initialSections: PricingSection[] = [
-  {
-    id: 'consultation',
-    title: 'Consultation fees',
-    items: [
-      { label: 'Standard consultation (15 min)', price: '\u00a345' },
-      { label: 'Extended consultation (30 min)', price: '\u00a370' },
-      { label: 'Extended consultation (30 min)', price: '\u00a370' },
-    ],
-  },
-  {
-    id: 'emergency',
-    title: 'Emergency fees',
-    items: [{ label: 'Out-of-hours triage', price: '\u00a395' }],
-  },
-  {
-    id: 'vaccination',
-    title: 'Vaccination prices',
-    items: [
-      { label: 'Puppy primary course', price: '\u00a372' },
-      { label: 'Kitten primary course', price: '\u00a368' },
-      { label: 'Annual booster', price: '\u00a352' },
-      { label: 'Rabbit RHD/Myxo', price: '\u00a348' },
-    ],
-  },
-  {
-    id: 'surgery',
-    title: 'Surgery prices',
-    items: [
-      { label: 'Cat spay', price: '\u00a3145' },
-      { label: 'Dog castration (small breed)', price: '\u00a3165' },
-      { label: 'Dental with extractions', price: '\u00a3220' },
-    ],
-  },
-]
-
-const initialPackages: HealthPackage[] = [
-  {
-    id: 'puppy-start',
-    name: 'Puppy Start Plan',
-    price: '\u00a318/mo',
-    description:
-      'First-year support with routine checks, reminders and preventive care guidance.',
-  },
-  {
-    id: 'senior-wellness',
-    name: 'Senior Wellness Plan',
-    price: '\u00a324/mo',
-    description:
-      'Ongoing checks for older pets with wellness monitoring and owner support.',
-  },
-  {
-    id: 'feline-care',
-    name: 'Feline Care Plan',
-    price: '\u00a320/mo',
-    description:
-      'Cat-focused preventive care with routine appointments and annual planning.',
-  },
-]
+type Pricing = {
+  id: string;
+  kind: "SERVICE" | "HEALTH_PACKAGE";
+  section: string;
+  name: string;
+  description: string | null;
+  price: string;
+  currency: string;
+  billingPeriod: "ONE_OFF" | "MONTHLY" | "YEARLY" | null;
+  active: boolean;
+  sortOrder: number;
+};
+const empty = {
+  kind: "SERVICE" as Pricing["kind"],
+  section: "",
+  name: "",
+  description: "",
+  price: "",
+  billingPeriod: "ONE_OFF" as NonNullable<Pricing["billingPeriod"]>,
+};
 
 export function VetPricingPage() {
-  const [sections, setSections] = useState(initialSections)
-  const [packages, setPackages] = useState(initialPackages)
-  const [addingSection, setAddingSection] = useState<PricingSection | null>(
-    null,
-  )
-  const [editingItem, setEditingItem] = useState<{
-    section: PricingSection
-    index: number
-    item: PriceItem
-  } | null>(null)
-  const [deletingItem, setDeletingItem] = useState<{
-    section: PricingSection
-    index: number
-    item: PriceItem
-  } | null>(null)
-
-  function updatePrice(sectionId: string, index: number, price: string) {
-    setSections((current) =>
-      current.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              items: section.items.map((item, itemIndex) =>
-                itemIndex === index ? { ...item, price } : item,
-              ),
-            }
-          : section,
-      ),
-    )
+  const [items, setItems] = useState<Pricing[]>([]);
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState<Pricing | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    void apiClient<Pricing[]>("/api/vet/pricing")
+      .then(setItems)
+      .catch((caught) =>
+        setError(
+          caught instanceof ApiClientError
+            ? caught.message
+            : "Pricing could not be loaded.",
+        ),
+      );
+  }, []);
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    try {
+      const item = await apiClient<Pricing>(
+        editing ? `/api/vet/pricing/${editing.id}` : "/api/vet/pricing",
+        {
+          method: editing ? "PUT" : "POST",
+          body: JSON.stringify({
+            ...form,
+            price: Number(form.price),
+            currency: "GBP",
+            description: form.description || null,
+            billingPeriod:
+              form.kind === "HEALTH_PACKAGE" ? form.billingPeriod : "ONE_OFF",
+            active: editing?.active ?? true,
+            sortOrder: editing?.sortOrder ?? items.length,
+          }),
+        },
+      );
+      setItems((current) =>
+        editing
+          ? current.map((value) => (value.id === item.id ? item : value))
+          : [...current, item],
+      );
+      setEditing(null);
+      setForm(empty);
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Pricing could not be saved.",
+      );
+    }
   }
-
-  function addPriceItem(sectionId: string, item: PriceItem) {
-    setSections((current) =>
-      current.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              items: [...section.items, item],
-            }
-          : section,
-      ),
-    )
-    setAddingSection(null)
+  async function remove(item: Pricing) {
+    if (!window.confirm(`Delete ${item.name}?`)) return;
+    try {
+      await apiClient(`/api/vet/pricing/${item.id}`, { method: "DELETE" });
+      setItems((current) => current.filter((value) => value.id !== item.id));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Pricing could not be deleted.");
+    }
   }
-
-  function editPriceItem(sectionId: string, index: number, item: PriceItem) {
-    setSections((current) =>
-      current.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              items: section.items.map((priceItem, itemIndex) =>
-                itemIndex === index ? item : priceItem,
-              ),
-            }
-          : section,
-      ),
-    )
-    setEditingItem(null)
-  }
-
-  function deletePriceItem(sectionId: string, index: number) {
-    setSections((current) =>
-      current.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              items: section.items.filter((_, itemIndex) => itemIndex !== index),
-            }
-          : section,
-      ),
-    )
-    setDeletingItem(null)
-  }
-
-  function updatePackagePrice(packageId: string, price: string) {
-    setPackages((current) =>
-      current.map((item) => (item.id === packageId ? { ...item, price } : item)),
-    )
-  }
-
   return (
     <div className="space-y-6">
-      <PricingBanner onSave={() => undefined} />
-      <PricingNote />
-
+      <div className="rounded-2xl bg-white p-5 shadow-lg">
+        <h1 className="dashboard-heading text-5xl">Pricing</h1>
+        <p className="text-sm text-muted-foreground">
+          Service fees and recurring health packages.
+        </p>
+      </div>
+      {error && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      )}
+      <form
+        onSubmit={(event) => void save(event)}
+        className="grid gap-3 rounded-xl bg-white p-5 md:grid-cols-3"
+      >
+        <select
+          value={form.kind}
+          onChange={(e) =>
+            setForm({ ...form, kind: e.target.value as Pricing["kind"] })
+          }
+          className="h-10 rounded-md border px-3 text-sm"
+        >
+          <option value="SERVICE">Service</option>
+          <option value="HEALTH_PACKAGE">Health package</option>
+        </select>
+        <input
+          required
+          value={form.section}
+          onChange={(e) => setForm({ ...form, section: e.target.value })}
+          placeholder="Section"
+          className="h-10 rounded-md border px-3 text-sm"
+        />
+        <input
+          required
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="Item name"
+          className="h-10 rounded-md border px-3 text-sm"
+        />
+        <input
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          placeholder="Description"
+          className="h-10 rounded-md border px-3 text-sm"
+        />
+        <input
+          required
+          type="number"
+          min="0"
+          step="0.01"
+          value={form.price}
+          onChange={(e) => setForm({ ...form, price: e.target.value })}
+          placeholder="Price GBP"
+          className="h-10 rounded-md border px-3 text-sm"
+        />
+        {form.kind === "HEALTH_PACKAGE" ? (
+          <select
+            value={form.billingPeriod}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                billingPeriod: e.target.value as typeof form.billingPeriod,
+              })
+            }
+            className="h-10 rounded-md border px-3 text-sm"
+          >
+            <option value="MONTHLY">Monthly</option>
+            <option value="YEARLY">Yearly</option>
+            <option value="ONE_OFF">One off</option>
+          </select>
+        ) : (
+          <div className="flex justify-end">
+            <button className="inline-flex h-10 items-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white">
+              <Plus className="size-4" />
+              {editing ? "Update" : "Add price"}
+            </button>
+          </div>
+        )}
+        {form.kind === "HEALTH_PACKAGE" && (
+          <div className="md:col-start-3 flex justify-end">
+            <button className="inline-flex h-10 items-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white">
+              <Plus className="size-4" />
+              {editing ? "Update" : "Add price"}
+            </button>
+          </div>
+        )}
+      </form>
       <div className="grid gap-5 xl:grid-cols-2">
-        {sections.map((section) => (
-          <PricingCard
-            key={section.id}
-            title={section.title}
-            items={section.items}
-            onPriceChange={(index, value) =>
-              updatePrice(section.id, index, value)
-            }
-            onEdit={(index) =>
-              setEditingItem({
-                section,
-                index,
-                item: section.items[index],
-              })
-            }
-            onDelete={(index) =>
-              setDeletingItem({
-                section,
-                index,
-                item: section.items[index],
-              })
-            }
-            onAdd={() => setAddingSection(section)}
-          />
+        {(["SERVICE", "HEALTH_PACKAGE"] as const).map((kind) => (
+          <Card key={kind} className="overflow-hidden p-0">
+            <h2 className="border-b p-5 font-semibold">
+              {kind === "SERVICE" ? "Service pricing" : "Health packages"}
+            </h2>
+            {items
+              .filter((item) => item.kind === kind)
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 border-b p-4"
+                >
+                  <div className="flex-1">
+                    <p className="font-semibold">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.section} &middot; {item.description}
+                    </p>
+                  </div>
+                  <strong>
+                    {new Intl.NumberFormat("en-GB", { style: "currency", currency: item.currency }).format(Number(item.price))}
+                    {item.billingPeriod === "MONTHLY"
+                      ? "/mo"
+                      : item.billingPeriod === "YEARLY"
+                        ? "/yr"
+                        : ""}
+                  </strong>
+                  <button
+                    onClick={() => {
+                      setEditing(item);
+                      setForm({
+                        kind: item.kind,
+                        section: item.section,
+                        name: item.name,
+                        description: item.description ?? "",
+                        price: item.price,
+                        billingPeriod: item.billingPeriod ?? "ONE_OFF",
+                      });
+                    }}
+                    className="rounded-md border px-3 py-2 text-xs"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => void remove(item)}
+                    className="text-red-600"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              ))}
+            {!items.some((item) => item.kind === kind) && (
+              <p className="p-8 text-center text-sm text-muted-foreground">
+                No items yet.
+              </p>
+            )}
+          </Card>
         ))}
       </div>
-
-      <HealthPackagesCard
-        packages={packages}
-        onPriceChange={updatePackagePrice}
-      />
-
-      {addingSection && (
-        <PricingItemModal
-          sectionTitle={addingSection.title}
-          onClose={() => setAddingSection(null)}
-          onSave={(item) => addPriceItem(addingSection.id, item)}
-        />
-      )}
-
-      {editingItem && (
-        <PricingItemModal
-          sectionTitle={editingItem.section.title}
-          item={editingItem.item}
-          onClose={() => setEditingItem(null)}
-          onSave={(item) =>
-            editPriceItem(editingItem.section.id, editingItem.index, item)
-          }
-        />
-      )}
-
-      {deletingItem && (
-        <ConfirmDeleteModal
-          title="Delete price?"
-          description={`This will remove ${deletingItem.item.label} from ${deletingItem.section.title}.`}
-          onClose={() => setDeletingItem(null)}
-          onConfirm={() =>
-            deletePriceItem(deletingItem.section.id, deletingItem.index)
-          }
-        />
-      )}
     </div>
-  )
+  );
 }

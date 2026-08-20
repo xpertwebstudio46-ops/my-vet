@@ -89,6 +89,7 @@ const featuredPlanSchema = z.object({
   stripePriceId: z.string().trim().nullable().optional(),
   active: z.boolean().default(true),
 })
+const featuredListingStatusSchema = z.object({ status: z.enum(['ACTIVE', 'CANCELLED', 'EXPIRED']) })
 const reportSchema = z
   .object({ start: z.coerce.date(), end: z.coerce.date() })
   .refine((value) => value.end >= value.start && value.end.valueOf() - value.start.valueOf() <= 366 * 86_400_000, {
@@ -143,7 +144,7 @@ adminRouter.patch('/practices/:id/status', validateParams(idParams), validateBod
       category: 'PRACTICE',
       title: `Practice ${body.status.toLowerCase()}`,
       message: body.reason,
-      actionUrl: '/vet/practice',
+      actionUrl: '/vet-dashboard/practice-profile',
     })
     return { updated, notification }
   })
@@ -183,7 +184,7 @@ adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBod
       category: 'REVIEW',
       title: `Review ${body.status.toLowerCase()}`,
       message: body.reason ?? `Your review was ${body.status.toLowerCase()}`,
-      actionUrl: '/dashboard/reviews',
+      actionUrl: '/my-reviews',
     })
     return { updated, notification }
   })
@@ -409,6 +410,33 @@ adminRouter.get('/featured-listing-plans', async (_request, response) => {
   const plans = await prisma.featuredListingPlan.findMany({ orderBy: { price: 'asc' } })
   sendSuccess(response, plans.map((plan) => ({ ...plan, price: plan.price.toString() })))
 })
+
+adminRouter.get('/featured-listings', async (_request, response) => {
+  const items = await prisma.featuredListing.findMany({
+    include: { practice: { select: { id: true, name: true } }, plan: true },
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+  })
+  sendSuccess(response, items.map((item) => ({ ...item, plan: { ...item.plan, price: item.plan.price.toString() } })))
+})
+
+adminRouter.patch('/featured-listings/:id/status', validateParams(idParams), validateBody(featuredListingStatusSchema), async (request, response) => {
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const { status } = request.validatedBody as z.infer<typeof featuredListingStatusSchema>
+  const existing = await prisma.featuredListing.findUnique({ where: { id }, include: { plan: true } })
+  if (!existing) throw new ApiError(404, 'FEATURED_LISTING_NOT_FOUND', 'Featured listing was not found')
+  const startsAt = status === 'ACTIVE' ? new Date() : existing.startsAt
+  const endsAt = status === 'ACTIVE' ? new Date(Date.now() + existing.plan.durationDays * 86_400_000) : existing.endsAt
+  const item = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.featuredListing.update({ where: { id }, data: { status, startsAt, endsAt } })
+    await transaction.practice.update({
+      where: { id: existing.practiceId },
+      data: { isFeatured: status === 'ACTIVE', featuredUntil: status === 'ACTIVE' ? endsAt : null },
+    })
+    return updated
+  })
+  sendSuccess(response, item, 'Featured listing status updated')
+})
 adminRouter.post('/featured-listing-plans', validateBody(featuredPlanSchema), async (request, response) => {
   const item = await prisma.featuredListingPlan.create({ data: request.validatedBody as z.infer<typeof featuredPlanSchema> })
   sendSuccess(response, { ...item, price: item.price.toString() }, 'Featured plan created', 201)
@@ -435,11 +463,13 @@ adminRouter.put('/settings', validateBody(settingsSchema), async (request, respo
 
 adminRouter.get('/reports/overview', validateQuery(reportSchema), async (request, response) => {
   const { start, end } = request.validatedQuery as z.infer<typeof reportSchema>
+  const endInclusive = new Date(end)
+  endInclusive.setUTCHours(23, 59, 59, 999)
   const [signups, invoices, views, searches, topPractices] = await Promise.all([
-    prisma.user.findMany({ where: { createdAt: { gte: start, lte: end } }, select: { createdAt: true } }),
-    prisma.subscriptionInvoice.findMany({ where: { paidAt: { gte: start, lte: end } }, select: { amountPaid: true, paidAt: true } }),
-    prisma.profileView.count({ where: { date: { gte: start, lte: end } } }),
-    prisma.searchEvent.count({ where: { createdAt: { gte: start, lte: end } } }),
+    prisma.user.findMany({ where: { createdAt: { gte: start, lte: endInclusive } }, select: { createdAt: true } }),
+    prisma.subscriptionInvoice.findMany({ where: { paidAt: { gte: start, lte: endInclusive } }, select: { amountPaid: true, paidAt: true } }),
+    prisma.profileView.count({ where: { date: { gte: start, lte: endInclusive } } }),
+    prisma.searchEvent.count({ where: { createdAt: { gte: start, lte: endInclusive } } }),
     prisma.practice.findMany({ where: { status: 'APPROVED' }, orderBy: [{ rating: 'desc' }, { reviewCount: 'desc' }], take: 10, select: { id: true, name: true, rating: true, reviewCount: true } }),
   ])
   const months = new Map<string, { signups: number; revenue: Prisma.Decimal }>()
@@ -465,8 +495,10 @@ adminRouter.get('/reports/overview', validateQuery(reportSchema), async (request
 
 adminRouter.get('/reports/export.csv', validateQuery(reportSchema), async (request, response) => {
   const { start, end } = request.validatedQuery as z.infer<typeof reportSchema>
+  const endInclusive = new Date(end)
+  endInclusive.setUTCHours(23, 59, 59, 999)
   const invoices = await prisma.subscriptionInvoice.findMany({
-    where: { paidAt: { gte: start, lte: end } },
+    where: { paidAt: { gte: start, lte: endInclusive } },
     include: { practice: { select: { name: true } } },
     orderBy: { paidAt: 'asc' },
     take: 10_000,

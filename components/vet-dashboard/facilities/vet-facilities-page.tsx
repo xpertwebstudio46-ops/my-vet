@@ -1,60 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
-import { FacilitiesBanner } from './facilities-banner'
-import { FacilityCard } from './facility-card'
-import type { FacilityOption } from './facility-types'
+import { apiClient, ApiClientError } from '@/lib/api/client'
 
-const initialFacilities: FacilityOption[] = [
-  { id: 'parking', name: 'Parking', selected: true },
-  { id: 'wheelchair-access', name: 'Wheelchair Access', selected: true },
-  { id: 'emergency-room', name: 'Emergency Room', selected: true },
-  { id: 'onsite-lab', name: 'On-site Lab', selected: true },
-  { id: 'digital-xray', name: 'Digital X-ray', selected: true },
-  { id: 'surgery-suite', name: 'Surgery Suite', selected: true },
-  { id: 'pharmacy', name: 'Pharmacy', selected: true },
-  { id: 'isolation-ward', name: 'Isolation Ward', selected: true },
-  { id: 'ultrasound', name: 'Ultrasound', selected: false },
-  { id: 'grooming-room', name: 'Grooming Room', selected: false },
-]
+type Facility = { id: string; name: string; description: string | null; active: boolean }
 
 export function VetFacilitiesPage() {
-  const [facilities, setFacilities] = useState(initialFacilities)
-  const selectedFacilities = facilities.filter((facility) => facility.selected)
-
-  return (
-    <div className="space-y-6">
-      <FacilitiesBanner onSave={() => undefined} />
-
-      <Card className="p-5">
-        <div className="border-b border-gray-200/80 pb-4">
-          <h2 className="text-base font-semibold text-black">
-            {selectedFacilities.length} facilities selected
-          </h2>
-          <p className="mt-2 text-sm font-medium text-[#01AEAD]">
-            {selectedFacilities.map((facility) => facility.name).join(' · ')}
-          </p>
-        </div>
-
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {facilities.map((facility) => (
-            <FacilityCard
-              key={facility.id}
-              facility={facility}
-              onToggle={() =>
-                setFacilities((current) =>
-                  current.map((item) =>
-                    item.id === facility.id
-                      ? { ...item, selected: !item.selected }
-                      : item,
-                  ),
-                )
-              }
-            />
-          ))}
-        </div>
-      </Card>
-    </div>
-  )
+  const [items, setItems] = useState<Facility[]>([]); const [name, setName] = useState(''); const [description, setDescription] = useState(''); const [error, setError] = useState('')
+  useEffect(() => { void apiClient<Facility[]>('/api/vet/facilities').then(setItems).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Facilities could not be loaded.')) }, [])
+  async function add(event: React.FormEvent) { event.preventDefault(); try { const item = await apiClient<Facility>('/api/vet/facilities', { method: 'POST', body: JSON.stringify({ name, description: description || null, active: true }) }); setItems((current) => [...current, item]); setName(''); setDescription('') } catch (caught) { setError(caught instanceof Error ? caught.message : 'Facility could not be added.') } }
+  async function toggle(item: Facility) { try { const saved = await apiClient<Facility>(`/api/vet/facilities/${item.id}`, { method: 'PUT', body: JSON.stringify({ active: !item.active }) }); setItems((current) => current.map((value) => value.id === item.id ? saved : value)) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Facility could not be updated.') } }
+  async function remove(item: Facility) { if (!window.confirm(`Delete ${item.name}?`)) return; try { await apiClient(`/api/vet/facilities/${item.id}`, { method: 'DELETE' }); setItems((current) => current.filter((value) => value.id !== item.id)) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Facility could not be deleted.') } }
+  return <div className="space-y-6"><div className="rounded-2xl bg-white p-5 shadow-lg"><h1 className="dashboard-heading text-5xl">Facilities</h1><p className="text-sm text-muted-foreground">Facilities available at your practice.</p></div>{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}<form onSubmit={(event) => void add(event)} className="grid gap-3 rounded-xl bg-white p-5 md:grid-cols-[1fr_2fr_auto]"><input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Facility name" className="h-10 rounded-md border px-3 text-sm" /><input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" className="h-10 rounded-md border px-3 text-sm" /><button className="inline-flex items-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white"><Plus className="size-4" />Add facility</button></form><Card className="grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">{items.map((item) => <div key={item.id} className="rounded-xl border p-4"><div className="flex items-start justify-between"><div><h2 className="font-semibold">{item.name}</h2><p className="mt-1 text-sm text-muted-foreground">{item.description || 'No description'}</p></div><button onClick={() => void remove(item)} className="text-red-600"><Trash2 className="size-4" /></button></div><label className="mt-4 flex items-center gap-2 text-sm"><input type="checkbox" checked={item.active} onChange={() => void toggle(item)} />Show on listing</label></div>)}{!items.length && <p className="text-sm text-muted-foreground">No facilities added.</p>}</Card></div>
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Modal } from '@/components/dashboard/modal'
 
-export function DeleteAccountModal({ onClose }: { onClose: () => void }) {
+export function DeleteAccountModal({ onClose, onDelete, deleting }: { onClose: () => void; onDelete: () => void; deleting: boolean }) {
   const [deleteText, setDeleteText] = useState('')
 
   return (
@@ -30,10 +30,11 @@ export function DeleteAccountModal({ onClose }: { onClose: () => void }) {
           </button>
           <button
             type="button"
-            disabled={deleteText !== 'DELETE'}
+            onClick={onDelete}
+            disabled={deleteText !== 'DELETE' || deleting}
             className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:pointer-events-none disabled:opacity-50"
           >
-            Delete permanently
+            {deleting ? 'Deleting…' : 'Delete permanently'}
           </button>
         </div>
       </div>

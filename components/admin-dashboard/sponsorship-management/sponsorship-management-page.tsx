@@ -57,7 +57,7 @@ export function SponsorshipManagementPage() {
       {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
       <Card className="p-5">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {loading && <p className="text-sm text-muted-foreground">Loading sponsorsâ€¦</p>}
+          {loading && <p className="text-sm text-muted-foreground">Loading sponsors...</p>}
           {sponsors.map((sponsor) => <SponsorCard key={sponsor.id} sponsor={sponsor} onEdit={() => { setEditing(sponsor); setModalOpen(true) }} onRemove={() => setDeletingSponsor(sponsor)} />)}
         </div>
       </Card>

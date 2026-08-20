@@ -1,130 +1,50 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Check, Star, X } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
+import { apiClient, ApiClientError } from '@/lib/api/client'
+import type { Paginated } from '@/lib/api/types'
 import { AdminPageBanner } from '../shared/admin-page-banner'
-import { ConfirmDeleteModal } from '../shared/confirm-delete-modal'
-import {
-  ReviewCard,
-  type ReviewManagementItem,
-  type ReviewStatus,
-} from './review-card'
-import { ReviewTabs, type ReviewTab } from './review-tabs'
 
-const initialReviews: ReviewManagementItem[] = [
-  {
-    id: 'review-1',
-    reviewer: 'Ava Thompson',
-    image: '/images/person-1.png',
-    practice: 'Green Paws Veterinary',
-    rating: 4.8,
-    date: 'Aug 18, 2026',
-    status: 'Pending',
-    body: 'The visit was helpful and the clinic team explained the vaccination plan clearly.',
-  },
-  {
-    id: 'review-2',
-    reviewer: 'Noah Williams',
-    image: '/images/person-2.png',
-    practice: 'CityVet Wellness Clinic',
-    rating: 4.2,
-    date: 'Aug 17, 2026',
-    status: 'Reported',
-    body: 'This review was reported because the billing details need admin moderation.',
-  },
-  {
-    id: 'review-3',
-    reviewer: 'Sophia Martinez',
-    image: '/images/person-3.png',
-    practice: 'Northside Animal Care',
-    rating: 5,
-    date: 'Aug 15, 2026',
-    status: 'Published',
-    body: 'Excellent appointment experience with fast booking and clear follow-up notes.',
-  },
-  {
-    id: 'review-4',
-    reviewer: 'Liam Johnson',
-    image: '/images/person-4.png',
-    practice: 'Happy Tails Vet Center',
-    rating: 4.5,
-    date: 'Aug 13, 2026',
-    status: 'Pending',
-    body: 'The clinic handled a same-day appointment and provided practical aftercare advice.',
-  },
-]
+type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+type Review = { id: string; rating: number; title: string | null; comment: string; status: ReviewStatus; createdAt: string; user: { firstName: string; lastName: string; email: string }; practice: { id: string; name: string } }
 
 export function ReviewManagementPage() {
-  const [activeTab, setActiveTab] = useState<ReviewTab>('All')
-  const [reviews, setReviews] = useState(initialReviews)
-  const [deletingReview, setDeletingReview] =
-    useState<ReviewManagementItem | null>(null)
+  const [items, setItems] = useState<Review[]>([])
+  const [status, setStatus] = useState<ReviewStatus | 'ALL'>('PENDING')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const counts = useMemo<Record<ReviewTab, number>>(() => {
-    const statusCounts = reviews.reduce(
-      (current, review) => {
-        current[review.status] += 1
-        return current
-      },
-      { Pending: 0, Reported: 0, Published: 0 } as Record<ReviewStatus, number>,
-    )
+  useEffect(() => {
+    void apiClient<Paginated<Review>>(`/api/admin/reviews?page=1&limit=100${status === 'ALL' ? '' : `&status=${status}`}`)
+      .then((result) => setItems(result.items))
+      .catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Reviews could not be loaded.'))
+      .finally(() => setLoading(false))
+  }, [status])
 
-    return {
-      All: reviews.length,
-      Pending: statusCounts.Pending,
-      Reported: statusCounts.Reported,
-      Published: statusCounts.Published,
+  async function moderate(item: Review, next: 'APPROVED' | 'REJECTED') {
+    const reason = window.prompt(next === 'APPROVED' ? 'Moderation note (optional):' : 'Reason for rejection:', next === 'APPROVED' ? 'Review meets community guidelines' : 'Review violates community guidelines')
+    if (reason === null) return
+    try {
+      await apiClient(`/api/admin/reviews/${item.id}/moderate`, { method: 'PATCH', body: JSON.stringify({ status: next, reason: reason || undefined }) })
+      if (status === 'ALL') setItems((current) => current.map((value) => value.id === item.id ? { ...value, status: next } : value))
+      else setItems((current) => current.filter((value) => value.id !== item.id))
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Review could not be moderated.')
     }
-  }, [reviews])
-
-  const visibleReviews =
-    activeTab === 'All'
-      ? reviews
-      : reviews.filter((review) => review.status === activeTab)
+  }
 
   return (
     <div className="space-y-6">
-      <AdminPageBanner
-        title="Reviews Management"
-        description="Moderate pending, reported and published reviews from one place."
-      />
-
-      <Card className="overflow-hidden p-0">
-        <ReviewTabs active={activeTab} counts={counts} onChange={setActiveTab} />
-        <div>
-          {visibleReviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              onApprove={() =>
-                setReviews((current) =>
-                  current.map((item) =>
-                    item.id === review.id
-                      ? { ...item, status: 'Published' }
-                      : item,
-                  ),
-                )
-              }
-              onRemove={() => setDeletingReview(review)}
-            />
-          ))}
-        </div>
-      </Card>
-
-      {deletingReview && (
-        <ConfirmDeleteModal
-          title="Remove review?"
-          description={`This will remove the review by ${deletingReview.reviewer}.`}
-          confirmLabel="Remove"
-          onClose={() => setDeletingReview(null)}
-          onConfirm={() => {
-            setReviews((current) =>
-              current.filter((item) => item.id !== deletingReview.id),
-            )
-            setDeletingReview(null)
-          }}
-        />
-      )}
+      <AdminPageBanner title="Review Management" description="Moderate reviews stored in the production database." />
+      <div className="flex flex-wrap gap-2">{(['PENDING', 'APPROVED', 'REJECTED', 'ALL'] as const).map((value) => <button key={value} onClick={() => { setLoading(true); setStatus(value) }} className={`rounded-full px-4 py-2 text-sm font-semibold ${status === value ? 'bg-[#01AEAD] text-white' : 'bg-white text-slate-600'}`}>{value}</button>)}</div>
+      {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+      <div className="grid gap-4">
+        {items.map((item) => <Card key={item.id} className="p-5"><div className="flex flex-col gap-4 md:flex-row md:items-start"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-3"><h2 className="font-semibold text-black">{item.title || `${item.rating}-star review`}</h2><span className="inline-flex items-center gap-1 text-sm font-semibold text-amber-600"><Star className="size-4 fill-current" />{item.rating}</span><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{item.status}</span></div><p className="mt-2 text-sm text-muted-foreground">{item.comment}</p><p className="mt-3 text-xs text-muted-foreground">{item.user.firstName} {item.user.lastName} &middot; {item.practice.name} &middot; {new Date(item.createdAt).toLocaleDateString('en-GB')}</p></div>{item.status === 'PENDING' && <div className="flex gap-2"><button onClick={() => void moderate(item, 'REJECTED')} className="inline-flex h-9 items-center gap-2 rounded-md border border-red-300 px-3 text-sm font-semibold text-red-700"><X className="size-4" />Reject</button><button onClick={() => void moderate(item, 'APPROVED')} className="inline-flex h-9 items-center gap-2 rounded-md bg-emerald-600 px-3 text-sm font-semibold text-white"><Check className="size-4" />Approve</button></div>}</div></Card>)}
+        {!loading && !items.length && <Card className="p-8 text-center text-sm text-muted-foreground">No reviews in this queue.</Card>}
+        {loading && <p className="text-center text-sm text-muted-foreground">Loading reviews...</p>}
+      </div>
     </div>
   )
 }

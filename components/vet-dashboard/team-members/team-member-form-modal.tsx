@@ -119,7 +119,7 @@ export function TeamMemberFormModal({
           disabled={saving}
           className="inline-flex h-10 items-center justify-center rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white hover:bg-[#019594]"
         >
-          {saving ? 'Savingâ€¦' : 'Save member'}
+          {saving ? 'Saving...' : 'Save member'}
         </button>
       </div>
     </Modal>

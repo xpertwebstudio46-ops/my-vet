@@ -18,7 +18,7 @@ let refreshRequest: Promise<string> | null = null;
 
 async function readEnvelope<T>(response: Response): Promise<T> {
   const envelope = (await response.json().catch(() => null)) as ApiEnvelope<T> | null;
-  if (!response.ok || !envelope?.success || envelope.data === null) {
+  if (!response.ok || !envelope?.success) {
     throw new ApiClientError(
       envelope?.message ?? "The request could not be completed",
       response.status,
@@ -26,7 +26,7 @@ async function readEnvelope<T>(response: Response): Promise<T> {
       envelope?.error?.details,
     );
   }
-  return envelope.data;
+  return envelope.data as T;
 }
 
 export async function refreshAccessToken() {

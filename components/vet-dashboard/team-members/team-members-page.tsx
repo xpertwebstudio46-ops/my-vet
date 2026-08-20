@@ -67,7 +67,7 @@ export function TeamMembersPage() {
 
       <Card className="p-5">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {loading && <p className="text-sm text-muted-foreground">Loading team membersâ€¦</p>}
+          {loading && <p className="text-sm text-muted-foreground">Loading team members...</p>}
           {members.map((member) => (
             <TeamMemberCard
               key={member.id}
