@@ -11,6 +11,7 @@ import { ApiError } from '../../shared/utils/api-error.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
 import { paginated, paginationSchema, paginationToPrisma } from '../../shared/utils/pagination.js'
 import { toSlug } from '../../shared/utils/slug.js'
+import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 
 const practiceFields = z.object({
   name: z.string().trim().min(2).max(150),
@@ -128,8 +129,20 @@ practicesRouter.post('/', authenticate, requireRole('VET'), validateBody(createP
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${randomBytes(3).toString('hex')}`
     try {
-      const practice = await prisma.practice.create({ data: { ...body, slug, ownerId: userId } })
-      sendSuccess(response, practiceDto(practice), 'Practice submitted for approval', 201)
+      const result = await prisma.$transaction(async (transaction) => {
+        const practice = await transaction.practice.create({ data: { ...body, slug, ownerId: userId } })
+        const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
+        const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
+          userId: admin.id,
+          category: 'PRACTICE',
+          title: 'New practice awaiting approval',
+          message: `${practice.name} has submitted a directory listing`,
+          actionUrl: '/admin-dashboard/pending-approvals',
+        })))
+        return { practice, notifications }
+      })
+      emitNotifications(result.notifications)
+      sendSuccess(response, practiceDto(result.practice), 'Practice submitted for approval', 201)
       return
     } catch (error) {
       if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')) throw error

@@ -7,14 +7,79 @@ import { Card } from '@/components/dashboard/ui'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 import type { Paginated } from '@/lib/api/types'
 
-type Dashboard = { practice: { id: string; name: string; rating: string; reviewCount: number; status: string }; stats: { upcomingAppointments: number; pendingReviews: number; views: number; contacts: number } }
+type PracticeStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'ARCHIVED'
+type Dashboard = { practice: { id: string; name: string; rating: string; reviewCount: number; status: PracticeStatus; moderationReason: string | null }; stats: { upcomingAppointments: number; pendingReviews: number; views: number; contacts: number } }
 type Appointment = { id: string; date: string; time: string; reason: string; status: string; pet: { name: string } | null; user: { firstName: string; lastName: string; email: string; phone: string | null } }
 
 export function VetDashboardPage() {
-  const [data, setData] = useState<Dashboard | null>(null); const [appointments, setAppointments] = useState<Appointment[]>([]); const [searchTerm, setSearchTerm] = useState(''); const [error, setError] = useState('')
-  useEffect(() => { const term = new URLSearchParams(window.location.search).get('q')?.trim() ?? ''; void Promise.all([apiClient<Dashboard>('/api/vet/dashboard'), apiClient<Paginated<Appointment>>('/api/appointments/vet?view=upcoming&page=1&limit=20')]).then(([dashboard, result]) => { setData(dashboard); setAppointments(result.items); setSearchTerm(term) }).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Dashboard could not be loaded.')) }, [])
-  async function transition(item: Appointment, action: 'confirm' | 'complete' | 'cancel') { try { if (action === 'cancel') { const reason = window.prompt('Cancellation reason:'); if (!reason) return; await apiClient(`/api/appointments/${item.id}/cancel`, { method: 'PATCH', body: JSON.stringify({ reason }) }) } else await apiClient(`/api/appointments/${item.id}/${action}`, { method: 'PATCH' }); setAppointments((current) => current.map((value) => value.id === item.id ? { ...value, status: action === 'confirm' ? 'CONFIRMED' : action === 'complete' ? 'COMPLETED' : 'CANCELLED' } : value)) } catch (caught) { setError(caught instanceof Error ? caught.message : 'Appointment could not be updated.') } }
-  const stats = data ? [{ label: 'Upcoming appointments', value: data.stats.upcomingAppointments, icon: CalendarCheck }, { label: 'Pending reviews', value: data.stats.pendingReviews, icon: Star }, { label: 'Profile views', value: data.stats.views, icon: Eye }, { label: 'Contact actions', value: data.stats.contacts, icon: MessageSquare }] : []
+  const [data, setData] = useState<Dashboard | null>(null)
+  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [resubmitting, setResubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const term = new URLSearchParams(window.location.search).get('q')?.trim() ?? ''
+    void Promise.all([
+      apiClient<Dashboard>('/api/vet/dashboard'),
+      apiClient<Paginated<Appointment>>('/api/appointments/vet?view=upcoming&page=1&limit=20'),
+    ]).then(([dashboard, result]) => {
+      setData(dashboard)
+      setAppointments(result.items)
+      setSearchTerm(term)
+    }).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Dashboard could not be loaded.'))
+  }, [])
+
+  async function transition(item: Appointment, action: 'confirm' | 'complete' | 'cancel') {
+    try {
+      if (action === 'cancel') {
+        const reason = window.prompt('Cancellation reason:')
+        if (!reason) return
+        await apiClient(`/api/appointments/${item.id}/cancel`, { method: 'PATCH', body: JSON.stringify({ reason }) })
+      } else {
+        await apiClient(`/api/appointments/${item.id}/${action}`, { method: 'PATCH' })
+      }
+      setAppointments((current) => current.map((value) => value.id === item.id ? { ...value, status: action === 'confirm' ? 'CONFIRMED' : action === 'complete' ? 'COMPLETED' : 'CANCELLED' } : value))
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Appointment could not be updated.')
+    }
+  }
+
+  async function resubmit() {
+    setResubmitting(true)
+    setError('')
+    try {
+      await apiClient('/api/vet/practice/resubmit', { method: 'POST' })
+      setData((current) => current ? { ...current, practice: { ...current.practice, status: 'PENDING', moderationReason: null } } : current)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Practice could not be resubmitted.')
+    } finally {
+      setResubmitting(false)
+    }
+  }
+
+  const stats = data ? [
+    { label: 'Upcoming appointments', value: data.stats.upcomingAppointments, icon: CalendarCheck },
+    { label: 'Pending reviews', value: data.stats.pendingReviews, icon: Star },
+    { label: 'Profile views', value: data.stats.views, icon: Eye },
+    { label: 'Contact actions', value: data.stats.contacts, icon: MessageSquare },
+  ] : []
   const visibleAppointments = searchTerm ? appointments.filter((item) => [item.pet?.name, item.reason, item.user.firstName, item.user.lastName, item.user.email, item.status].some((value) => value?.toLowerCase().includes(searchTerm.toLowerCase()))) : appointments
-  return <div className="space-y-6"><section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-lg"><div><h1 className="dashboard-heading text-5xl text-black">{data?.practice.name || 'Practice dashboard'}</h1><p className="text-sm text-muted-foreground">Live appointments and practice performance &middot; {data?.practice.status}</p></div><Link href="/vet-dashboard/practice-profile" className="rounded-lg bg-[#064071] px-4 py-3 text-sm font-semibold text-white">Edit practice</Link></section>{error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}<section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => { const Icon = stat.icon; return <Card key={stat.label} className="flex items-center justify-between p-5"><div><p className="text-sm text-muted-foreground">{stat.label}</p><p className="mt-2 text-2xl font-semibold">{stat.value}</p></div><Icon className="size-5 text-[#01AEAD]" /></Card> })}</section><Card className="overflow-hidden p-0"><div className="border-b p-5"><h2 className="font-semibold">{searchTerm ? `Appointments matching “${searchTerm}”` : 'Upcoming appointments'}</h2></div>{visibleAppointments.map((item) => <div key={item.id} className="flex flex-col gap-3 border-b p-5 md:flex-row md:items-center"><div className="flex-1"><p className="font-semibold">{item.pet?.name || 'Pet'} &middot; {item.reason}</p><p className="text-sm text-muted-foreground">{new Date(item.date).toLocaleDateString('en-GB')} at {item.time} &middot; {item.user.firstName} {item.user.lastName} &middot; {item.status}</p></div><div className="flex gap-2">{['PENDING','RESCHEDULED'].includes(item.status) && <button onClick={() => void transition(item, 'confirm')} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Confirm</button>}{item.status === 'CONFIRMED' && <button onClick={() => void transition(item, 'complete')} className="rounded-md bg-[#01AEAD] px-3 py-2 text-xs font-semibold text-white">Complete</button>}{['PENDING','RESCHEDULED','CONFIRMED'].includes(item.status) && <button onClick={() => void transition(item, 'cancel')} className="rounded-md border border-red-300 px-3 py-2 text-xs font-semibold text-red-700">Cancel</button>}</div></div>)}{!visibleAppointments.length && <p className="p-8 text-center text-sm text-muted-foreground">{searchTerm ? 'No appointments match that search.' : 'No upcoming appointments.'}</p>}</Card><section className="grid gap-3 sm:grid-cols-3"><Link href="/vet-dashboard/services" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Manage services</Link><Link href="/vet-dashboard/opening-hours" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Update opening hours</Link><Link href="/vet-dashboard/reviews" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Reply to reviews</Link></section></div>
+
+  return (
+    <div className="space-y-6">
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-lg"><div><h1 className="dashboard-heading text-5xl text-black">{data?.practice.name || 'Practice dashboard'}</h1><p className="text-sm text-muted-foreground">Live appointments and practice performance{data ? <> &middot; {data.practice.status}</> : null}</p></div><Link href="/vet-dashboard/practice-profile" className="rounded-lg bg-[#064071] px-4 py-3 text-sm font-semibold text-white">Edit practice</Link></section>
+      {data && data.practice.status !== 'APPROVED' && <ApprovalNotice practice={data.practice} resubmitting={resubmitting} onResubmit={() => void resubmit()} />}
+      {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map((stat) => { const Icon = stat.icon; return <Card key={stat.label} className="flex items-center justify-between p-5"><div><p className="text-sm text-muted-foreground">{stat.label}</p><p className="mt-2 text-2xl font-semibold">{stat.value}</p></div><Icon className="size-5 text-[#01AEAD]" /></Card> })}</section>
+      <Card className="overflow-hidden p-0"><div className="border-b p-5"><h2 className="font-semibold">{searchTerm ? `Appointments matching "${searchTerm}"` : 'Upcoming appointments'}</h2></div>{visibleAppointments.map((item) => <div key={item.id} className="flex flex-col gap-3 border-b p-5 md:flex-row md:items-center"><div className="flex-1"><p className="font-semibold">{item.pet?.name || 'Pet'} &middot; {item.reason}</p><p className="text-sm text-muted-foreground">{new Date(item.date).toLocaleDateString('en-GB')} at {item.time} &middot; {item.user.firstName} {item.user.lastName} &middot; {item.status}</p></div><div className="flex gap-2">{['PENDING', 'RESCHEDULED'].includes(item.status) && <button onClick={() => void transition(item, 'confirm')} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Confirm</button>}{item.status === 'CONFIRMED' && <button onClick={() => void transition(item, 'complete')} className="rounded-md bg-[#01AEAD] px-3 py-2 text-xs font-semibold text-white">Complete</button>}{['PENDING', 'RESCHEDULED', 'CONFIRMED'].includes(item.status) && <button onClick={() => void transition(item, 'cancel')} className="rounded-md border border-red-300 px-3 py-2 text-xs font-semibold text-red-700">Cancel</button>}</div></div>)}{!visibleAppointments.length && <p className="p-8 text-center text-sm text-muted-foreground">{searchTerm ? 'No appointments match that search.' : 'No upcoming appointments.'}</p>}</Card>
+      <section className="grid gap-3 sm:grid-cols-3"><Link href="/vet-dashboard/services" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Manage services</Link><Link href="/vet-dashboard/opening-hours" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Update opening hours</Link><Link href="/vet-dashboard/reviews" className="rounded-xl bg-white p-4 text-sm font-semibold shadow">Reply to reviews</Link></section>
+    </div>
+  )
+}
+
+function ApprovalNotice({ practice, resubmitting, onResubmit }: { practice: Dashboard['practice']; resubmitting: boolean; onResubmit: () => void }) {
+  if (practice.status === 'PENDING') return <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"><strong>Awaiting admin approval.</strong> Complete your profile while it is reviewed. The listing is not public yet.</div>
+  const blocked = practice.status === 'SUSPENDED' || practice.status === 'ARCHIVED'
+  return <div role="alert" className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"><div><strong>{blocked ? `Practice ${practice.status.toLowerCase()}.` : 'Changes are required before approval.'}</strong>{practice.moderationReason && <span className="ml-1">{practice.moderationReason}</span>}</div>{practice.status === 'REJECTED' && <button type="button" disabled={resubmitting} onClick={onResubmit} className="h-9 rounded-md bg-red-600 px-4 font-semibold text-white disabled:opacity-50">{resubmitting ? 'Resubmitting...' : 'Resubmit for review'}</button>}</div>
 }

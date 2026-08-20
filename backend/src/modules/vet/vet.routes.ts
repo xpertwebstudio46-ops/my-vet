@@ -9,6 +9,7 @@ import { sendSuccess } from '../../shared/utils/api-response.js'
 import { deleteR2Object } from '../upload/upload.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
+import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const animalParams = z.object({ animalTypeId: z.string().min(1) })
@@ -107,6 +108,27 @@ vetRouter.get('/dashboard', async (request, response) => {
     practice: { ...practice, rating: practice.rating.toString() },
     stats: { upcomingAppointments, pendingReviews, views, contacts },
   })
+})
+
+vetRouter.post('/practice/resubmit', async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  if (practice.status !== 'REJECTED') {
+    throw new ApiError(409, 'PRACTICE_CANNOT_BE_RESUBMITTED', 'Only a rejected practice can be resubmitted')
+  }
+  const result = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.practice.update({ where: { id: practice.id }, data: { status: 'PENDING', moderationReason: null } })
+    const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
+    const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
+      userId: admin.id,
+      category: 'PRACTICE',
+      title: 'Practice resubmitted',
+      message: `${practice.name} is ready for another review`,
+      actionUrl: '/admin-dashboard/pending-approvals',
+    })))
+    return { updated, notifications }
+  })
+  emitNotifications(result.notifications)
+  sendSuccess(response, result.updated, 'Practice resubmitted for approval')
 })
 
 vetRouter.get('/reviews', async (request, response) => {

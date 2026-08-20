@@ -3,8 +3,6 @@ import {
   BarChart3,
   Building2,
   ClipboardCheck,
-  CreditCard,
-  Crown,
   Handshake,
   Home,
   LogOut,
@@ -76,19 +74,9 @@ export const adminNavSections: Array<{
       heading: 'Revenue',
       items: [
         {
-          label: 'Featured Listings',
-          href: '/admin-dashboard/featured-listings',
-          icon: Crown,
-        },
-        {
           label: 'Sponsorship',
           href: '/admin-dashboard/sponsorship-management',
           icon: Handshake,
-        },
-        {
-          label: 'Subscription Plan',
-          href: '/admin-dashboard/subscription-plan',
-          icon: CreditCard,
         },
       ],
     },

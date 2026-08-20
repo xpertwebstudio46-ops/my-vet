@@ -6,13 +6,11 @@ import {
   Camera,
   Cat,
   ClipboardList,
-  CreditCard,
   HelpCircle,
   Home,
   LogOut,
   ReceiptPoundSterling,
   Settings,
-  Sparkles,
   Star,
   Stethoscope,
   UsersRound,
@@ -93,16 +91,6 @@ export const vetNavSections: Array<{
   {
     heading: 'Account',
     items: [
-      {
-        label: 'Featured Listing',
-        href: '/vet-dashboard/featured-listing',
-        icon: Sparkles,
-      },
-      {
-        label: 'Subscription',
-        href: '/vet-dashboard/subscription',
-        icon: CreditCard,
-      },
       { label: 'Notifications', href: '/vet-dashboard/notifications', icon: Bell },
       { label: 'Settings', href: '/vet-dashboard/settings', icon: Settings },
       { label: 'Help & support', href: '/vet-dashboard/help-support', icon: HelpCircle },
