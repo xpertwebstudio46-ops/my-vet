@@ -14,7 +14,7 @@ export function UploadMediaCard({ onClick }: { onClick: () => void }) {
         Upload new media
       </span>
       <span className="mt-1 text-sm text-muted-foreground">
-        Add a photo or video cover to your gallery.
+        Add a JPEG, PNG, WebP or GIF image to your gallery.
       </span>
     </button>
   )

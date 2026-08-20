@@ -16,6 +16,7 @@ Copy `.env.example` to `.env.local` and set both API URLs. On Railway, configure
 ```text
 API_URL=https://your-backend.up.railway.app
 NEXT_PUBLIC_API_URL=https://your-backend.up.railway.app
+NEXT_PUBLIC_R2_PUBLIC_URL=https://media.your-domain.example
 ```
 
 ## Backend

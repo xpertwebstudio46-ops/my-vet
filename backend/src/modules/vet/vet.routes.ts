@@ -67,6 +67,13 @@ const gallerySchema = z.object({
   caption: z.string().trim().max(500).nullable().optional(),
   sortOrder: z.number().int().min(0).default(0),
 })
+const galleryUpdateSchema = z
+  .object({
+    altText: z.string().trim().max(200).nullable().optional(),
+    caption: z.string().trim().max(500).nullable().optional(),
+    sortOrder: z.number().int().min(0).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, 'At least one gallery field is required')
 const pricingSchema = z.object({
   kind: z.enum(['SERVICE', 'HEALTH_PACKAGE']),
   section: z.string().trim().min(1).max(100),
@@ -239,6 +246,18 @@ vetRouter.post('/gallery', validateBody(gallerySchema), async (request, response
     return created
   })
   sendSuccess(response, media, 'Gallery media added', 201)
+})
+
+vetRouter.put('/gallery/:id', validateParams(idParams), validateBody(galleryUpdateSchema), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const existing = await prisma.galleryMedia.findFirst({ where: { id, practiceId: practice.id }, select: { id: true } })
+  if (!existing) throw new ApiError(404, 'GALLERY_MEDIA_NOT_FOUND', 'Gallery media was not found')
+  const media = await prisma.galleryMedia.update({
+    where: { id },
+    data: request.validatedBody as z.infer<typeof galleryUpdateSchema>,
+  })
+  sendSuccess(response, media, 'Gallery media updated')
 })
 
 vetRouter.delete('/gallery/:id', validateParams(idParams), async (request, response) => {

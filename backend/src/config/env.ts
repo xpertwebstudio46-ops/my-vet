@@ -42,6 +42,7 @@ const envSchema = z
     STRIPE_WEBHOOK_SECRET: optionalString,
     R2_ENABLED: envBoolean(false),
     CLOUDFLARE_ACCOUNT_ID: optionalString,
+    CLOUDFLARE_R2_ENDPOINT: optionalUrl,
     CLOUDFLARE_R2_ACCESS_KEY: optionalString,
     CLOUDFLARE_R2_SECRET_KEY: optionalString,
     CLOUDFLARE_R2_BUCKET: optionalString,
@@ -59,6 +60,7 @@ const envSchema = z
     if (value.R2_ENABLED) {
       for (const key of [
         'CLOUDFLARE_ACCOUNT_ID',
+        'CLOUDFLARE_R2_ENDPOINT',
         'CLOUDFLARE_R2_ACCESS_KEY',
         'CLOUDFLARE_R2_SECRET_KEY',
         'CLOUDFLARE_R2_BUCKET',

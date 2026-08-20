@@ -8,6 +8,7 @@ export function getR2() {
   if (
     !env.R2_ENABLED ||
     !env.CLOUDFLARE_ACCOUNT_ID ||
+    !env.CLOUDFLARE_R2_ENDPOINT ||
     !env.CLOUDFLARE_R2_ACCESS_KEY ||
     !env.CLOUDFLARE_R2_SECRET_KEY
   ) {
@@ -15,7 +16,7 @@ export function getR2() {
   }
   r2Client ??= new S3Client({
     region: 'auto',
-    endpoint: `https://${env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    endpoint: env.CLOUDFLARE_R2_ENDPOINT.replace(/\/$/, ''),
     credentials: {
       accessKeyId: env.CLOUDFLARE_R2_ACCESS_KEY,
       secretAccessKey: env.CLOUDFLARE_R2_SECRET_KEY,

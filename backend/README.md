@@ -39,6 +39,7 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 | `STRIPE_WEBHOOK_SECRET` | When Stripe enabled | Yes | Stripe endpoint signing secret |
 | `R2_ENABLED` | Yes | No | Enables uploads |
 | `CLOUDFLARE_ACCOUNT_ID` | When R2 enabled | Yes | R2 account identifier |
+| `CLOUDFLARE_R2_ENDPOINT` | When R2 enabled | No | Exact jurisdiction-aware S3 endpoint, without the bucket path |
 | `CLOUDFLARE_R2_ACCESS_KEY` | When R2 enabled | Yes | R2 access key |
 | `CLOUDFLARE_R2_SECRET_KEY` | When R2 enabled | Yes | R2 secret key |
 | `CLOUDFLARE_R2_BUCKET` | When R2 enabled | No | Bucket name |
