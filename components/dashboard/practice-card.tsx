@@ -1,25 +1,35 @@
 'use client'
 
-import Image from 'next/image'
+import Link from 'next/link'
 import { ArrowRight, MapPin, Star } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import type { Practice } from '@/lib/dashboard-data'
+import { buttonVariants } from '@/components/ui/button'
+
+export type PracticeCardItem = {
+  id: string
+  slug?: string
+  name: string
+  image: string
+  location: string
+  distance?: string
+  rating: number
+  reviews: number
+  tags: string[]
+  description: string
+}
 
 export function PracticeCard({
   practice,
 }: {
-  practice: Practice
+  practice: PracticeCardItem
   favourited?: boolean
 }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-white bg-white font-sans shadow-lg shadow-black/10 transition-shadow hover:shadow-xl">
       <div className="relative h-40 w-full overflow-hidden">
-        <Image
+        <img
           src={practice.image}
           alt={practice.name}
-          fill
-          sizes="(max-width: 768px) 100vw, 400px"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 font-sans text-xs shadow-md shadow-black/10">
           <Star className="size-3.5 fill-warning text-warning" />
@@ -36,7 +46,7 @@ export function PracticeCard({
         <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="size-3.5 text-[#01AEAD]" />
           <span>
-            {practice.location} - {practice.distance}
+            {practice.location}{practice.distance ? ` - ${practice.distance}` : ''}
           </span>
         </div>
         <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
@@ -56,10 +66,10 @@ export function PracticeCard({
           <div className="rounded-full px-3 py-1.5 font-sans text-xs font-medium text-muted-foreground ">
             {practice.reviews} Reviews
           </div>
-          <Button className="rounded-full bg-[#064071] px-4 hover:bg-[#05365f]" size="lg">
+          <Link href={practice.slug ? `/vet-search/${practice.slug}` : '/vet-search'} className={buttonVariants({ size: 'lg', className: 'rounded-full bg-[#064071] px-4 text-white hover:bg-[#05365f]' })}>
             View Profile
             <ArrowRight className="size-4" />
-          </Button>
+          </Link>
         </div>
       </div>
     </div>

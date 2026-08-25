@@ -11,6 +11,7 @@ const navLinks = [
     { label: 'Find a Vet', href: '/vet-search' },
     { label: 'Directory', href: '/directory' },
     { label: 'Reviews', href: '/review' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Sponsorship', href: '/sponsorship' },
 ]
 

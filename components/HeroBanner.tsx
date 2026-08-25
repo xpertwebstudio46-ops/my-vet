@@ -91,7 +91,7 @@ const HeroBanner = () => {
 
             {/* Search Bar */}
             <div className="relative top-11 z-10 mt-16 px-4 sm:px-4 flex justify-center">
-                <div className="w-full max-w-[76%] flex flex-col  sm:flex-row items-stretch sm:items-center bg-white p-0 sm:p-2 rounded-3xl sm:rounded-full border border-gray-300 gap-6 sm:gap-0">
+                <form action="/vet-search" className="w-full max-w-[76%] flex flex-col sm:flex-row items-stretch sm:items-center bg-white p-0 sm:p-2 rounded-3xl sm:rounded-full border border-gray-300 gap-6 sm:gap-0">
                     <div className="flex flex-1 items-center gap-3 px-5 sm:px-7 bg-gray-200 sm:rounded-tl-full sm:rounded-bl-full min-h-[72px]">
                         <svg
                             className="w-5 h-5 shrink-0"
@@ -108,7 +108,8 @@ const HeroBanner = () => {
                             />
                         </svg>
                         <input
-                            type="text"
+                            type="search"
+                            name="q"
                             placeholder="Search for trusted veterinary care near you..."
                             className="flex-1 py-5 text-base text-gray-500 placeholder-gray-400 outline-none"
                         />
@@ -119,7 +120,7 @@ const HeroBanner = () => {
                     >
                         Find a Vet
                     </button>
-                </div>
+                </form>
             </div>
 
         </section>

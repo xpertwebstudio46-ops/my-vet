@@ -85,6 +85,20 @@ body {
     box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a[href],
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
   body {
     @apply bg-background text-foreground;
   }

@@ -32,6 +32,15 @@ export function ProfileHeroCard() {
       );
   }, []);
 
+  useEffect(() => {
+    const update = (event: Event) => {
+      const saved = (event as CustomEvent<Partial<Practice>>).detail;
+      setPractice((current) => current ? { ...current, ...saved } : current);
+    };
+    window.addEventListener("myvet:practice-updated", update);
+    return () => window.removeEventListener("myvet:practice-updated", update);
+  }, []);
+
   async function replaceImage(file: File, kind: "logo" | "banner") {
     setUploading(kind);
     setError("");

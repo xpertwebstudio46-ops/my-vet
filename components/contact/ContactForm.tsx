@@ -9,13 +9,13 @@ const socialLinks = [
   { icon: "images/grp-4.png", href: "#", label: "Instagram" },
 ];
 
-export default function StayConnectedSection() {
+export default function StayConnectedSection({ initialSubject = '' }: { initialSubject?: string }) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    practiceType: "",
+    practiceType: initialSubject,
     message: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -44,7 +44,7 @@ export default function StayConnectedSection() {
         }),
       }, { authenticated: false });
       setFeedback({ type: "success", message: "Thanks — your message has been received." });
-      setFormData({ firstName: "", lastName: "", email: "", phone: "", practiceType: "", message: "" });
+      setFormData({ firstName: "", lastName: "", email: "", phone: "", practiceType: initialSubject, message: "" });
     } catch (caught) {
       setFeedback({ type: "error", message: caught instanceof ApiClientError ? caught.message : "Your message could not be sent." });
     } finally {

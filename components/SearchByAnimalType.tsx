@@ -6,36 +6,42 @@ const categories = [
     id: 1,
     icon: '/images/icon-2.png',
     title: 'Small Animal Vets',
+    href: '/vet-search?animalType=small-animals',
     description: 'Find trusted dog & cat veterinary care near you',
   },
   {
     id: 2,
     icon: '/images/icon-1.png',
     title: 'Equine Specialists',
+    href: '/vet-search?animalType=equine',
     description: 'Specialist equine veterinary professionals',
   },
   {
     id: 3,
     icon: '/images/icon-3.png',
     title: 'Farm Animal Vets',
+    href: '/vet-search?animalType=farm-animals',
     description: 'Farm livestock health & emergency care services',
   },
   {
     id: 4,
     icon: '/images/icon-4.png',
     title: 'Exotic Animal Care',
+    href: '/vet-search?animalType=exotics',
     description: 'Specialized care for reptiles, birds, and exotics',
   },
   {
     id: 5,
     icon: '/images/icon-5.png',
     title: 'Emergency 24/7 Vets',
+    href: '/vet-search?service=Emergency+Care',
     description: 'Immediate out-of-hours emergency care',
   },
   {
     id: 6,
     icon: '/images/icon-6.png',
     title: 'Holistic & Therapy',
+    href: '/vet-search?service=Holistic',
     description: 'Alternative therapies and rehabilitation',
   },
 ]
@@ -64,7 +70,7 @@ const SearchByAnimalType = () => {
           {categories.map((cat) => (
             <Link
               key={cat.id}
-              href={`/category/${cat.id}`}
+              href={cat.href}
               className="group bg-white rounded-[20px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col gap-4"
             >
               {/* Teal icon box */}

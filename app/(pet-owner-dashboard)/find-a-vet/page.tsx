@@ -1,303 +1,93 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  animalTypes,
-  practices,
-  services as serviceList,
-} from '@/lib/dashboard-data'
-import { PageHeader, Card } from '@/components/dashboard/ui'
-import { PracticeCard } from '@/components/dashboard/practice-card'
-import { Pagination } from '@/components/dashboard/feedback'
+import { useCallback, useEffect, useState } from 'react'
+import { Search, SlidersHorizontal } from 'lucide-react'
+import { EmptyState } from '@/components/dashboard/feedback'
+import { PracticeCard, type PracticeCardItem } from '@/components/dashboard/practice-card'
+import { Card, PageHeader } from '@/components/dashboard/ui'
+import { apiClient, ApiClientError } from '@/lib/api/client'
+import type { Paginated, Practice } from '@/lib/api/types'
 
-const sortOptions = ['Recommended', 'Highest rated', 'Nearest', 'Most reviewed']
+const animalTypes = ['Small Animals', 'Cats', 'Dogs', 'Equine', 'Farm Animals', 'Exotics']
+const services = ['Emergency Care', 'Surgery', 'Dental Care', 'Vaccinations', 'Diagnostics', 'Holistic Care']
+const pageSize = 12
+
+function toCard(practice: Practice): PracticeCardItem {
+  return {
+    id: practice.id,
+    slug: practice.slug,
+    name: practice.name,
+    image: practice.bannerUrl || practice.logoUrl || '/placeholder.svg',
+    location: [practice.city, practice.county].filter(Boolean).join(', '),
+    distance: practice.postcode,
+    rating: Number(practice.rating),
+    reviews: practice.reviewCount,
+    tags: [
+      ...(practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []),
+      ...(practice.services?.map((service) => service.name) ?? []),
+    ].slice(0, 5),
+    description: practice.description || 'View this practice profile for services, opening hours and booking information.',
+  }
+}
 
 export default function FindAVetPage() {
-  const [query, setQuery] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return new URLSearchParams(window.location.search).get('q') ?? ''
-  })
+  const [query, setQuery] = useState('')
+  const [submittedQuery, setSubmittedQuery] = useState('')
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [sort, setSort] = useState(sortOptions[0])
-  const [sortOpen, setSortOpen] = useState(false)
-  const [
-    filtersOpen, setFiltersOpen] = useState(false)
+  const [sort, setSort] = useState<'rating' | 'newest' | 'name'>('rating')
   const [page, setPage] = useState(1)
+  const [result, setResult] = useState<Paginated<Practice> | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
-  function updateSearchUrl() {
-    const params = new URLSearchParams(window.location.search)
-    const trimmed = query.trim()
-
-    if (trimmed) {
-      params.set('q', trimmed)
-    } else {
-      params.delete('q')
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    const params = new URLSearchParams({ page: String(page), limit: String(pageSize), sort })
+    if (submittedQuery) params.set('q', submittedQuery)
+    if (selectedAnimals.length) params.set('animalType', selectedAnimals.join(','))
+    if (selectedServices.length) params.set('service', selectedServices.join(','))
+    try {
+      setResult(await apiClient<Paginated<Practice>>(`/api/practices?${params}`, {}, { authenticated: false }))
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : 'Practices could not be loaded.')
+    } finally {
+      setLoading(false)
     }
+  }, [page, selectedAnimals, selectedServices, sort, submittedQuery])
 
-    const search = params.toString()
-    window.history.pushState(null, '', search ? `?${search}` : window.location.pathname)
-  }
+  useEffect(() => { queueMicrotask(() => void load()) }, [load])
 
-  function toggle(
-    list: string[],
-    setList: (v: string[]) => void,
-    value: string,
-  ) {
-    setList(
-      list.includes(value)
-        ? list.filter((v) => v !== value)
-        : [...list, value],
-    )
+  function toggle(current: string[], value: string, update: (next: string[]) => void) {
+    update(current.includes(value) ? current.filter((item) => item !== value) : [...current, value])
     setPage(1)
   }
 
-  const filtered = useMemo(() => {
-    let result = practices.filter((p) => {
-      const matchesQuery =
-        !query ||
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.tags.some((t) => t.toLowerCase().includes(query.toLowerCase()))
-      const matchesAnimal =
-        selectedAnimals.length === 0 ||
-        selectedAnimals.some((a) => p.tags.includes(a))
-      const matchesService =
-        selectedServices.length === 0 ||
-        selectedServices.some((s) => p.tags.includes(s))
-      return matchesQuery && matchesAnimal && matchesService
-    })
-    if (sort === 'Highest rated')
-      result = [...result].sort((a, b) => b.rating - a.rating)
-    if (sort === 'Most reviewed')
-      result = [...result].sort((a, b) => b.reviews - a.reviews)
-    if (sort === 'Nearest')
-      result = [...result].sort(
-        (a, b) => parseFloat(a.distance) - parseFloat(b.distance),
-      )
-    return result
-  }, [query, selectedAnimals, selectedServices, sort])
+  const filterContent = <div className="space-y-6">
+    <FilterGroup title="Animal type" options={animalTypes} selected={selectedAnimals} onToggle={(value) => toggle(selectedAnimals, value, setSelectedAnimals)} />
+    <FilterGroup title="Services" options={services} selected={selectedServices} onToggle={(value) => toggle(selectedServices, value, setSelectedServices)} />
+    {(selectedAnimals.length > 0 || selectedServices.length > 0) && <button type="button" onClick={() => { setSelectedAnimals([]); setSelectedServices([]); setPage(1) }} className="text-xs font-semibold text-[#01AEAD] hover:underline">Clear all filters</button>}
+  </div>
 
-  const totalResults = 104
-  const filterCount = selectedAnimals.length + selectedServices.length
-
-  const filterContent = (
-    <div className="space-y-6">
-      <div>
-        <p className="mb-3 text-[12.62px] font-normal">Animal type</p>
-        <div className="space-y-2.5">
-          {animalTypes.map((a) => (
-            <Checkbox
-              key={a}
-              label={a}
-              checked={selectedAnimals.includes(a)}
-              onChange={() =>
-                toggle(selectedAnimals, setSelectedAnimals, a)
-              }
-            />
-          ))}
-        </div>
-      </div>
-      <div className="border-t border-border pt-5">
-        <p className="mb-3 text-[12.62px] font-normal">Services</p>
-        <div className="space-y-2.5">
-          {serviceList.map((s) => (
-            <Checkbox
-              key={s}
-              label={s}
-              checked={selectedServices.includes(s)}
-              onChange={() =>
-                toggle(selectedServices, setSelectedServices, s)
-              }
-            />
-          ))}
-        </div>
-      </div>
-      {filterCount > 0 && (
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedAnimals([])
-            setSelectedServices([])
-          }}
-          className="text-xs font-medium text-brand hover:underline"
-        >
-          Clear all filters
-        </button>
-      )}
+  const cards = result?.items.map(toCard) ?? []
+  return <div>
+    <PageHeader title="Find a Vet" description="Search live approved practices by name, animal type and service." />
+    <Card className="mb-6 p-3"><form className="flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); setPage(1); setSubmittedQuery(query.trim()) }}><div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Practice name or treatment" className="h-11 w-full rounded-lg border bg-white pl-9 pr-4 text-sm outline-none focus:border-[#01AEAD]" /></div><button className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#064071] px-6 text-sm font-semibold text-white"><Search className="size-4" />Search</button></form></Card>
+    <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <aside className="hidden lg:block"><Card className="sticky top-20 p-5"><div className="mb-4 flex items-center gap-2"><SlidersHorizontal className="size-4 text-[#064071]" /><h2 className="font-semibold">Filters</h2></div>{filterContent}</Card></aside>
+      <section>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white p-3"><p className="text-sm text-muted-foreground">{loading ? 'Loading practices...' : `${result?.total ?? 0} practices found`}</p><div className="flex gap-2"><button type="button" onClick={() => setFiltersOpen((current) => !current)} className="inline-flex h-10 items-center gap-2 rounded-lg border px-3 text-sm font-medium lg:hidden"><SlidersHorizontal className="size-4" />Filters</button><label className="sr-only" htmlFor="practice-sort">Sort practices</label><select id="practice-sort" value={sort} onChange={(event) => { setSort(event.target.value as typeof sort); setPage(1) }} className="h-10 rounded-lg border bg-white px-3 text-sm"><option value="rating">Highest rated</option><option value="newest">Newest</option><option value="name">Name A-Z</option></select></div></div>
+        {filtersOpen && <Card className="mb-4 p-5 lg:hidden">{filterContent}</Card>}
+        {error && <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+        {!loading && cards.length === 0 ? <EmptyState icon={Search} title="No practices found" description="Try a broader search or clear one of the filters." /> : <div className="grid gap-4 sm:grid-cols-2">{cards.map((practice) => <PracticeCard key={practice.id} practice={practice} />)}</div>}
+        {(result?.totalPages ?? 0) > 1 && <nav aria-label="Practice result pages" className="mt-6 flex items-center justify-center gap-3"><button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40">Previous</button><span className="text-sm text-muted-foreground">Page {page} of {result?.totalPages}</span><button type="button" disabled={page >= (result?.totalPages ?? 1)} onClick={() => setPage((current) => current + 1)} className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold disabled:opacity-40">Next</button></nav>}
+      </section>
     </div>
-  )
-
-  return (
-    <div>
-      <PageHeader
-        title="Find a Vet"
-        description="Search the MY VET directory by location, animal type and service."
-      />
-
-      <Card className="mb-6 p-3">
-        <form
-          className="flex flex-col gap-2 sm:flex-row"
-          onSubmit={(event) => {
-            event.preventDefault()
-            updateSearchUrl()
-          }}
-        >
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              name="q"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value)
-                setPage(1)
-              }}
-              placeholder="Practice name or treatment"
-              className="h-11 w-full rounded-lg border border-gray-400/30 bg-white pl-9 pr-4 text-sm  outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-            />
-          </div>
-          <Button size="lg" className="h-11 px-6 bg-[#064071] ">
-            <Search className="size-4" /> Search
-          </Button>
-        </form>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
-        {/* Filters — desktop */}
-        <aside className="hidden lg:block">
-          <Card className="sticky top-20 p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <SlidersHorizontal className="size-4  text-[#064071]" />
-              <h2 className="font-manrope text-md font-bold">
-                Advanced Filters
-              </h2>
-            </div>
-            {filterContent}
-          </Card>
-        </aside>
-
-        {/* Results */}
-        <div>
-          <div className="mb-4 flex items-center justify-between gap-3 bg-white p-3 rounded-lg">
-            <p className="text-sm text-[#475569]">
-              Showing{' '}
-              <span className="font-semibold text-[#475569]">
-                {totalResults}
-              </span>{' '}
-              practices
-            </p>
-            <div className="flex items-center gap-2 ">
-              <Button
-             
-                size="lg"
-                className="lg:hidden bg-[#E2E8F0]"
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <SlidersHorizontal className="size-4" />
-                Filters
-                {filterCount > 0 && (
-                  <span className="ml-1 flex size-5 items-center justify-center rounded-full bg-brand text-[0.65rem] font-bold text-brand-foreground">
-                    {filterCount}
-                  </span>
-                )}
-              </Button>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setSortOpen((o) => !o)}
-                  className="flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium hover:bg-muted"
-                >
-                  <span className="hidden sm:inline text-muted-foreground">
-                    Sort by:
-                  </span>
-                  {sort}
-                  <ChevronDown className="size-4 text-muted-foreground" />
-                </button>
-                {sortOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setSortOpen(false)}
-                    />
-                    <div className="absolute right-0 top-11 z-20 w-44 overflow-hidden rounded-lg border border-border bg-popover p-1 shadow-lg">
-                      {sortOptions.map((o) => (
-                        <button
-                          key={o}
-                          type="button"
-                          onClick={() => {
-                            setSort(o)
-                            setSortOpen(false)
-                          }}
-                          className={`block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted ${
-                            o === sort ? 'font-semibold text-brand' : ''
-                          }`}
-                        >
-                          {o}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Filters — mobile collapsible */}
-          {filtersOpen && (
-            <Card className="mb-4 p-5 lg:hidden">{filterContent}</Card>
-          )}
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 ">
-            {filtered.map((p) => (
-              <PracticeCard key={p.id} practice={p} />
-            ))}
-          </div>
-
-          <Pagination page={page} totalPages={9} onChange={setPage} />
-        </div>
-      </div>
-    </div>
-  )
+  </div>
 }
 
-function Checkbox({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  onChange: () => void
-}) {
-  return (
-    <label className="flex cursor-pointer items-center gap-2.5 text-sm">
-      <span
-        className={`flex size-4 items-center justify-center rounded border transition-colors ${
-          checked
-            ? 'border-brand bg-brand text-brand-foreground'
-            : 'border-border bg-card'
-        }`}
-      >
-        {checked && (
-          <svg viewBox="0 0 12 12" className="size-3" fill="none">
-            <path
-              d="M2.5 6.5L5 9L9.5 3.5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-        className="sr-only"
-      />
-      <span className="text-foreground">{label}</span>
-    </label>
-  )
+function FilterGroup({ title, options, selected, onToggle }: { title: string; options: string[]; selected: string[]; onToggle: (value: string) => void }) {
+  return <fieldset className="border-t pt-5 first:border-t-0 first:pt-0"><legend className="mb-3 text-sm font-semibold">{title}</legend><div className="space-y-2.5">{options.map((option) => <label key={option} className="flex items-center gap-2.5 text-sm"><input type="checkbox" checked={selected.includes(option)} onChange={() => onToggle(option)} className="size-4 accent-[#01AEAD]" />{option}</label>)}</div></fieldset>
 }

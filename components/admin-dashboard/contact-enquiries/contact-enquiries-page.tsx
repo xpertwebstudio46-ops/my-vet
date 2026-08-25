@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import { Archive, Reply } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
+import { Modal } from '@/components/dashboard/modal'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 import type { Paginated } from '@/lib/api/types'
+import { downloadCsv } from '@/lib/csv'
 import { AdminPageBanner } from '../shared/admin-page-banner'
 
 type Status = 'NEW' | 'IN_PROGRESS' | 'REPLIED' | 'CLOSED'
@@ -14,6 +16,7 @@ export function ContactEnquiriesPage() {
   const [items, setItems] = useState<Enquiry[]>([])
   const [status, setStatus] = useState<Status | 'ALL'>('NEW')
   const [error, setError] = useState('')
+  const [replying, setReplying] = useState<Enquiry | null>(null)
 
   useEffect(() => {
     void apiClient<Paginated<Enquiry>>(`/api/admin/enquiries?page=1&limit=100${status === 'ALL' ? '' : `&status=${status}`}`)
@@ -21,35 +24,37 @@ export function ContactEnquiriesPage() {
       .catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Enquiries could not be loaded.'))
   }, [status])
 
-  async function reply(item: Enquiry) {
-    const text = window.prompt(`Reply to ${item.email}:`, item.reply ?? '')
-    if (!text) return
+  async function sendReply(text: string) {
+    if (!replying) return
     try {
-      const updated = await apiClient<Enquiry>(`/api/admin/enquiries/${item.id}/reply`, { method: 'POST', body: JSON.stringify({ reply: text }) })
-      setItems((current) => status === 'NEW' ? current.filter((value) => value.id !== item.id) : current.map((value) => value.id === item.id ? updated : value))
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Reply could not be sent.')
-    }
+      const updated = await apiClient<Enquiry>(`/api/admin/enquiries/${replying.id}/reply`, { method: 'POST', body: JSON.stringify({ reply: text }) })
+      setItems((current) => status === 'NEW' ? current.filter((value) => value.id !== replying.id) : current.map((value) => value.id === replying.id ? updated : value))
+      setReplying(null)
+    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Reply could not be sent.') }
   }
 
   async function close(item: Enquiry) {
     try {
       await apiClient(`/api/admin/enquiries/${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'CLOSED' }) })
       setItems((current) => status === 'ALL' ? current.map((value) => value.id === item.id ? { ...value, status: 'CLOSED' } : value) : current.filter((value) => value.id !== item.id))
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Enquiry could not be closed.')
-    }
+    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Enquiry could not be closed.') }
   }
 
-  return (
-    <div className="space-y-6">
-      <AdminPageBanner title="Contact Enquiries" description="Messages submitted through the public contact form." />
-      <div className="flex flex-wrap gap-2">{(['NEW', 'IN_PROGRESS', 'REPLIED', 'CLOSED', 'ALL'] as const).map((value) => <button key={value} onClick={() => setStatus(value)} className={`rounded-full px-4 py-2 text-sm font-semibold ${status === value ? 'bg-[#01AEAD] text-white' : 'bg-white'}`}>{value}</button>)}</div>
-      {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-      <div className="grid gap-4">
-        {items.map((item) => <Card key={item.id} className="p-5"><div className="flex flex-col gap-4 md:flex-row"><div className="min-w-0 flex-1"><div className="flex items-center gap-3"><h2 className="font-semibold">{item.subject}</h2><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{item.status}</span></div><p className="mt-2 text-sm text-muted-foreground">{item.message}</p><p className="mt-3 text-xs text-muted-foreground">{item.name} &middot; {item.email} &middot; {new Date(item.createdAt).toLocaleString('en-GB')}</p>{item.reply && <p className="mt-3 rounded-lg bg-teal-50 p-3 text-sm"><strong>Reply:</strong> {item.reply}</p>}</div><div className="flex gap-2"><button onClick={() => void reply(item)} className="inline-flex h-9 items-center gap-2 rounded-md bg-[#064071] px-3 text-sm font-semibold text-white"><Reply className="size-4" />Reply</button>{item.status !== 'CLOSED' && <button onClick={() => void close(item)} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-semibold"><Archive className="size-4" />Close</button>}</div></div></Card>)}
-        {!items.length && <Card className="p-8 text-center text-sm text-muted-foreground">No enquiries in this queue.</Card>}
-      </div>
-    </div>
-  )
+  function exportItems() {
+    if (!downloadCsv('contact-enquiries.csv', items.map((item) => ({ Name: item.name, Email: item.email, Subject: item.subject, Message: item.message, Status: item.status, Reply: item.reply, Received: new Date(item.createdAt).toLocaleString('en-GB') })))) setError('There are no enquiries to export in this queue.')
+  }
+
+  return <div className="space-y-6">
+    <AdminPageBanner title="Contact Enquiries" description="Messages submitted through the public contact form." action={{ label: 'Export CSV', icon: 'download', tone: 'outline', onClick: exportItems }} />
+    <div className="flex flex-wrap gap-2">{(['NEW', 'IN_PROGRESS', 'REPLIED', 'CLOSED', 'ALL'] as const).map((value) => <button type="button" key={value} onClick={() => setStatus(value)} className={`rounded-full px-4 py-2 text-sm font-semibold ${status === value ? 'bg-[#01AEAD] text-white' : 'bg-white'}`}>{value}</button>)}</div>
+    {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+    <div className="grid gap-4">{items.map((item) => <Card key={item.id} className="p-5"><div className="flex flex-col gap-4 md:flex-row"><div className="min-w-0 flex-1"><div className="flex items-center gap-3"><h2 className="font-semibold">{item.subject}</h2><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{item.status}</span></div><p className="mt-2 text-sm text-muted-foreground">{item.message}</p><p className="mt-3 text-xs text-muted-foreground">{item.name} &middot; {item.email} &middot; {new Date(item.createdAt).toLocaleString('en-GB')}</p>{item.reply && <p className="mt-3 rounded-lg bg-teal-50 p-3 text-sm"><strong>Reply:</strong> {item.reply}</p>}</div><div className="flex gap-2"><button type="button" onClick={() => setReplying(item)} className="inline-flex h-9 items-center gap-2 rounded-md bg-[#064071] px-3 text-sm font-semibold text-white"><Reply className="size-4" />Reply</button>{item.status !== 'CLOSED' && <button type="button" onClick={() => void close(item)} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-semibold"><Archive className="size-4" />Close</button>}</div></div></Card>)}{!items.length && <Card className="p-8 text-center text-sm text-muted-foreground">No enquiries in this queue.</Card>}</div>
+    {replying && <ReplyModal enquiry={replying} onClose={() => setReplying(null)} onSend={sendReply} />}
+  </div>
+}
+
+function ReplyModal({ enquiry, onClose, onSend }: { enquiry: Enquiry; onClose: () => void; onSend: (text: string) => Promise<void> }) {
+  const [text, setText] = useState(enquiry.reply ?? '')
+  const [sending, setSending] = useState(false)
+  return <Modal open onClose={onClose} title={`Reply to ${enquiry.name}`} description={`${enquiry.email} — ${enquiry.subject}`} className="max-w-xl"><p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{enquiry.message}</p><form onSubmit={(event) => { event.preventDefault(); if (!text.trim()) return; setSending(true); void onSend(text.trim()).finally(() => setSending(false)) }} className="mt-4"><label className="block text-sm font-medium">Your reply<textarea autoFocus required minLength={2} rows={6} value={text} onChange={(event) => setText(event.target.value)} className="mt-2 w-full resize-y rounded-lg border p-3 text-sm" /></label><div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className="h-10 rounded-md border px-4 text-sm font-semibold">Cancel</button><button disabled={sending || !text.trim()} className="h-10 rounded-md bg-[#064071] px-4 text-sm font-semibold text-white disabled:opacity-50">{sending ? 'Sending...' : 'Send reply'}</button></div></form></Modal>
 }

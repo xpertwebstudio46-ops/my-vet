@@ -1,12 +1,14 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database.js'
-import { validateParams, validateQuery } from '../../shared/middleware/validate.js'
+import { validateBody, validateParams, validateQuery } from '../../shared/middleware/validate.js'
+import { contactRateLimiter } from '../../shared/middleware/rate-limiter.js'
 import { ApiError } from '../../shared/utils/api-error.js'
 import { paginated, paginationSchema, paginationToPrisma } from '../../shared/utils/pagination.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
 
 const slugParams = z.object({ slug: z.string().min(1).max(180) })
+const newsletterSchema = z.object({ email: z.string().trim().toLowerCase().pipe(z.email()) })
 
 export const publicContentRouter = Router()
 
@@ -30,7 +32,7 @@ publicContentRouter.get('/blog', validateQuery(paginationSchema), async (request
     }),
     prisma.blogPost.count({ where }),
   ])
-  response.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
+  response.setHeader('Cache-Control', 'no-store')
   sendSuccess(response, paginated(items, total, query.page, query.limit))
 })
 
@@ -50,7 +52,7 @@ publicContentRouter.get('/blog/:slug', validateParams(slugParams), async (reques
     },
   })
   if (!post) throw new ApiError(404, 'BLOG_POST_NOT_FOUND', 'Blog post was not found')
-  response.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
+  response.setHeader('Cache-Control', 'no-store')
   sendSuccess(response, post)
 })
 
@@ -61,6 +63,16 @@ publicContentRouter.get('/sponsorships', async (_request, response) => {
     select: { id: true, name: true, description: true, imageUrl: true, websiteUrl: true },
     orderBy: { sortOrder: 'asc' },
   })
-  response.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=600')
+  response.setHeader('Cache-Control', 'no-store')
   sendSuccess(response, sponsorships)
+})
+
+publicContentRouter.post('/newsletter', contactRateLimiter, validateBody(newsletterSchema), async (request, response) => {
+  const { email } = request.validatedBody as z.infer<typeof newsletterSchema>
+  await prisma.newsletterSubscriber.upsert({
+    where: { email },
+    update: { active: true, unsubscribedAt: null, subscribedAt: new Date() },
+    create: { email },
+  })
+  sendSuccess(response, { subscribed: true }, 'You are subscribed', 201)
 })

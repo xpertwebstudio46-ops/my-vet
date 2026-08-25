@@ -19,13 +19,13 @@ const icons: Record<'download' | 'plus', LucideIcon> = {
 export function AdminPageBanner({
   title,
   description,
-  action = { label: 'Export CSV', icon: 'download', tone: 'outline' },
+  action,
 }: AdminPageBannerProps) {
-  const Icon = action.icon ? icons[action.icon] : null
+  const Icon = action?.icon ? icons[action.icon] : null
   const actionClassName =
-    action.tone === 'blue'
+    action?.tone === 'blue'
       ? 'border-[#064071] bg-[#064071] text-white hover:bg-[#052f52]'
-      : action.tone === 'teal'
+      : action?.tone === 'teal'
         ? 'border-[#01AEAD] bg-[#01AEAD] text-white hover:bg-[#019594]'
         : 'border-[#064071] bg-transparent text-[#064071] hover:bg-[#064071] hover:text-white'
 
@@ -39,14 +39,14 @@ export function AdminPageBanner({
           {description}
         </p>
       </div>
-      <button
+      {action && <button
         type="button"
         onClick={action.onClick}
         className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold transition-colors ${actionClassName}`}
       >
         {Icon && <Icon className="size-4" />}
         {action.label}
-      </button>
+      </button>}
     </section>
   )
 }

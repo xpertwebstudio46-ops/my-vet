@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Star, MapPin, ShieldCheck, Phone, Calendar } from "lucide-react";
+import { Star, MapPin, ShieldCheck, Phone } from "lucide-react";
+import { BookAppointmentButton } from "@/components/appointments/book-appointment-modal";
 
 export default function VetProfile({ name, bannerUrl, rating, reviewCount, address, phone, practiceId }: {
   name: string;
@@ -26,7 +26,7 @@ export default function VetProfile({ name, bannerUrl, rating, reviewCount, addre
         </div>
         <div className="flex items-center gap-4">
           <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-[#064071] transition hover:bg-gray-100"><Phone size={16} />Contact</a>
-          <Link href={`/dashboard?practice=${encodeURIComponent(practiceId)}`} className="flex items-center gap-2 rounded-full bg-[#2AB7A9] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#239b8f]"><Calendar size={16} />Book Appt</Link>
+          <BookAppointmentButton practiceId={practiceId} practiceName={name} className="flex items-center gap-2 rounded-full bg-[#2AB7A9] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#239b8f]" />
         </div>
       </div>
     </section>

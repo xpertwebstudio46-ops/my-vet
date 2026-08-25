@@ -36,8 +36,8 @@ const contactActionSchema = z.object({ type: z.enum(ContactActionType), source: 
 const searchSchema = paginationSchema.extend({
   q: z.string().trim().max(100).optional(),
   city: z.string().trim().max(100).optional(),
-  animalType: z.string().trim().max(100).optional(),
-  service: z.string().trim().max(100).optional(),
+  animalType: z.string().trim().max(300).optional(),
+  service: z.string().trim().max(300).optional(),
   sort: z.enum(['rating', 'newest', 'name']).default('rating'),
 })
 
@@ -47,8 +47,11 @@ function publicInclude() {
     facilities: { where: { active: true } },
     animalTypes: { include: { animalType: true } },
     openingHours: { orderBy: { dayOfWeek: 'asc' as const } },
+    holidayHours: { orderBy: { date: 'asc' as const } },
+    emergencyHours: true,
     galleryMedia: { orderBy: { sortOrder: 'asc' as const } },
     pricing: { where: { active: true }, orderBy: { sortOrder: 'asc' as const } },
+    teamMembers: { where: { active: true }, orderBy: { sortOrder: 'asc' as const } },
   }
 }
 
@@ -77,13 +80,23 @@ practicesRouter.get('/', validateQuery(searchSchema), async (request, response) 
     where.OR = [
       { name: { contains: query.q, mode: 'insensitive' } },
       { description: { contains: query.q, mode: 'insensitive' } },
+      { city: { contains: query.q, mode: 'insensitive' } },
+      { county: { contains: query.q, mode: 'insensitive' } },
+      { postcode: { contains: query.q, mode: 'insensitive' } },
+      { services: { some: { active: true, name: { contains: query.q, mode: 'insensitive' } } } },
+      { services: { some: { active: true, category: { active: true, name: { contains: query.q, mode: 'insensitive' } } } } },
+      { animalTypes: { some: { animalType: { active: true, name: { contains: query.q, mode: 'insensitive' } } } } },
     ]
   }
   if (query.city) where.city = { contains: query.city, mode: 'insensitive' }
   if (query.animalType) {
-    where.animalTypes = { some: { animalType: { slug: query.animalType, active: true } } }
+    const animalTypes = query.animalType.split(',').map((value) => value.trim()).filter(Boolean)
+    where.animalTypes = { some: { animalType: { active: true, OR: [{ slug: { in: animalTypes } }, ...animalTypes.map((name) => ({ name: { equals: name, mode: 'insensitive' as const } }))] } } }
   }
-  if (query.service) where.services = { some: { name: { contains: query.service, mode: 'insensitive' }, active: true } }
+  if (query.service) {
+    const services = query.service.split(',').map((value) => value.trim()).filter(Boolean)
+    where.AND = services.map((service) => ({ services: { some: { active: true, OR: [{ name: { contains: service, mode: 'insensitive' } }, { category: { name: { contains: service, mode: 'insensitive' }, active: true } }] } } }))
+  }
   const orderBy: Prisma.PracticeOrderByWithRelationInput =
     query.sort === 'newest' ? { createdAt: 'desc' } : query.sort === 'name' ? { name: 'asc' } : { rating: 'desc' }
 

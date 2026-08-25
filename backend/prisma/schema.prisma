@@ -770,3 +770,14 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([createdAt])
 }
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  active         Boolean   @default(true)
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+  updatedAt      DateTime  @updatedAt
+
+  @@index([active, subscribedAt])
+}

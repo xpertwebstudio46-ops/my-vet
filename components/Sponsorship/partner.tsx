@@ -1,65 +1,6 @@
-const logos = [
-    { src: '/images/Frame 34.png', alt: 'Sheba' },
-    { src: '/images/Frame 35.png', alt: 'Brand Logo' },
-    { src: '/images/Frame 36.png', alt: 'Brand Logo' },
-    { src: '/images/Frame 37.png', alt: 'Brand Logo' },
-    { src: '/images/Frame 39.png', alt: 'Brand Logo' },
-    { src: '/images/Frame 41.png', alt: 'Brand Logo' },
-]
+import { getSponsorships } from '@/lib/api/server'
 
-const Partner = () => {
-    const track = [...logos, ...logos]
-
-    return (
-        <section className="py-10 bg-white  overflow-hidden">
-            <h1 className="font-bold text-center mb-10 font-heading text-[48px] text-[#064071]">Our Current <span className="text-teal-500">Partner</span></h1>
-            <div
-                className="flex items-center"
-                style={{
-                    animation: 'marquee 18s linear infinite',
-                    width: 'max-content',
-                }}
-            >
-                {track.map((logo, i) => (
-                    <div
-                        key={i}
-                        className="shrink-0 mx-8 flex items-center justify-center"
-                        style={{
-                            width: '180px',
-                            height: '80px',
-                            background: '#ffffff',
-                            borderRadius: '12px',
-                            padding: '8px 16px',
-                        }}
-                    >
-                        <img
-                            src={logo.src}
-                            alt={logo.alt}
-                            className="logo-img"
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    </div>
-                ))}
-            </div>
-
-            <style>{`
-        @keyframes marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .logo-img {
-          transition: opacity 0.3s;
-        }
-        .logo-img:hover {
-          opacity: 0.8;
-        }
-      `}</style>
-        </section>
-    )
+export default async function Partner() {
+  const sponsors = await getSponsorships()
+  return <section className="overflow-hidden bg-white py-14"><h2 className="mb-10 text-center text-[48px] font-bold font-heading text-[#064071]">Our Current <span className="text-teal-500">Partners</span></h2>{sponsors.length ? <div className="mx-auto grid max-w-6xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">{sponsors.map((sponsor) => <a key={sponsor.id} href={sponsor.websiteUrl ?? '#'} target={sponsor.websiteUrl ? '_blank' : undefined} rel={sponsor.websiteUrl ? 'noreferrer' : undefined} className="flex min-h-40 flex-col items-center justify-center rounded-2xl border bg-white p-6 text-center shadow-sm transition hover:shadow-md">{sponsor.imageUrl ? <img src={sponsor.imageUrl} alt={`${sponsor.name} logo`} className="h-20 max-w-full object-contain" /> : <span className="text-xl font-semibold text-[#064071]">{sponsor.name}</span>}{sponsor.description && <p className="mt-4 text-sm text-slate-500">{sponsor.description}</p>}</a>)}</div> : <p className="text-center text-sm text-slate-500">Current sponsorships will appear here.</p>}</section>
 }
-
-export default Partner

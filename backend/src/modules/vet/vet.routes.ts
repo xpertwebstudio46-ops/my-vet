@@ -142,6 +142,15 @@ vetRouter.get('/reviews', async (request, response) => {
   sendSuccess(response, items)
 })
 
+vetRouter.get('/service-categories', async (_request, response) => {
+  const categories = await prisma.serviceCategory.findMany({
+    where: { active: true },
+    select: { id: true, name: true, description: true, imageUrl: true },
+    orderBy: { name: 'asc' },
+  })
+  sendSuccess(response, categories)
+})
+
 function registerCrud(
   path: string,
   schema: z.ZodObject,

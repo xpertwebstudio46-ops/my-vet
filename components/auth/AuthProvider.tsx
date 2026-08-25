@@ -36,8 +36,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    void refreshAccessToken()
-      .then(() => apiClient<User>("/api/auth/me", {}, { retry: false }))
+    const restore = async () => {
+      if (getAccessToken()) {
+        try {
+          return await apiClient<User>("/api/auth/me");
+        } catch {
+          // Fall through to the secure refresh-cookie flow.
+        }
+      }
+      await refreshAccessToken();
+      return apiClient<User>("/api/auth/me", {}, { retry: false });
+    };
+
+    void restore()
       .then((currentUser) => {
         if (active) setUser(currentUser);
       })
@@ -51,6 +62,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const update = (event: Event) => {
+      const next = (event as CustomEvent<Partial<User>>).detail;
+      setUser((current) => (current ? { ...current, ...next } : current));
+    };
+    window.addEventListener("myvet:user-updated", update);
+    return () => window.removeEventListener("myvet:user-updated", update);
   }, []);
 
   useEffect(() => {

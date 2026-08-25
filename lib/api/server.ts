@@ -1,5 +1,5 @@
 import "server-only";
-import type { ApiEnvelope, Paginated, Practice, PracticeReview } from "./types";
+import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeReview, Sponsorship } from "./types";
 
 const API_URL = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/$/, "");
 
@@ -27,6 +27,8 @@ export function getPractices(options: {
   limit?: number;
   q?: string;
   city?: string;
+  animalType?: string;
+  service?: string;
   sort?: "rating" | "newest" | "name";
 } = {}) {
   const query = new URLSearchParams();
@@ -34,6 +36,8 @@ export function getPractices(options: {
   query.set("limit", String(options.limit ?? 20));
   if (options.q) query.set("q", options.q);
   if (options.city) query.set("city", options.city);
+  if (options.animalType) query.set("animalType", options.animalType);
+  if (options.service) query.set("service", options.service);
   if (options.sort) query.set("sort", options.sort);
   return apiFetch<Paginated<Practice>>(`/api/practices?${query.toString()}`);
 }
@@ -44,4 +48,16 @@ export function getPractice(slug: string) {
 
 export function getPracticeReviews(practiceId: string, limit = 10) {
   return apiFetch<Paginated<PracticeReview>>(`/api/reviews/practice/${encodeURIComponent(practiceId)}?page=1&limit=${limit}`);
+}
+
+export function getBlogPosts(page = 1, limit = 24) {
+  return apiFetch<Paginated<BlogPostSummary>>(`/api/blog?page=${page}&limit=${limit}`);
+}
+
+export function getBlogPost(slug: string) {
+  return apiFetch<BlogPost>(`/api/blog/${encodeURIComponent(slug)}`);
+}
+
+export function getSponsorships() {
+  return apiFetch<Sponsorship[]>("/api/sponsorships");
 }

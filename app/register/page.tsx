@@ -12,12 +12,14 @@ export default function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState<Exclude<Role, "ADMIN">>("PET_OWNER");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setError("");
+    setFieldErrors({});
     setSubmitting(true);
     try {
       const user = await register({
@@ -29,7 +31,12 @@ export default function RegisterPage() {
       });
       router.push(user.role === 'VET' ? '/register-practice' : dashboardForRole(user.role));
     } catch (caught) {
-      setError(caught instanceof ApiClientError ? caught.message : "Account creation failed.");
+      if (caught instanceof ApiClientError) {
+        setFieldErrors(caught.details ?? {});
+        setError(caught.details ? "Please correct the highlighted fields." : caught.message);
+      } else {
+        setError("Account creation failed.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -48,14 +55,19 @@ export default function RegisterPage() {
           <button type="button" onClick={() => setRole("VET")} className={`rounded-lg border p-3 text-sm ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</button>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-medium">First name<input name="firstName" required autoComplete="given-name" className="mt-2 w-full rounded-lg border px-3 py-2.5" /></label>
-          <label className="text-sm font-medium">Last name<input name="lastName" required autoComplete="family-name" className="mt-2 w-full rounded-lg border px-3 py-2.5" /></label>
+          <Field label="First name" name="firstName" autoComplete="given-name" errors={fieldErrors.firstName} />
+          <Field label="Last name" name="lastName" autoComplete="family-name" errors={fieldErrors.lastName} />
         </div>
-        <label className="block text-sm font-medium">Email<input name="email" type="email" required autoComplete="email" className="mt-2 w-full rounded-lg border px-3 py-2.5" /></label>
-        <label className="block text-sm font-medium">Password<input name="password" type="password" required minLength={10} autoComplete="new-password" className="mt-2 w-full rounded-lg border px-3 py-2.5" /><span className="mt-1 block text-xs font-normal text-slate-500">10+ characters with upper/lowercase letters and a number.</span></label>
+        <Field label="Email" name="email" type="email" autoComplete="email" errors={fieldErrors.email} />
+        <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : "Create account"}</button>
       </form>
     </main>
   );
+}
+
+function Field({ label, name, type = "text", autoComplete, minLength, errors, hint }: { label: string; name: string; type?: string; autoComplete: string; minLength?: number; errors?: string[]; hint?: string }) {
+  const errorId = `${name}-error`;
+  return <label className="block text-sm font-medium">{label}<input name={name} type={type} required minLength={minLength} autoComplete={autoComplete} aria-invalid={Boolean(errors?.length)} aria-describedby={errors?.length ? errorId : undefined} className={`mt-2 w-full rounded-lg border px-3 py-2.5 ${errors?.length ? "border-red-500 ring-2 ring-red-100" : ""}`} />{hint && !errors?.length && <span className="mt-1 block text-xs font-normal text-slate-500">{hint}</span>}{errors?.length ? <span id={errorId} className="mt-1 block text-xs font-normal text-red-600">{errors.join(" ")}</span> : null}</label>;
 }

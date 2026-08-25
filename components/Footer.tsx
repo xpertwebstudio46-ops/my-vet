@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { apiClient, ApiClientError } from '@/lib/api/client'
 
 const quickLinks = [
   { label: 'Home', href: '/' },
@@ -9,6 +10,7 @@ const quickLinks = [
   { label: 'Find a Vet', href: '/vet-search' },
   { label: 'Directory', href: '/directory' },
   { label: 'Reviews', href: '/review' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Sponsorship', href: '/sponsorship' },
   { label: 'Contact', href: '/contact' },
 ]
@@ -20,6 +22,15 @@ const supportLinks = [
 
 const Footer = () => {
   const [email, setEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [subscribing, setSubscribing] = useState(false)
+
+  async function subscribe(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSubscribing(true); setNewsletterStatus(null)
+    try { await apiClient('/api/newsletter', { method: 'POST', body: JSON.stringify({ email }) }, { authenticated: false }); setEmail(''); setNewsletterStatus({ type: 'success', message: 'Thanks — you are subscribed.' }) }
+    catch (caught) { setNewsletterStatus({ type: 'error', message: caught instanceof ApiClientError ? caught.message : 'Subscription could not be completed.' }) }
+    finally { setSubscribing(false) }
+  }
 
   return (
     <footer style={{ background: '#0d2e5e', fontFamily: 'var(--font-dm-sans), sans-serif' }}>
@@ -62,18 +73,20 @@ const Footer = () => {
           </div>
 
           {/* Email form */}
-          <div className="relative z-10 flex items-center gap-3 bg-white rounded-xl px-3 py-3 min-w-[620px] shadow-lg">
+          <form onSubmit={(event) => void subscribe(event)} className="relative z-10 flex min-w-0 flex-col items-stretch gap-2 rounded-xl bg-white px-3 py-3 shadow-lg sm:min-w-[520px] sm:flex-row sm:items-center">
             <input
               type="email"
               placeholder="Enter your Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               className="flex-1 border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-600 outline-none placeholder:text-gray-400 bg-white"
             />
-            <button className="bg-[#0d2e5e] text-white text-sm font-semibold px-6 py-3 rounded-md whitespace-nowrap cursor-pointer">
-              Subcribe Now
+            <button disabled={subscribing} className="bg-[#0d2e5e] text-white text-sm font-semibold px-6 py-3 rounded-md whitespace-nowrap disabled:opacity-60">
+              {subscribing ? 'Subscribing...' : 'Subscribe Now'}
             </button>
-          </div>
+            {newsletterStatus && <p role={newsletterStatus.type === 'error' ? 'alert' : 'status'} className={`text-xs sm:absolute sm:left-3 sm:top-full sm:mt-1 ${newsletterStatus.type === 'error' ? 'text-red-700' : 'text-emerald-700'}`}>{newsletterStatus.message}</p>}
+          </form>
         </div>
       </div>
 

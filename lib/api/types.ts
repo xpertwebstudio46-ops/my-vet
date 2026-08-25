@@ -66,8 +66,11 @@ export interface Practice {
   facilities?: Array<{ id: string; name: string; description: string | null; icon: string | null }>;
   animalTypes?: PracticeAnimalType[];
   openingHours?: OpeningHours[];
-  galleryMedia?: Array<{ id: string; url: string; caption: string | null; type: "IMAGE" | "VIDEO" }>;
-  pricing?: Array<{ id: string; name: string; section: string; price: string; currency: string }>;
+  holidayHours?: Array<{ id: string; date: string; isClosed: boolean; opensAt: string | null; closesAt: string | null; note: string | null }>;
+  emergencyHours?: { enabled: boolean; phone: string | null; instructions: string | null } | null;
+  galleryMedia?: Array<{ id: string; url: string; altText: string | null; caption: string | null; mediaType: "IMAGE" | "VIDEO" }>;
+  pricing?: Array<{ id: string; kind: "SERVICE" | "HEALTH_PACKAGE"; name: string; section: string; description: string | null; price: string; currency: string; billingPeriod: "ONE_OFF" | "MONTHLY" | "YEARLY" | null }>;
+  teamMembers?: Array<{ id: string; name: string; role: string; bio: string | null; imageUrl: string | null; qualifications: string | null }>;
 }
 
 export interface PracticeReview {
@@ -85,4 +88,26 @@ export interface PracticeReview {
 export interface AuthResult {
   user: User;
   accessToken: string;
+}
+
+export interface BlogPostSummary {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  coverUrl: string | null;
+  publishedAt: string;
+  author: { firstName: string; lastName: string; avatar: string | null };
+}
+
+export interface BlogPost extends BlogPostSummary {
+  content: string;
+}
+
+export interface Sponsorship {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  websiteUrl: string | null;
 }

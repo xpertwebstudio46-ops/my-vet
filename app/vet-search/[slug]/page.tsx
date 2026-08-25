@@ -6,6 +6,7 @@ import LeaveReviewForm from "@/components/vetProfile/LeaveReviewForm";
 import LocationMap from "@/components/vetProfile/LocationMap";
 import PetOwnerReviews from "@/components/vetProfile/PetOwnerReviews";
 import VetProfile from "@/components/vetProfile/ProfileHero";
+import { PublicPracticeDetails } from "@/components/vetProfile/PublicPracticeDetails";
 import Footer from "@/components/Footer";
 import { ApiRequestError, getPractice, getPracticeReviews } from "@/lib/api/server";
 
@@ -43,6 +44,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
         <div className="mx-auto max-w-6xl grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 flex flex-col gap-8">
             <AboutPracticeSection name={practice.name} description={description} mission={mission} services={practice.services ?? []} facilities={practice.facilities ?? []} animalTypes={practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []} />
+            <PublicPracticeDetails practice={practice} />
             <PetOwnerReviews reviews={reviewCards} averageRating={Number(practice.rating)} totalReviews={practice.reviewCount} />
             <LeaveReviewForm practiceId={practice.id} />
           </div>
