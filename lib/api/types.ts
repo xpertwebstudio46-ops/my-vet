@@ -7,6 +7,17 @@ export interface ApiEnvelope<T> {
   error: { code: string; details?: Record<string, string[]>; requestId?: string } | null;
 }
 
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: string;
+  currency: string;
+  billingPeriod: "MONTHLY";
+  features: unknown;
+}
+
 export interface Paginated<T> {
   items: T[];
   total: number;

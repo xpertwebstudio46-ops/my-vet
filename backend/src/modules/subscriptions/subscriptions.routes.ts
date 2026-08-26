@@ -18,6 +18,16 @@ subscriptionsRouter.get('/plans', async (_request, response) => {
   const plans = await prisma.subscriptionPlan.findMany({
     where: { active: true, billingPeriod: 'MONTHLY', price: { gt: 0 } },
     orderBy: [{ sortOrder: 'asc' }, { price: 'asc' }],
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      price: true,
+      currency: true,
+      billingPeriod: true,
+      features: true,
+    },
   })
   sendSuccess(response, plans.map((plan) => ({ ...plan, price: plan.price.toString() })))
 })

@@ -1,5 +1,5 @@
 import "server-only";
-import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeReview, Sponsorship } from "./types";
+import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeReview, Sponsorship, SubscriptionPlan } from "./types";
 
 const API_URL = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/$/, "");
 
@@ -60,4 +60,8 @@ export function getBlogPost(slug: string) {
 
 export function getSponsorships() {
   return apiFetch<Sponsorship[]>("/api/sponsorships");
+}
+
+export function getSubscriptionPlans() {
+  return apiFetch<SubscriptionPlan[]>("/api/subscriptions/plans");
 }
