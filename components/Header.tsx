@@ -64,7 +64,7 @@ const Header = () => {
                         </button>
                     )}
                     <Link
-                        href="/register-practice"
+                        href="/register?role=vet"
                         className="px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"
                     >
                         Register Your Practice

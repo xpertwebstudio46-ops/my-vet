@@ -11,18 +11,21 @@ export type PracticeDetailsFormData = {
   email: string
   phone: string
   website: string
+  branchCount: string
 }
 
 type Props = {
   onSubmit?: (formData: PracticeDetailsFormData) => void | Promise<void>
   submitting?: boolean
   feedback?: { type: 'success' | 'error'; message: string } | null
+  groupRegistration?: boolean
+  groupBranchRange?: { min: number; max?: number }
 }
 
-const initialForm: PracticeDetailsFormData = { practiceName: '', veterinaryType: '', addressLine1: '', city: '', postcode: '', email: '', phone: '', website: '' }
+const initialForm: PracticeDetailsFormData = { practiceName: '', veterinaryType: '', addressLine1: '', city: '', postcode: '', email: '', phone: '', website: '', branchCount: '1' }
 
-export default function PracticeDetailsForm({ onSubmit, submitting = false, feedback = null }: Props) {
-  const [formData, setFormData] = useState(initialForm)
+export default function PracticeDetailsForm({ onSubmit, submitting = false, feedback = null, groupRegistration = false, groupBranchRange }: Props) {
+  const [formData, setFormData] = useState(() => ({ ...initialForm, branchCount: groupRegistration ? String(groupBranchRange?.min ?? '') : '1' }))
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target
@@ -39,7 +42,8 @@ export default function PracticeDetailsForm({ onSubmit, submitting = false, feed
     <div className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <h2 className="font-heading text-4xl font-bold text-[#064071]">Practice details</h2>
       <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
-        <div className="grid gap-4 sm:grid-cols-2"><Field label="Practice name" required><input name="practiceName" value={formData.practiceName} onChange={handleChange} placeholder="e.g. Greenfield Vets" required className={inputClass} /></Field><Field label="Veterinary type" required><input name="veterinaryType" value={formData.veterinaryType} onChange={handleChange} placeholder="e.g. Small animal practice" required className={inputClass} /></Field></div>
+        <div className="grid gap-4 sm:grid-cols-2"><Field label={groupRegistration ? 'Group / primary branch name' : 'Practice name'} required><input name="practiceName" value={formData.practiceName} onChange={handleChange} placeholder="e.g. Greenfield Vets" required className={inputClass} /></Field><Field label="Veterinary type" required><input name="veterinaryType" value={formData.veterinaryType} onChange={handleChange} placeholder="e.g. Small animal practice" required className={inputClass} /></Field></div>
+        {groupRegistration && <Field label="Number of UK branches" required><input type="number" name="branchCount" value={formData.branchCount} onChange={handleChange} min={groupBranchRange?.min ?? 2} max={groupBranchRange?.max} step={1} placeholder="e.g. 10" required className={inputClass} /></Field>}
         <Field label="Address line 1" required><input name="addressLine1" value={formData.addressLine1} onChange={handleChange} placeholder="Street and building" required className={inputClass} /></Field>
         <div className="grid gap-4 sm:grid-cols-2"><Field label="City" required><input name="city" value={formData.city} onChange={handleChange} required className={inputClass} /></Field><Field label="Postcode" required><input name="postcode" value={formData.postcode} onChange={handleChange} required className={inputClass} /></Field></div>
         <div className="grid gap-4 sm:grid-cols-2"><Field label="Email address" required><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="contact@practice.com" required className={inputClass} /></Field><Field label="Phone number" required><input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="01234 567890" required className={inputClass} /></Field></div>

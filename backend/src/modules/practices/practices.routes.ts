@@ -28,7 +28,37 @@ const practiceFields = z.object({
   bannerUrl: z.url().nullable().optional(),
   timezone: z.string().trim().min(3).max(80).default('Europe/London'),
 })
-const createPracticeSchema = practiceFields
+const groupMembershipSelection = z.object({
+  membership: z.literal('group'),
+  plan: z.enum(['starter', 'growth', 'scale', 'enterprise']),
+  billing: z.enum(['monthly', 'annual']),
+  branchCount: z.number().int().min(2).max(10_000),
+}).superRefine((selection, context) => {
+  const ranges = {
+    starter: { min: 2, max: 5 },
+    growth: { min: 6, max: 20 },
+    scale: { min: 21, max: 50 },
+    enterprise: { min: 51, max: 10_000 },
+  } as const
+  const range = ranges[selection.plan]
+  if (selection.branchCount < range.min || selection.branchCount > range.max) {
+    context.addIssue({
+      code: 'custom',
+      path: ['branchCount'],
+      message: `${selection.plan} supports ${range.min}–${range.max === 10_000 ? '10,000' : range.max} branches`,
+    })
+  }
+})
+const membershipSelectionSchema = z.union([
+  z.object({
+    membership: z.literal('independent'),
+    plan: z.enum(['essential', 'standard', 'premium']),
+    billing: z.enum(['monthly', 'annual']),
+    branchCount: z.literal(1),
+  }),
+  groupMembershipSelection,
+])
+const createPracticeSchema = practiceFields.extend({ membershipSelection: membershipSelectionSchema.optional() })
 const updatePracticeSchema = practiceFields.partial()
 const idParams = z.object({ id: z.string().min(1) })
 const slugParams = z.object({ slug: z.string().min(1).max(180) })
@@ -137,13 +167,25 @@ practicesRouter.get('/:slug', validateParams(slugParams), async (request, respon
 
 practicesRouter.post('/', authenticate, requireRole('VET'), validateBody(createPracticeSchema), async (request, response) => {
   const body = request.validatedBody as z.infer<typeof createPracticeSchema>
+  const { membershipSelection, ...practiceFields } = body
   const userId = request.user!.userId
   const baseSlug = toSlug(body.name) || 'practice'
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${randomBytes(3).toString('hex')}`
     try {
       const result = await prisma.$transaction(async (transaction) => {
-        const practice = await transaction.practice.create({ data: { ...body, slug, ownerId: userId } })
+        const practice = await transaction.practice.create({ data: { ...practiceFields, slug, ownerId: userId } })
+        if (membershipSelection) {
+          await transaction.contactEnquiry.create({
+            data: {
+              name: practice.name,
+              email: practice.email,
+              phone: practice.phone,
+              subject: `Membership signup: ${membershipSelection.membership} / ${membershipSelection.plan}`,
+              message: `Billing: ${membershipSelection.billing}\nUK branches: ${membershipSelection.branchCount}\nLaunch offer: first 6 months free`,
+            },
+          })
+        }
         const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
         const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
           userId: admin.id,

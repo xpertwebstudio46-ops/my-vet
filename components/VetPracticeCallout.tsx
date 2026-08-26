@@ -28,7 +28,7 @@ const VetPracticeCallout = () => {
         </p>
 
         <Link
-          href="/register"
+          href="/register?role=vet"
           className="self-start inline-flex items-center gap-2 px-6 py-3.5 font-sans text-[16px] rounded-full text-white font-normal"
           style={{ backgroundColor: '#0d2e5e' }}
         >

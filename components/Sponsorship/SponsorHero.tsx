@@ -56,7 +56,7 @@ const SponsorHero = () => {
                     </p>
 
                     <Link
-                        href="/register"
+                        href="/register?role=vet"
                         className="inline-flex items-center border-none bg-[#13b8a8] gap-2 px-4 py-4 text-sm font-semibold border-2 rounded-full transition-colors hover:bg-[#13b8a8] hover:text-white"
                         style={{ color: '#fff' }}
                     >

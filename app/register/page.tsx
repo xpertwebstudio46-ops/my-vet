@@ -1,16 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { dashboardForRole, useAuth } from "@/components/auth/AuthProvider";
 import { ApiClientError } from "@/lib/api/client";
 import type { Role } from "@/lib/api/types";
+import { formatPlanPrice, getMembershipPlan, type BillingCycle } from "@/lib/membership-plans";
 
-export default function RegisterPage() {
+function queryValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value
+}
+
+export default function RegisterPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = use(searchParams)
+  const membership = queryValue(params.membership)
+  const planSlug = queryValue(params.plan)
+  const selectedPlan = getMembershipPlan(membership, planSlug)
+  const billing: BillingCycle = queryValue(params.billing) === 'annual' ? 'annual' : 'monthly'
   const { register } = useAuth();
   const router = useRouter();
-  const [role, setRole] = useState<Exclude<Role, "ADMIN">>("PET_OWNER");
+  const [role, setRole] = useState<Exclude<Role, "ADMIN">>(selectedPlan || queryValue(params.role) === 'vet' ? "VET" : "PET_OWNER");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +39,17 @@ export default function RegisterPage() {
         password: String(form.get("password")),
         role,
       });
-      router.push(user.role === 'VET' ? '/register-practice' : dashboardForRole(user.role));
+      if (user.role === 'VET') {
+        const selection = new URLSearchParams()
+        if (selectedPlan) {
+          selection.set('membership', selectedPlan.membership)
+          selection.set('plan', selectedPlan.slug)
+          selection.set('billing', billing)
+        }
+        router.push(`/register-practice${selection.size ? `?${selection.toString()}` : ''}`)
+      } else {
+        router.push(dashboardForRole(user.role));
+      }
     } catch (caught) {
       if (caught instanceof ApiClientError) {
         setFieldErrors(caught.details ?? {});
@@ -46,14 +66,26 @@ export default function RegisterPage() {
     <main className="min-h-screen bg-slate-50 px-4 py-14">
       <form onSubmit={submit} className="mx-auto max-w-lg space-y-5 rounded-2xl bg-white p-8 shadow-sm">
         <div>
-          <Link href="/" className="text-sm text-[#01AEAD]">← Back to MY VET</Link>
+          <Link href={selectedPlan ? '/#pricing' : '/'} className="text-sm text-[#01AEAD]">← Back to MY VET</Link>
           <h1 className="mt-4 text-3xl font-bold text-[#064071]">Create your account</h1>
-          <p className="mt-2 text-sm text-slate-600">Choose the account type that matches how you use MY VET.</p>
+          <p className="mt-2 text-sm text-slate-600">Create your account to start your listing. No payment card is needed today.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <button type="button" onClick={() => setRole("PET_OWNER")} className={`rounded-lg border p-3 text-sm ${role === "PET_OWNER" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Pet owner</button>
           <button type="button" onClick={() => setRole("VET")} className={`rounded-lg border p-3 text-sm ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</button>
         </div>
+        {role === 'VET' && selectedPlan && (
+          <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-slate-700">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#078a83]">Your selected plan</p>
+                <p className="mt-1 font-semibold text-[#064071]">{selectedPlan.name} · {selectedPlan.audience}</p>
+              </div>
+              <p className="shrink-0 text-right font-semibold text-[#064071]">{formatPlanPrice(selectedPlan, billing)}<span className="block text-[11px] font-normal text-slate-500">{billing === 'annual' ? 'per year' : 'per month'}</span></p>
+            </div>
+            <p className="mt-3 border-t border-teal-200 pt-3 text-xs text-[#087b75]">First 6 months free · No card required</p>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="First name" name="firstName" autoComplete="given-name" errors={fieldErrors.firstName} />
           <Field label="Last name" name="lastName" autoComplete="family-name" errors={fieldErrors.lastName} />
@@ -61,7 +93,7 @@ export default function RegisterPage() {
         <Field label="Email" name="email" type="email" autoComplete="email" errors={fieldErrors.email} />
         <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-        <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : "Create account"}</button>
+        <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & add practice" : "Create account"}</button>
       </form>
     </main>
   );
