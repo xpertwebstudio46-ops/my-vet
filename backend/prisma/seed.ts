@@ -184,16 +184,57 @@ async function main() {
   })
   await prisma.practice.update({ where: { id: practice.id }, data: { rating: new Prisma.Decimal(5), reviewCount: 1 } })
 
+  await prisma.subscriptionPlan.upsert({
+    where: { slug: 'basic' },
+    update: { price: new Prisma.Decimal(9), active: true },
+    create: {
+      id: 'seed_plan_basic',
+      name: 'Basic',
+      slug: 'basic',
+      description: 'Perfect for getting your practice on the map.',
+      price: new Prisma.Decimal(9),
+      features: { items: ['Basic practice info', 'Location visibility', 'Limited search ranking'] },
+      sortOrder: 10,
+    },
+  })
+  await prisma.subscriptionPlan.upsert({
+    where: { slug: 'professional' },
+    update: { price: new Prisma.Decimal(29), active: true },
+    create: {
+      id: 'seed_plan_professional',
+      name: 'Professional',
+      slug: 'professional',
+      description: 'Everything you need to build trust and attract clients.',
+      price: new Prisma.Decimal(29),
+      features: { items: ['Full profile page', 'Services & pricing display', 'Customer reviews', 'Analytics dashboard'] },
+      sortOrder: 20,
+    },
+  })
+  await prisma.subscriptionPlan.upsert({
+    where: { slug: 'premium' },
+    update: { price: new Prisma.Decimal(59), active: true },
+    create: {
+      id: 'seed_plan_premium',
+      name: 'Premium',
+      slug: 'premium',
+      description: 'Maximise your visibility and grow your practice faster.',
+      price: new Prisma.Decimal(59),
+      features: { items: ['Featured placement', 'Unlimited media uploads', 'Advanced analytics'] },
+      sortOrder: 30,
+    },
+  })
   const freePlan = await prisma.subscriptionPlan.upsert({
     where: { slug: 'free' },
-    update: { price: new Prisma.Decimal(0), active: true },
+    update: { price: new Prisma.Decimal(0), active: false },
     create: {
       id: 'seed_plan_free',
       name: 'Free',
       slug: 'free',
-      description: 'Essential directory listing',
+      description: 'Legacy test plan',
       price: new Prisma.Decimal(0),
-      features: { directoryListing: true },
+      features: { items: ['Basic practice record'] },
+      active: false,
+      sortOrder: 0,
     },
   })
   await prisma.subscription.upsert({

@@ -10,6 +10,8 @@ import { deleteR2Object } from '../upload/upload.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
+import { frontendReturnUrl } from '../../shared/utils/frontend-url.js'
+import { STRIPE_APP } from '../subscriptions/stripe-catalog.service.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const animalParams = z.object({ animalTypeId: z.string().min(1) })
@@ -91,7 +93,7 @@ const pricingSchema = z.object({
   sortOrder: z.number().int().min(0).default(0),
   active: z.boolean().default(true),
 })
-const checkoutSchema = z.object({ planId: z.string().min(1), successUrl: z.url(), cancelUrl: z.url() })
+const checkoutSchema = z.object({ planId: z.string().min(1) })
 
 export const vetRouter = Router()
 vetRouter.use(authenticate, requireRole('VET'))
@@ -457,10 +459,10 @@ vetRouter.post('/featured-listing/checkout', validateBody(checkoutSchema), async
       {
         mode: 'payment',
         line_items: [{ price: plan.stripePriceId, quantity: 1 }],
-        success_url: body.successUrl,
-        cancel_url: body.cancelUrl,
+        success_url: frontendReturnUrl(request, '/vet-dashboard/featured-listing', 'success'),
+        cancel_url: frontendReturnUrl(request, '/vet-dashboard/featured-listing', 'cancelled'),
         customer: practice.stripeCustomerId ?? undefined,
-        metadata: { kind: 'featured_listing', listingId: listing.id, practiceId: practice.id, planId: plan.id },
+        metadata: { app: STRIPE_APP, kind: 'featured_listing', listingId: listing.id, practiceId: practice.id, planId: plan.id },
       },
       { idempotencyKey: `featured-listing-${listing.id}` },
     )

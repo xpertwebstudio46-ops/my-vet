@@ -531,7 +531,8 @@ model SubscriptionPlan {
   price         Decimal        @db.Decimal(10, 2)
   currency      String         @default("GBP")
   billingPeriod BillingPeriod  @default(MONTHLY)
-  stripePriceId String?        @unique
+  stripeProductId String?      @unique
+  stripePriceId   String?      @unique
   features      Json
   active        Boolean        @default(true)
   sortOrder     Int            @default(0)

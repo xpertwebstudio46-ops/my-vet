@@ -26,5 +26,5 @@ webhookRouter.post('/', async (request, response) => {
     throw new ApiError(400, 'INVALID_STRIPE_SIGNATURE', 'Stripe webhook signature is invalid')
   }
   const result = await processStripeEvent(event)
-  sendSuccess(response, { received: true, duplicate: result.duplicate })
+  sendSuccess(response, { received: true, duplicate: result.duplicate, ignored: result.ignored })
 })

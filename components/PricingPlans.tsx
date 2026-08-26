@@ -4,8 +4,8 @@ const plans = [
   {
     name: 'Basic',
     description: 'Perfect for getting your practice on the map.',
-    price: '£09',
-    period: '/forever',
+    price: '£9',
+    period: '/per month',
     features: ['Basic practice info', 'Location visibility', 'Limited search ranking'],
     popular: false,
     href: '/enquire?plan=basic',
@@ -129,6 +129,7 @@ const PricingPlans = () => {
               </span>
               <span className="text-white text-sm">{plan.period}</span>
             </div>
+            <p className="-mt-5 mb-6 text-xs text-blue-100">VAT included</p>
 
             {/* Features */}
             <ul className="flex flex-col gap-3 mb-8 flex-1">

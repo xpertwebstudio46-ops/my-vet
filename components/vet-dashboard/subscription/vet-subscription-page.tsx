@@ -11,7 +11,7 @@ type Plan = {
   description: string | null
   price: string
   currency: string
-  billingPeriod: 'MONTHLY' | 'YEARLY'
+  billingPeriod: 'MONTHLY'
   features: unknown
 }
 
@@ -72,6 +72,11 @@ export function VetSubscriptionPage() {
   }, [])
 
   useEffect(() => {
+    const checkout = new URLSearchParams(window.location.search).get('checkout')
+    void Promise.resolve().then(() => {
+      if (checkout === 'success') setMessage('Payment completed. Your subscription will appear as soon as Stripe confirms it.')
+      if (checkout === 'cancelled') setMessage('Checkout was cancelled. You have not been charged.')
+    })
     void Promise.all([
       apiClient<Plan[]>('/api/subscriptions/plans', {}, { authenticated: false }),
       apiClient<Subscription | null>('/api/subscriptions/me'),
@@ -81,23 +86,24 @@ export function VetSubscriptionPage() {
     }).catch((caught) => {
       setError(caught instanceof ApiClientError ? caught.message : 'Subscription details could not be loaded.')
     }).finally(() => setLoading(false))
-  }, [])
+    const timers = checkout === 'success' ? [1_500, 4_000].map((delay) => window.setTimeout(() => void load(), delay)) : []
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [load])
 
   async function choosePlan(plan: Plan) {
     setBusy(plan.id)
     setError('')
     setMessage('')
     try {
-      const returnUrl = `${window.location.origin}/vet-dashboard/subscription`
       const result = await apiClient<{ checkoutUrl: string | null }>(
         '/api/subscriptions/checkout',
-        { method: 'POST', body: JSON.stringify({ planId: plan.id, successUrl: `${returnUrl}?checkout=success`, cancelUrl: `${returnUrl}?checkout=cancelled` }) },
+        { method: 'POST', body: JSON.stringify({ planId: plan.id }) },
       )
       if (result.checkoutUrl) {
         window.location.assign(result.checkoutUrl)
         return
       }
-      setMessage(`${plan.name} is now active.`)
+      setMessage(`Your ${plan.name} upgrade was accepted. Stripe is confirming the change.`)
       await load()
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : 'Checkout could not be started.')
@@ -116,6 +122,20 @@ export function VetSubscriptionPage() {
       await load()
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : 'The subscription could not be cancelled.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function resumeSubscription() {
+    setBusy('resume')
+    setError('')
+    try {
+      await apiClient('/api/subscriptions/resume', { method: 'POST' })
+      setMessage('Your subscription will continue and the scheduled cancellation has been removed.')
+      await load()
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : 'The subscription could not be resumed.')
     } finally {
       setBusy(null)
     }
@@ -143,6 +163,11 @@ export function VetSubscriptionPage() {
                   {busy === 'cancel' ? 'Cancelling…' : 'Cancel subscription'}
                 </button>
               )}
+              {subscription?.status === 'ACTIVE' && subscription.cancelAtPeriodEnd && (
+                <button type="button" disabled={busy === 'resume'} onClick={() => void resumeSubscription()} className="h-10 rounded-md border border-[#01AEAD] px-4 text-sm font-semibold text-[#047c7b] disabled:opacity-50">
+                  {busy === 'resume' ? 'Resuming…' : 'Keep subscription'}
+                </button>
+              )}
             </div>
           </Card>
 
@@ -151,14 +176,18 @@ export function VetSubscriptionPage() {
             {plans.length === 0 ? <Card className="p-6 text-sm text-muted-foreground">No subscription plans are currently available.</Card> : (
               <div className="grid gap-5 lg:grid-cols-3">
                 {plans.map((plan) => {
-                  const current = subscription?.plan.id === plan.id
+                  const current = subscription?.plan.id === plan.id && subscription.status !== 'CANCELLED'
+                  const paidSubscription = Boolean(subscription && ['ACTIVE', 'TRIALING'].includes(subscription.status))
+                  const downgrade = Boolean(paidSubscription && subscription && Number(plan.price) < Number(subscription.plan.price))
+                  const changeBlocked = Boolean(subscription?.cancelAtPeriodEnd || downgrade)
                   return <Card key={plan.id} className={current ? 'border-[#01AEAD] p-6 ring-1 ring-[#01AEAD]' : 'p-6'}>
                     <h3 className="text-lg font-semibold text-black">{plan.name}</h3>
                     <p className="mt-1 min-h-10 text-sm text-muted-foreground">{plan.description ?? 'Practice subscription plan'}</p>
-                    <p className="mt-5 text-3xl font-semibold text-[#064071]">{money(plan.price, plan.currency)}<span className="text-sm font-normal text-muted-foreground">/{plan.billingPeriod === 'YEARLY' ? 'year' : 'month'}</span></p>
+                    <p className="mt-5 text-3xl font-semibold text-[#064071]">{money(plan.price, plan.currency)}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="mt-1 text-xs text-muted-foreground">VAT included</p>
                     <ul className="mt-5 space-y-2 text-sm">{featureList(plan.features).map((feature) => <li key={feature} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-[#01AEAD]" />{feature}</li>)}</ul>
-                    <button type="button" disabled={current || busy !== null} onClick={() => void choosePlan(plan)} className="mt-6 h-10 w-full rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white disabled:bg-slate-300">
-                      {current ? 'Current plan' : busy === plan.id ? 'Starting…' : Number(plan.price) === 0 ? 'Activate plan' : 'Choose plan'}
+                    <button type="button" disabled={current || changeBlocked || busy !== null} onClick={() => void choosePlan(plan)} className="mt-6 h-10 w-full rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white disabled:bg-slate-300">
+                      {current ? 'Current plan' : subscription?.cancelAtPeriodEnd ? 'Resume subscription first' : downgrade ? 'Downgrades coming later' : busy === plan.id ? 'Starting…' : paidSubscription ? 'Upgrade plan' : 'Choose plan'}
                     </button>
                   </Card>
                 })}

@@ -13,6 +13,7 @@ import { createNotification, emitNotifications } from '../../shared/services/not
 import { mailService } from '../../shared/services/mail.service.js'
 import { recalculatePracticeRating } from '../reviews/review-rating.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
+import { installAndSyncSubscriptionCatalog, syncSubscriptionPlan } from '../subscriptions/stripe-catalog.service.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const statusQuery = paginationSchema.extend({ status: z.string().trim().max(40).optional(), q: z.string().trim().max(100).optional() })
@@ -72,10 +73,9 @@ const planSchema = z.object({
   name: z.string().trim().min(2).max(120),
   slug: z.string().trim().min(2).max(120).optional(),
   description: z.string().trim().max(2_000).nullable().optional(),
-  price: z.coerce.number().nonnegative().max(1_000_000),
-  currency: z.string().length(3).transform((value) => value.toUpperCase()).default('GBP'),
-  billingPeriod: z.enum(['ONE_OFF', 'MONTHLY', 'YEARLY']).default('MONTHLY'),
-  stripePriceId: z.string().trim().nullable().optional(),
+  price: z.coerce.number().positive().max(1_000_000),
+  currency: z.literal('GBP').default('GBP'),
+  billingPeriod: z.literal('MONTHLY').default('MONTHLY'),
   features: z.record(z.string(), z.unknown()).default({}),
   active: z.boolean().default(true),
   sortOrder: z.number().int().min(0).default(0),
@@ -388,12 +388,21 @@ adminRouter.get('/subscription-plans', async (_request, response) => {
   const plans = await prisma.subscriptionPlan.findMany({ orderBy: { sortOrder: 'asc' } })
   sendSuccess(response, plans.map((plan) => ({ ...plan, price: plan.price.toString() })))
 })
+adminRouter.post('/subscription-plans/sync-stripe', async (_request, response) => {
+  const plans = await installAndSyncSubscriptionCatalog()
+  sendSuccess(
+    response,
+    plans.map((plan) => ({ ...plan, price: plan.price.toString() })),
+    'Stripe subscription catalog synced',
+  )
+})
 adminRouter.post('/subscription-plans', validateBody(planSchema), async (request, response) => {
   const body = request.validatedBody as z.infer<typeof planSchema>
   const item = await prisma.subscriptionPlan.create({
     data: { ...body, slug: body.slug ?? toSlug(body.name), features: body.features as Prisma.InputJsonValue },
   })
-  sendSuccess(response, { ...item, price: item.price.toString() }, 'Plan created', 201)
+  const synced = await syncSubscriptionPlan(item.id)
+  sendSuccess(response, { ...synced, price: synced.price.toString() }, 'Plan created and synced to Stripe', 201)
 })
 adminRouter.put('/subscription-plans/:id', validateParams(idParams), validateBody(planSchema.partial()), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
@@ -403,7 +412,8 @@ adminRouter.put('/subscription-plans/:id', validateParams(idParams), validateBod
     where: { id },
     data: { ...data, ...(features ? { features: features as Prisma.InputJsonValue } : {}) },
   })
-  sendSuccess(response, { ...item, price: item.price.toString() }, 'Plan updated')
+  const synced = await syncSubscriptionPlan(item.id)
+  sendSuccess(response, { ...synced, price: synced.price.toString() }, 'Plan updated and synced to Stripe')
 })
 
 adminRouter.get('/featured-listing-plans', async (_request, response) => {

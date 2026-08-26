@@ -58,11 +58,7 @@ export function VetFeaturedListingPage() {
         "/api/vet/featured-listing/checkout",
         {
           method: "POST",
-          body: JSON.stringify({
-            planId: plan.id,
-            successUrl: `${window.location.origin}/vet-dashboard/featured-listing?checkout=success`,
-            cancelUrl: `${window.location.origin}/vet-dashboard/featured-listing?checkout=cancelled`,
-          }),
+          body: JSON.stringify({ planId: plan.id }),
         },
       );
       if (result.checkoutUrl) window.location.assign(result.checkoutUrl);

@@ -83,7 +83,11 @@ The command is idempotent. It imports the historical rating totals separately fr
 
 External-service notes:
 
-- Configure the Stripe webhook URL as `https://YOUR_API/api/subscriptions/webhook` and subscribe to Checkout Session, Subscription, and Invoice events used by the API.
+- For the test deployment, set `FRONTEND_URL=https://test.my-vet.co.uk`, `STRIPE_ENABLED=true`, the client's `sk_test_...` key, and that endpoint's `whsec_...` signing secret. Product and Price IDs are stored in PostgreSQL, not environment variables.
+- Configure the Stripe webhook URL as `https://backend-production-7d07.up.railway.app/api/subscriptions/webhook`. Subscribe to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.pending_update_applied`, `customer.subscription.pending_update_expired`, `invoice.paid`, and `invoice.payment_failed`.
+- In My Vet's admin Subscription Plans page, use **Set up / resync Stripe catalog** once after deployment. It creates the missing Basic, Professional, and Premium products and VAT-inclusive monthly Prices through Stripe's API. Subsequent plan edits create replacement Prices automatically; no Stripe product setup is manual.
+- Checkout enables Stripe automatic tax and collects a billing address. Configure the client's test-mode Stripe Tax business address and applicable UK tax registration before testing VAT calculations.
+- Every Stripe object created here has `app=my-vet` metadata. Webhooks from other products in the shared account are acknowledged and ignored.
 - Use a private R2 bucket behind the configured public CDN/custom domain. The API owns object keys and validates image magic bytes.
 - The included rate limiter is process-local. Use a shared store before running more than one API replica.
 - Socket.IO is also single-instance. Add a shared adapter before horizontal scaling.
