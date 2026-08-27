@@ -44,7 +44,7 @@ export function PageHeader({
   return (
     <div className="mb-5 flex min-w-0 flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:p-5">
       <div className="min-w-0">
-        <h1 className="dashboard-heading text-4xl font-normal leading-none text-black sm:text-[48px]">
+        <h1 className="dashboard-heading text-[34px] font-normal leading-none text-black sm:text-[48px]">
           {title}
         </h1>
         {description && (

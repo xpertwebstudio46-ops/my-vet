@@ -32,7 +32,7 @@ export function AdminPageBanner({
   return (
     <section className="flex min-w-0 flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:p-5 md:flex-row md:items-center md:justify-between">
       <div className="min-w-0">
-        <h1 className="dashboard-heading text-4xl font-semibold leading-tight text-black sm:text-[48px]">
+        <h1 className="dashboard-heading text-[34px] font-semibold leading-tight text-black sm:text-[48px]">
           {title}
         </h1>
         <p className="dashboard-font mt-1 text-sm text-muted-foreground">
