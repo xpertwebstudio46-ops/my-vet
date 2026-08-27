@@ -36,7 +36,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [pathname])
 
   return (
-    <div className="dashboard-font flex min-h-screen bg-[#F5F6FB]">
+    <div className="dashboard-font flex min-h-screen overflow-x-hidden bg-[#F5F6FB]">
       <Sidebar
         open={mobileNavOpen}
         onClose={() => setMobileNavOpen(false)}
@@ -51,7 +51,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           onOpenSidebar={() => setMobileNavOpen(true)}
           onLogout={() => setLogoutOpen(true)}
         />
-        <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
+        <main className="min-w-0 flex-1 px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 xl:px-8">
           <div className="mx-auto w-full max-w-6xl">
             {routeLoading ? <DashboardContentSkeleton /> : children}
           </div>

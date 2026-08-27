@@ -8,7 +8,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-white bg-white text-card-foreground shadow-lg shadow-black/10',
+        'min-w-0 max-w-full rounded-2xl border border-white bg-white text-card-foreground shadow-lg shadow-black/10',
         className,
       )}
       {...props}
@@ -42,9 +42,9 @@ export function PageHeader({
   children?: React.ReactNode
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-black/10 sm:flex-row sm:items-start sm:justify-between">
-      <div>
-        <h1 className="dashboard-heading text-[48px] font-normal leading-none text-black">
+    <div className="mb-5 flex min-w-0 flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:p-5">
+      <div className="min-w-0">
+        <h1 className="dashboard-heading text-4xl font-normal leading-none text-black sm:text-[48px]">
           {title}
         </h1>
         {description && (
@@ -53,7 +53,11 @@ export function PageHeader({
           </p>
         )}
       </div>
-      {children && <div className="shrink-0">{children}</div>}
+      {children && (
+        <div className="flex w-full shrink-0 [&>*]:w-full sm:w-auto sm:[&>*]:w-auto">
+          {children}
+        </div>
+      )}
     </div>
   )
 }
@@ -124,14 +128,14 @@ export function Tabs({
   onChange: (tab: string) => void
 }) {
   return (
-    <div className="inline-flex rounded-xl border border-border bg-white p-1 shadow-md shadow-black/10">
+    <div className="flex max-w-full overflow-x-auto rounded-xl border border-border bg-white p-1 shadow-md shadow-black/10 sm:inline-flex">
       {tabs.map((tab) => (
         <button
           key={tab}
           type="button"
           onClick={() => onChange(tab)}
           className={cn(
-            'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+            'shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
             active === tab
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground',

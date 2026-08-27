@@ -28,7 +28,7 @@ export function Sidebar({ open, onClose, onLogout }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed bottom-3 left-3 top-3 z-50 flex w-64 flex-col overflow-hidden rounded-2xl border border-white bg-white shadow-xl shadow-black/10 transition-transform duration-200 lg:sticky lg:bottom-auto lg:top-4 lg:z-auto lg:ml-4 lg:h-[calc(100vh-2rem)] lg:translate-x-0',
+          'fixed bottom-2 left-2 top-2 z-50 flex w-[min(calc(100vw-1rem),16rem)] flex-col overflow-hidden rounded-2xl border border-white bg-white shadow-xl shadow-black/10 transition-transform duration-200 sm:bottom-3 sm:left-3 sm:top-3 lg:sticky lg:bottom-auto lg:top-4 lg:z-auto lg:ml-4 lg:h-[calc(100vh-2rem)] lg:w-64 lg:translate-x-0',
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >

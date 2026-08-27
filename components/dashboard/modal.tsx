@@ -33,7 +33,7 @@ export function Modal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4">
       <div
         className="absolute inset-0 bg-foreground/50"
         onClick={onClose}
@@ -43,7 +43,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         className={cn(
-          'relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl',
+          'relative max-h-[calc(100vh-1.5rem)] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-card p-4 shadow-xl sm:max-h-[calc(100vh-2rem)] sm:p-6',
           className,
         )}
       >

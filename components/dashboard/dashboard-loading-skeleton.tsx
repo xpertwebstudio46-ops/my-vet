@@ -9,13 +9,13 @@ export function DashboardLoadingSkeleton() {
       role="status"
       aria-label="Loading dashboard page"
     >
-      <section className="rounded-2xl bg-white p-5 shadow-lg shadow-black/10">
+      <section className="rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-3">
             <SkeletonBlock className="h-12 w-56 max-w-full" />
             <SkeletonBlock className="h-4 w-80 max-w-full" />
           </div>
-          <SkeletonBlock className="h-11 w-36" />
+          <SkeletonBlock className="h-11 w-full sm:w-36" />
         </div>
       </section>
 
@@ -37,7 +37,7 @@ export function DashboardLoadingSkeleton() {
       </div>
 
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <section className="rounded-2xl border border-white bg-white p-5 shadow-lg shadow-black/10">
+        <section className="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-black/10 sm:p-5">
           <div className="border-b border-gray-200/80 pb-4">
             <SkeletonBlock className="h-5 w-44" />
           </div>
@@ -45,7 +45,7 @@ export function DashboardLoadingSkeleton() {
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 border-b border-gray-200/80 pb-4 last:border-b-0"
+                className="flex items-center gap-3 border-b border-gray-200/80 pb-4 last:border-b-0 sm:gap-4"
               >
                 <SkeletonBlock className="size-12 rounded-lg" />
                 <div className="min-w-0 flex-1 space-y-2">
@@ -58,7 +58,7 @@ export function DashboardLoadingSkeleton() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white bg-white p-5 shadow-lg shadow-black/10">
+        <section className="rounded-2xl border border-white bg-white p-4 shadow-lg shadow-black/10 sm:p-5">
           <div className="border-b border-gray-200/80 pb-4">
             <SkeletonBlock className="h-5 w-36" />
           </div>

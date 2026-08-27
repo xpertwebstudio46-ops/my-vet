@@ -24,8 +24,8 @@ export function PracticeCard({
   favourited?: boolean
 }) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white bg-white font-sans shadow-lg shadow-black/10 transition-shadow hover:shadow-xl">
-      <div className="relative h-40 w-full overflow-hidden">
+    <div className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white bg-white font-sans shadow-lg shadow-black/10 transition-shadow hover:shadow-xl">
+      <div className="relative h-36 w-full overflow-hidden sm:h-40">
         <img
           src={practice.image}
           alt={practice.name}
@@ -39,13 +39,13 @@ export function PracticeCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-manrope text-[18.03px] font-bold leading-tight text-primary text-balance">
+      <div className="flex min-w-0 flex-1 flex-col p-4">
+        <h3 className="font-manrope text-base font-bold leading-tight text-primary text-balance sm:text-[18.03px]">
           {practice.name}
         </h3>
-        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <MapPin className="size-3.5 text-[#01AEAD]" />
-          <span>
+        <div className="mt-1 flex min-w-0 items-start gap-1 text-xs text-muted-foreground">
+          <MapPin className="mt-0.5 size-3.5 shrink-0 text-[#01AEAD]" />
+          <span className="min-w-0 break-words">
             {practice.location}{practice.distance ? ` - ${practice.distance}` : ''}
           </span>
         </div>
@@ -62,11 +62,11 @@ export function PracticeCard({
             </span>
           ))}
         </div>
-        <div className="mt-4 flex items-center justify-between gap-3 pt-1">
-          <div className="rounded-full px-3 py-1.5 font-sans text-xs font-medium text-muted-foreground ">
+        <div className="mt-4 flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="rounded-full font-sans text-xs font-medium text-muted-foreground sm:px-3 sm:py-1.5">
             {practice.reviews} Reviews
           </div>
-          <Link href={practice.slug ? `/vet-search/${practice.slug}` : '/vet-search'} className={buttonVariants({ size: 'lg', className: 'rounded-full bg-[#064071] px-4 text-white hover:bg-[#05365f]' })}>
+          <Link href={practice.slug ? `/vet-search/${practice.slug}` : '/vet-search'} className={buttonVariants({ size: 'lg', className: 'w-full rounded-full bg-[#064071] px-4 text-white hover:bg-[#05365f] sm:w-auto' })}>
             View Profile
             <ArrowRight className="size-4" />
           </Link>

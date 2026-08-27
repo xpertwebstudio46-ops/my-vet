@@ -15,7 +15,7 @@ export function EmptyState({
   action?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-white bg-white px-6 py-16 text-center shadow-lg shadow-black/10">
+    <div className="flex min-w-0 flex-col items-center justify-center rounded-2xl border border-white bg-white px-4 py-12 text-center shadow-lg shadow-black/10 sm:px-6 sm:py-16">
       <div className="flex size-14 items-center justify-center rounded-full bg-brand-muted text-brand">
         <Icon className="size-6" />
       </div>
@@ -43,7 +43,7 @@ export function Pagination({
 
   return (
     <nav
-      className="mt-6 flex items-center justify-center gap-1"
+      className="mt-6 flex flex-wrap items-center justify-center gap-1"
       aria-label="Pagination"
     >
       <button
