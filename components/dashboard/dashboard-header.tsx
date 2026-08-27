@@ -124,7 +124,7 @@ export function DashboardHeader({
         <Menu className="size-5" />
       </button>
       <form
-        className="relative order-3 w-full min-w-0 flex-none sm:order-none sm:max-w-4xl sm:flex-1"
+        className="relative order-3 z-0 w-full min-w-0 flex-none sm:order-none sm:max-w-4xl sm:flex-1"
         action={searchAction}
       >
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -137,7 +137,7 @@ export function DashboardHeader({
       </form>
       <div
         ref={container}
-        className="relative ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2"
+        className="relative z-50 ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2"
       >
         <div className="relative">
           <button
@@ -158,7 +158,7 @@ export function DashboardHeader({
             )}
           </button>
           {open === 'notifications' && (
-            <div className="fixed left-3 right-3 top-[7.25rem] max-h-[calc(100vh-8rem)] overflow-hidden rounded-xl border bg-white shadow-lg sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80 sm:max-h-none">
+            <div className="fixed left-3 right-3 top-[7.25rem] z-50 max-h-[calc(100vh-8rem)] overflow-hidden rounded-xl border bg-white shadow-lg sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-80 sm:max-h-none">
               <div className="flex items-center justify-between border-b px-4 py-3">
                 <strong className="text-sm">Notifications</strong>
                 <Link
@@ -221,7 +221,7 @@ export function DashboardHeader({
             <ChevronDown className="hidden size-4 sm:block" />
           </button>
           {open === 'profile' && (
-            <div className="absolute right-0 top-12 w-[min(calc(100vw-1.5rem),15rem)] overflow-hidden rounded-xl border bg-white shadow-lg">
+            <div className="absolute right-0 top-12 z-50 w-[min(calc(100vw-1.5rem),15rem)] overflow-hidden rounded-xl border bg-white shadow-lg">
               <div className="border-b px-4 py-3">
                 <p className="truncate text-sm font-semibold">{name}</p>
                 <p className="truncate text-xs text-muted-foreground">

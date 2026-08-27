@@ -40,7 +40,7 @@ export function AdminDashboardShell({
   }, [pathname])
 
   return (
-    <div className="dashboard-font flex min-h-screen bg-[#F5F6FB]">
+    <div className="dashboard-font flex min-h-screen overflow-x-hidden bg-[#F5F6FB]">
       <AdminSidebar
         open={mobileNavOpen}
         onClose={() => setMobileNavOpen(false)}
@@ -55,8 +55,8 @@ export function AdminDashboardShell({
           onOpenSidebar={() => setMobileNavOpen(true)}
           onLogout={() => setLogoutOpen(true)}
         />
-        <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
-          <div className="w-full">
+        <main className="min-w-0 flex-1 px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 xl:px-8">
+          <div className="w-full min-w-0">
             {routeLoading ? <AdminDashboardSkeleton /> : children}
           </div>
         </main>
@@ -101,7 +101,7 @@ function SkeletonBlock({ className }: { className: string }) {
 function AdminDashboardSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Loading page">
-      <div className="rounded-2xl bg-white p-5 shadow-lg shadow-black/10">
+      <div className="rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:p-5">
         <SkeletonBlock className="h-11 w-72 max-w-full" />
         <SkeletonBlock className="mt-3 h-4 w-full max-w-xl" />
       </div>
@@ -116,7 +116,7 @@ function AdminDashboardSkeleton() {
           </div>
         ))}
       </div>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
         <SkeletonBlock className="h-80 rounded-2xl" />
         <SkeletonBlock className="h-80 rounded-2xl" />
       </div>

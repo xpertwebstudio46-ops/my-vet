@@ -32,8 +32,10 @@ export function Sidebar({ open, onClose, onLogout }: SidebarProps) {
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="flex h-16 items-center justify-between px-5">
-          <Logo />
+        <div className="flex h-16 items-center justify-between gap-3 px-5">
+          <Link href="/dashboard" onClick={onClose} className="min-w-0">
+            <Logo />
+          </Link>
           <button
             type="button"
             onClick={onClose}

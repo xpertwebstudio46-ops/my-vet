@@ -30,23 +30,25 @@ export function AdminPageBanner({
         : 'border-[#064071] bg-transparent text-[#064071] hover:bg-[#064071] hover:text-white'
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-black/10 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 className="dashboard-heading text-[48px] font-semibold leading-tight text-black">
+    <section className="flex min-w-0 flex-col gap-4 rounded-2xl bg-white p-4 shadow-lg shadow-black/10 sm:p-5 md:flex-row md:items-center md:justify-between">
+      <div className="min-w-0">
+        <h1 className="dashboard-heading text-4xl font-semibold leading-tight text-black sm:text-[48px]">
           {title}
         </h1>
         <p className="dashboard-font mt-1 text-sm text-muted-foreground">
           {description}
         </p>
       </div>
-      {action && <button
-        type="button"
-        onClick={action.onClick}
-        className={`inline-flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold transition-colors ${actionClassName}`}
-      >
-        {Icon && <Icon className="size-4" />}
-        {action.label}
-      </button>}
+      {action && (
+        <button
+          type="button"
+          onClick={action.onClick}
+          className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold transition-colors md:w-auto ${actionClassName}`}
+        >
+          {Icon && <Icon className="size-4" />}
+          {action.label}
+        </button>
+      )}
     </section>
   )
 }
