@@ -81,8 +81,8 @@ export default function MyProfilePage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-black/10">
-      <div className='max-sm:flex-col'>
+      <div className="mb-6 max-sm:flex-col flex items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-black/10">
+      <div className=''>
         <h1 className="dashboard-heading text-[48px] font-normal leading-none text-black">My profile</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
           Your details are shared with a practice only when you send an enquiry or book.</p>
