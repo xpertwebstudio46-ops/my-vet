@@ -13,7 +13,7 @@ const SponsorHero = () => {
                 alt="Hero Banner"
                 fill
                 sizes="100vw"
-                className="!h-[100%]"
+                className="object-cover"
                 priority
             />
 

@@ -12,7 +12,7 @@ const AboutHero = () => {
                 alt="Hero Banner"
                 fill
                 sizes="100vw"
-                className=""
+                className="object-cover"
                 priority
             />
 
