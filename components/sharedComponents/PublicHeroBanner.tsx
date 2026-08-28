@@ -68,7 +68,7 @@ export function PublicHeroBanner({
                     <img src="/images/paw-2.png" alt="" className="h-20 w-full object-cover opacity-70 sm:h-32" />
                 </div>
 
-                <div className="absolute bottom-0 left-2 z-20 pointer-events-none">
+                <div className="absolute bottom-0 max-sm:bottom-14 left-2 z-20 pointer-events-none">
                     <img src="/images/paw-1.png" alt="" className="h-20 w-20 object-contain opacity-70 sm:h-32 sm:w-32" />
                 </div>
                 <div className="absolute bottom-0 left-0 z-20 pointer-events-none">
@@ -101,7 +101,7 @@ export function PublicHeroBanner({
                     </div>
 
                     <div className={imageGroupClassName}>
-                        <div className="absolute top-4 left-[42%] z-20 pointer-events-none sm:top-0 sm:left-32">
+                        <div className="absolute top-4 left-[42%] z-20 pointer-events-none sm:top-0 max-sm:left-24 sm:left-32">
                             <img src="/images/half-right.png" alt="" className="w-6 h-6 object-contain " />
                         </div>
                         <div className="absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20">
