@@ -51,6 +51,12 @@ export function PublicHeroBanner({
     const imageGroupClassName = innerLayout
         ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
         : 'absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-0 lg:h-[620px] lg:w-[54%]'
+    const halfRightShapeClassName = innerLayout
+        ? 'absolute top-0 left-[42%] z-20 pointer-events-none max-sm:left-24 sm:left-32 lg:top-0'
+        : 'absolute top-4 left-[42%] z-20 pointer-events-none sm:top-0 max-sm:left-24 sm:left-32'
+    const rightShapeClassName = innerLayout
+        ? 'absolute top-[-15px] left-[12%] z-20 pointer-events-none lg:top-24 lg:left-20'
+        : 'absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20'
 
     return (
         <section className={`relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
@@ -101,14 +107,14 @@ export function PublicHeroBanner({
                     </div>
 
                     <div className={imageGroupClassName}>
-                        <div className="absolute top-4 left-[42%] z-20 pointer-events-none sm:top-0 max-sm:left-24 sm:left-32">
+                        <div className={halfRightShapeClassName}>
                             <img src="/images/half-right.png" alt="" className="w-6 h-6 object-contain " />
                         </div>
-                        <div className="absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20">
+                        <div className={rightShapeClassName}>
                             <img src="/images/right-shape.png" alt="" className="h-9 w-9 object-contain sm:h-12 sm:w-12" />
                         </div>
                         <div className={`absolute inset-0 z-0 pointer-events-none ${innerLayout ? 'top-10 sm:top-20 lg:top-16' : 'top-16 sm:top-30'}`}>
-                            <img src="/images/back-shapes.png" alt="" className={`w-full h-full object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`} />
+                            <img src="/images/back-shapes.png" alt="" className="w-full h-full object-contain object-right-bottom" />
                         </div>
                         <div className={`absolute ${rightImageBottomClassName} top-0 left-0 ${innerLayout ? 'right-0 lg:right-4' : 'right-4'} z-10`}>
                             <Image
