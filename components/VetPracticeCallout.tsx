@@ -3,7 +3,7 @@ import Link from 'next/link'
 const VetPracticeCallout = () => {
   return (
     <section
-      className="relative overflow-hidden w-[98%] rounded-xl mx-auto h-[75vh] mt-16"
+      className="relative mx-auto mt-10 min-h-[520px] w-[94%] overflow-hidden rounded-xl sm:mt-16 sm:w-[98%] lg:h-[75vh]"
       style={{
         backgroundImage: "url('/images/use.png')",
         backgroundRepeat: 'no-repeat',
@@ -15,14 +15,14 @@ const VetPracticeCallout = () => {
      
 
       {/* Text content — right half */}
-      <div className="absolute right-0 top-0 bottom-12 z-10 w-[80%] flex flex-col justify-center pl-[500px]">
-        <h2 className="font-heading text-[48px] font-bold text-[#064071] leading-tight mb-3">
+      <div className="absolute inset-x-0 bottom-0 top-0 z-10 flex flex-col justify-center bg-black/20 p-6 sm:p-10 lg:right-0 lg:left-auto lg:bottom-12 lg:w-[80%] lg:bg-transparent lg:pl-[500px]">
+        <h2 className="font-heading text-[32px] font-bold text-[#064071] leading-tight mb-3 sm:text-[40px]">
           Are You a
           <br />
           <span className="font-bold font-heading text-white">Veterinary</span> Practice?
         </h2>
 
-        <p className="text-white text-[18px] leading-relaxed mb-5 max-w-lg">
+        <p className="text-white text-[16px] leading-relaxed mb-5 max-w-lg sm:text-[18px]">
           Join My Vet to grow your visibility, attract new clients, and manage
           your online reputation in one place.
         </p>

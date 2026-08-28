@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const testimonials = [
   {
@@ -47,27 +47,39 @@ const testimonials = [
   },
 ]
 
-const VISIBLE = 3
-
 const Testimonials = () => {
   const [start, setStart] = useState(0)
+  const [visible, setVisible] = useState(1)
 
-  const canPrev = start > 0
-  const canNext = start + VISIBLE < testimonials.length
+  useEffect(() => {
+    const updateVisible = () => {
+      if (window.innerWidth >= 1024) setVisible(3)
+      else if (window.innerWidth >= 640) setVisible(2)
+      else setVisible(1)
+    }
 
-  const prev = () => { if (canPrev) setStart((s) => s - 1) }
-  const next = () => { if (canNext) setStart((s) => s + 1) }
+    updateVisible()
+    window.addEventListener('resize', updateVisible)
+    return () => window.removeEventListener('resize', updateVisible)
+  }, [])
 
-  // Each card = 100/3 % width. Slide by one card width at a time.
-  const translateX = -(start * (100 / VISIBLE))
+  const maxStart = Math.max(testimonials.length - visible, 0)
+  const safeStart = Math.min(start, maxStart)
+  const canPrev = safeStart > 0
+  const canNext = safeStart + visible < testimonials.length
+
+  const prev = () => { if (canPrev) setStart((s) => Math.max(s - 1, 0)) }
+  const next = () => { if (canNext) setStart((s) => Math.min(s + 1, maxStart)) }
+
+  const translateX = -(safeStart * (100 / visible))
 
   return (
-    <section className="py-16 px-6 bg-white">
+    <section className="bg-white px-4 py-12 sm:px-6 sm:py-16">
       <div className="max-w-6xl mx-auto">
 
         {/* Title */}
         <div className="text-center mb-3">
-          <h2 className="font-heading font-bold text-[48px] text-[#064071] leading-tight">
+          <h2 className="font-heading font-bold text-[32px] text-[#064071] leading-tight sm:text-[40px]">
             Trusted by Pet{' '}
             <span style={{ color: '#13b8a8' }}>Owners</span>{' '}
             Nationwide
@@ -114,7 +126,7 @@ const Testimonials = () => {
               <div
                 key={t.id}
                 className="shrink-0 px-2.5"
-                style={{ width: `${100 / VISIBLE}%` }}
+                style={{ width: `${100 / visible}%` }}
               >
 
                 

@@ -33,7 +33,7 @@ export default function WhySponsorUs() {
       <div className="mx-auto max-w-6xl">
         {/* Heading */}
         <div className="text-center mb-12">
-          <h2 className="text-[48px] font-bold font-heading text-[#064071]">
+          <h2 className="text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
             Why <span className="text-teal-500">Sponsor</span> Us?
           </h2>
           <p className="mt-3 font-sans text-slate-500 text-sm sm:text-base max-w-2xl mx-auto">

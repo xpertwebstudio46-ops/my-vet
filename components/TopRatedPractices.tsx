@@ -19,9 +19,9 @@ export default function TopRatedPractices() {
   }, []);
 
   return (
-    <section className="py-16 px-6 bg-gray-50">
+    <section className="bg-gray-50 px-4 py-12 sm:px-6 sm:py-16">
       <div className="text-center mb-10">
-        <h2 className="font-heading font-extrabold text-[48px] text-[#064071] mb-3">Top Rated <span className="text-[#01AEAD]">Veterinary</span> Practices</h2>
+        <h2 className="font-heading font-extrabold text-[32px] leading-tight text-[#064071] mb-3 sm:text-[40px]">Top Rated <span className="text-[#01AEAD]">Veterinary</span> Practices</h2>
         <p className="text-black text-[16px] font-sans font-normal leading-relaxed max-w-xl mx-auto">Discover highly recommended professionals in your area, reviewed by our community of pet owners.</p>
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">

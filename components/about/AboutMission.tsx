@@ -8,7 +8,7 @@ const missionPoints = [
 
 export default function AboutMissionSection() {
   return (
-    <section className="py-20">
+    <section className="py-12 sm:py-16 lg:py-20">
       <div className="max-w-[90%] mx-auto">
         {/* Badge */}
         <span className="inline-flex items-center rounded-full border border-[#10B7A6] px-5 py-2 text-[12px] font-medium text-[#01AEAD]">
@@ -16,14 +16,14 @@ export default function AboutMissionSection() {
         </span>
 
         {/* Heading */}
-        <h2 className="mt-5 max-w-3xl text-[48px] font-bold font-heading leading-tight text-[#064071]">
+        <h2 className="mt-5 max-w-3xl text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
           Providing Loving Care for
           <br />
           <span className="text-[#01AEAD]">Your Pets</span>, Always.
         </h2>
 
         {/* Content */}
-        <div className="mt-14 grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+        <div className="mt-8 grid items-center gap-8 sm:mt-12 lg:mt-14 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
           {/* Left Image */}
           <div className="overflow-hidden rounded-3xl">
             <Image
@@ -37,7 +37,7 @@ export default function AboutMissionSection() {
 
           {/* Right Content */}
           <div>
-            <h3 className="text-[36px] font-bold text-black">
+            <h3 className="text-[28px] font-bold text-black sm:text-[36px]">
               Our Mission
             </h3>
 

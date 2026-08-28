@@ -11,11 +11,11 @@ const features = [
 
 export default function OurStorySection() {
     return (
-        <section className="py-20">
-            <div className="max-w-[90%] mx-auto grid items-center gap-12 lg:grid-cols-2">
+        <section className="py-12 sm:py-16 lg:py-20">
+            <div className="max-w-[90%] mx-auto grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
                 {/* Left Content */}
                 <div className="relative">
-                    <img src="/images/pa.png" className="absolute -top-30 left-0" alt="" />
+                    <img src="/images/pa.png" className="absolute -top-20 left-0 h-auto w-24 sm:-top-30 sm:w-auto" alt="" />
                     <div className="flex flex-col items-start gap-2">
 
                         {/* Top Wave */}
@@ -84,7 +84,7 @@ export default function OurStorySection() {
 
                     </div>
 
-                    <h2 className="mt-3  font-bold leading-tight text-[#0d2e5e] text-[48px]">
+                    <h2 className="mt-3 font-bold leading-tight text-[#0d2e5e] text-[32px] sm:text-[40px]">
                         We are fully committed to better veterinary care
                     </h2>
 

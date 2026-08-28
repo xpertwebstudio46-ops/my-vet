@@ -53,22 +53,22 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
   };
 
   return (
-    <section className="w-full py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className="w-full px-4 py-12 sm:px-6 sm:py-16 lg:px-8 bg-white">
       <div className="mx-auto max-w-6xl">
         {/* Heading */}
         <div className="text-center mb-10">
-          <h2 className="text-[48px] font-bold font-heading">
+          <h2 className="text-[32px] font-bold font-heading leading-tight sm:text-[40px]">
             Stay <span style={{ color: "#064071" }}>Connected</span>
           </h2>
-          <p className=" text-[18px] font-sans font-normal">
+          <p className="text-[16px] font-sans font-normal sm:text-[18px]">
             Message us anytime on your preferred platform
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-start rounded-2xl  p-6 sm:p-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-start rounded-2xl p-0 sm:p-6 lg:p-8">
           {/* Left — form */}
           <div className="border border-[#064071] p-4 rounded-lg">
-            <h3 className="font-heading font-bold text-[44px]">
+            <h3 className="font-heading font-bold text-[30px] leading-tight sm:text-[40px]">
               Send Us a <span style={{ color: "#064071" }}>Message</span>
             </h3>
             <p className="mt-1 text-[16px] fotn-normal font-sans">
@@ -183,7 +183,7 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
 
           {/* Right — map + social */}
           <div>
-            <h3 className="font-heading font-bold text-[44px]">
+            <h3 className="font-heading font-bold text-[30px] leading-tight sm:text-[40px]">
               Get <span style={{ color: "#064071" }}>Directions</span>:
             </h3>
 
@@ -199,7 +199,7 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
               />
             </div>
 
-            <h3 className="mt-8 text-[44px] font-bold font-heading">
+            <h3 className="mt-8 text-[30px] font-bold font-heading leading-tight sm:text-[40px]">
               Follow <span style={{ color: "#064071" }}>Us</span>:
             </h3>
 

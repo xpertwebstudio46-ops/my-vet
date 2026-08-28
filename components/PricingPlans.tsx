@@ -136,7 +136,7 @@ export default function PricingPlans() {
   const plans = membership === 'independent' ? independentPlans : groupPlans
 
   return (
-    <section id="pricing" className="relative isolate w-full overflow-hidden bg-[#052f55] px-4 py-20 sm:px-6 lg:px-8">
+    <section id="pricing" className="relative isolate w-full overflow-hidden bg-[#052f55] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-10" style={{ backgroundImage: "url('/images/bg.png')", backgroundPosition: 'center', backgroundSize: 'cover' }} />
       <PawPrint size={150} className="pointer-events-none absolute -left-8 top-16 -z-10 text-white opacity-[0.06]" />
       <PawPrint size={110} className="pointer-events-none absolute -right-5 bottom-20 -z-10 text-white opacity-[0.06]" />
@@ -144,7 +144,7 @@ export default function PricingPlans() {
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#4de0d3]">Practice memberships</p>
-          <h2 className="mt-4 font-display text-4xl font-extrabold leading-tight text-white sm:text-5xl">
+          <h2 className="mt-4 font-display text-[32px] font-extrabold leading-tight text-white sm:text-[40px]">
             Choose how your practice <span className="text-[#4de0d3]">grows</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-blue-100">

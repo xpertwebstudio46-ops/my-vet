@@ -52,9 +52,9 @@ export default function TeamMembers() {
     const member = members[active];
 
     return (
-        <section className="max-w-7xl mx-auto px-6 py-20">
+        <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
             {/* Heading */}
-            <div className="mb-16">
+            <div className="mb-10 sm:mb-16">
                 <div className="flex items-center gap-2 mb-4">
 
 
@@ -127,7 +127,7 @@ export default function TeamMembers() {
                     </div>
                 </div>
 
-                <h2 className="text-[48px] font-bold leading-tight text-[#064071] font-heading">
+                <h2 className="text-[32px] font-bold leading-tight text-[#064071] font-heading sm:text-[40px]">
                     Loyal,
                     <span className="text-[#01AEAD]"> Passionate, </span>
                     and Driven
@@ -140,7 +140,7 @@ export default function TeamMembers() {
             </div>
 
             {/* Slider */}
-            <div className="grid lg:grid-cols-[280px_420px_1fr] gap-14 items-center">
+            <div className="grid gap-8 items-center lg:grid-cols-[280px_420px_1fr] lg:gap-14">
                 {/* Left */}
                 <div className="relative">
                     <div className="absolute left-0 top-0 w-[3px] h-full bg-[#15c8be]" />
@@ -188,7 +188,7 @@ export default function TeamMembers() {
 
                 {/* Right */}
                 <div>
-                    <h3 className="text-[36px] font-heading font-bold text-black">
+                    <h3 className="text-[28px] font-heading font-bold text-black sm:text-[36px]">
                         {member.name}
                     </h3>
 

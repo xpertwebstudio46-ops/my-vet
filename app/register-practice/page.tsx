@@ -73,7 +73,7 @@ export default function RegisterPracticePage({ searchParams }: { searchParams: P
   return (
     <RequireAuth roles={['VET']}>
       <RegisterHero />
-      <section className="my-20 bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
+      <section className="my-12 bg-slate-50 px-4 py-10 sm:my-16 sm:px-6 sm:py-12 lg:my-20 lg:px-8">
         <div className="mx-auto max-w-3xl sm:px-6">
           <div className="mb-6 rounded-2xl border border-teal-100 bg-teal-50 p-5">
             <h2 className="text-xl font-semibold text-[#064071]">Submit your {selectedPlan?.membership === 'group' ? 'primary branch' : 'practice'} for approval</h2>

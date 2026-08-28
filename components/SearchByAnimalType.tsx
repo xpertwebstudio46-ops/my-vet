@@ -48,19 +48,19 @@ const categories = [
 
 const SearchByAnimalType = () => {
   return (
-    <section className="w-full bg-white py-16 px-6 mt-18">
+    <section className="w-full bg-white px-4 py-12 sm:px-6 sm:py-16">
       <div className="max-w-6xl mx-auto">
 
         {/* Heading */}
         <div className="text-center mb-4">
-          <h2 className="text-[48px] font-heading font-bold text-[#0d2e5e]">
+          <h2 className="text-[32px] font-heading font-bold leading-tight text-[#0d2e5e] sm:text-[40px]">
             Search by{' '}
             <span style={{ color: '#13b8a8' }}>Animal Type</span>
           </h2>
         </div>
 
         {/* Subtitle */}
-        <p className="text-center text-black text-[16px] font-sans  mb-12 max-w-xl font-normal mx-auto">
+        <p className="text-center text-black text-[16px] font-sans mb-8 max-w-xl font-normal mx-auto sm:mb-12">
           Select a category to find specialized veterinary professionals tailored
           to your animal&apos;s specific needs.
         </p>

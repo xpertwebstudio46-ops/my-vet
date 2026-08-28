@@ -11,23 +11,23 @@ const features = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="pt-0 px-6 bg-white">
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+    <section className="px-4 py-12 bg-white sm:px-6 sm:py-16 lg:pt-0">
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
 
         {/* Left — text content */}
         <div className="flex-1">
-          <h2 className="font-heading font-bold text-[48px] text-[#064071] mb-4 leading-tight">
+          <h2 className="font-heading font-bold text-[32px] text-[#064071] mb-4 leading-tight sm:text-[40px]">
             Why {' '}
             <span style={{ color: '#01AEAD' }}>Choose</span> My Vet?
           </h2>
 
-          <p className="text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
+          <p className="text-[16px] sm:text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
             A trusted veterinary directory designed to help animal owners
             make informed, confident decisions.
           </p>
 
           {/* Features — 2 column grid */}
-          <div className="grid grid-cols-2 gap-y-4 gap-x-10">
+          <div className="grid grid-cols-1 gap-y-4 gap-x-10 sm:grid-cols-2">
             {features.map((feature, i) => (
               <div key={i} className="flex items-center gap-2">
                 <svg
@@ -51,7 +51,7 @@ const WhyChooseUs = () => {
         </div>
 
         {/* Right — collage image */}
-        <div className="flex-shrink-0 relative w-full lg:w-[480px] h-[360px]">
+        <div className="flex-shrink-0 relative w-full h-[260px] sm:h-[360px] lg:w-[480px]">
           <Image
             src="/images/why.png"
             alt="Why Choose My Vet — vet collage"

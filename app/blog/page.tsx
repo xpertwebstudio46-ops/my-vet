@@ -38,7 +38,7 @@ export default async function BlogPage() {
             ))}
           </div>
         ) : (
-          <p className="py-20 text-center text-slate-500">No published articles yet.</p>
+          <p className="py-12 text-center text-slate-500 sm:py-16 lg:py-20">No published articles yet.</p>
         )}
       </main>
       <Footer />

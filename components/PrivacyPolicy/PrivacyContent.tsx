@@ -1,7 +1,7 @@
 export default function PrivacyContent() {
   return (
-    <section className="font-sans text-gray-700 ">
-      <div className="space-y-10 max-w-6xl mx-auto my-12">
+    <section className="px-4 font-sans text-gray-700 sm:px-6 lg:px-8">
+      <div className="mx-auto my-10 max-w-6xl space-y-8 sm:my-12 sm:space-y-10">
         {/* 1 */}
         <div>
           <h2 className="text-3xl font-bold text-[#143B66] mb-5">
