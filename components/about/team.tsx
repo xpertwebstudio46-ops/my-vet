@@ -20,7 +20,7 @@ const members = [
     {
         id: 2,
         thumb: "/images/person-2.png",
-        image: "/images/center-big-2.png",
+        image: "/images/center-big.png",
         name: "David Smith",
         role: "Pet Coordinator",
         description:
@@ -29,7 +29,7 @@ const members = [
     {
         id: 3,
         thumb: "/images/person-3.png",
-        image: "/images/center-big-3.png",
+        image: "/images/center-big.png",
         name: "Emma Brown",
         role: "Veterinarian",
         description:
@@ -37,8 +37,8 @@ const members = [
     },
     {
         id: 4,
-        thumb: "/images/bt.jpg",
-        image: "/images/bt.jpg",
+        thumb: "/images/person-3.png",
+        image: "/images/center-big.png",
         name: "Mary Douglas",
         role: "Groomer",
         description:

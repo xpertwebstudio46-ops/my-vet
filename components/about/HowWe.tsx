@@ -182,7 +182,7 @@ export default function HowWe() {
           {/* Decorative cat illustration — overlaps bottom-right of the image / step 3 */}
           <div className="hidden sm:block absolute -bottom-10 right-0 w-23 h-42 pointer-events-none">
             <Image
-              src="/images/cat.png"
+              src="/images/shape-cat.png"
               alt=""
               fill
               sizes="100px"

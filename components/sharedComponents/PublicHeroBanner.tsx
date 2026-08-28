@@ -69,7 +69,7 @@ export function PublicHeroBanner({
                 </div>
 
                 <div className="absolute bottom-0 max-sm:bottom-14 left-2 z-20 pointer-events-none">
-                    <img src="/images/paw-1.png" alt="" className="h-20 w-20 object-contain opacity-70 sm:h-32 sm:w-32" />
+                    <img src="/images/paw-1.png" alt="" className="h-20 w-20 object-cover opacity-70 sm:h-32 sm:w-32" />
                 </div>
                 <div className="absolute bottom-0 left-0 z-20 pointer-events-none">
                     <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
