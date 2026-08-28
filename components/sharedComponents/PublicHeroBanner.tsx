@@ -47,10 +47,10 @@ export function PublicHeroBanner({
     rightImageBottomClassName = 'bottom-0',
     innerLayout = true,
 }: PublicHeroBannerProps) {
-    const textColumnClassName = innerLayout ? 'lg:w-[46%]' : 'lg:w-[42%]'
+    const textColumnClassName = 'lg:w-[45%]'
     const imageGroupClassName = innerLayout
-        ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-[-24px] lg:h-[640px] lg:w-[62%] xl:right-[-48px] xl:w-[64%]'
-        : 'absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-[-60px] lg:h-[620px] lg:w-[60%]'
+        ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
+        : 'absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-0 lg:h-[620px] lg:w-[54%]'
 
     return (
         <section className={`relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
@@ -107,16 +107,16 @@ export function PublicHeroBanner({
                         <div className="absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20">
                             <img src="/images/right-shape.png" alt="" className="h-9 w-9 object-contain sm:h-12 sm:w-12" />
                         </div>
-                        <div className={`absolute inset-0 z-0 pointer-events-none ${innerLayout ? 'top-10 sm:top-20 lg:top-10' : 'top-16 sm:top-30'}`}>
-                            <img src="/images/back-shapes.png" alt="" className={`w-full h-full object-contain ${innerLayout ? 'object-center lg:object-right' : 'object-right'}`} />
+                        <div className={`absolute inset-0 z-0 pointer-events-none ${innerLayout ? 'top-10 sm:top-20 lg:top-16' : 'top-16 sm:top-30'}`}>
+                            <img src="/images/back-shapes.png" alt="" className={`w-full h-full object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`} />
                         </div>
-                        <div className={`absolute ${rightImageBottomClassName} ${innerLayout ? 'right-0 lg:right-8 xl:right-14' : 'right-4'} inset-0 z-10`}>
+                        <div className={`absolute ${rightImageBottomClassName} top-0 left-0 ${innerLayout ? 'right-0 lg:right-4' : 'right-4'} z-10`}>
                             <Image
                                 src={rightImageSrc}
                                 alt={rightImageAlt}
                                 fill
                                 sizes="(min-width: 1024px) 60vw, 100vw"
-                                className={`object-contain ${innerLayout ? 'object-center lg:object-right' : 'object-right'}`}
+                                className={`object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`}
                                 priority
                             />
                         </div>
