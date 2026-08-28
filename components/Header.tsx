@@ -34,7 +34,7 @@ const Header = () => {
                     <Link href="/" className="shrink-0">
                         <picture>
                             <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
-                            <img src="/images/white-logo.png" alt="MY VET" className="h-auto w-[132px] sm:w-[150px] lg:w-[166px]" />
+                            <img src="/images/change-logo.png" alt="MY VET" className="h-auto w-[132px] sm:w-[150px] lg:w-[166px]" />
                         </picture>
                     </Link>
 
