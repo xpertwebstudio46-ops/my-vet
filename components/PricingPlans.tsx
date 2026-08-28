@@ -268,7 +268,7 @@ function FeatureComparison({ plans, sections, billing }: { plans: MembershipPlan
         <span>Compare every feature</span>
         <ChevronDown className="size-5 shrink-0 text-[#4de0d3] transition-transform group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <div className="grid gap-4 border-t border-white/10 p-4 sm:hidden">
+      <div className="grid gap-4 border-t border-white/10 p-4 lg:hidden">
         {sections.map((section) => (
           <section key={section.title} className="rounded-2xl border border-white/10 bg-white/[0.05]">
             <h3 className="rounded-t-2xl bg-[#13b8a8]/20 px-4 py-3 text-xs font-bold uppercase tracking-widest text-[#70f2e8]">
@@ -292,7 +292,7 @@ function FeatureComparison({ plans, sections, billing }: { plans: MembershipPlan
           </section>
         ))}
       </div>
-      <div className="hidden max-w-full overflow-x-auto overscroll-x-contain border-t border-white/10 pb-3 sm:block" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="hidden max-w-full overflow-x-auto overscroll-x-contain border-t border-white/10 pb-3 lg:block" style={{ WebkitOverflowScrolling: 'touch' }}>
         <table className="min-w-[920px] border-collapse text-left text-sm sm:min-w-[760px] lg:w-full">
           <thead>
             <tr className="bg-[#032846] text-white">

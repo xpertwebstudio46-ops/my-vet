@@ -93,14 +93,14 @@ const Testimonials = () => {
         </p>
 
         {/* Slider with side arrows */}
-        <div className="relative flex items-center gap-3">
+        <div className="relative flex items-center sm:gap-3">
 
           {/* Left arrow */}
           <button
             onClick={prev}
             disabled={!canPrev}
             aria-label="Previous"
-            className="shrink-0 cursor-pointer w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+            className="absolute left-1 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors sm:static sm:h-10 sm:w-10 sm:translate-y-0"
             style={{
               borderColor: canPrev ? '#13b8a8' : '#d1d5db',
               color: canPrev ? '#13b8a8' : '#d1d5db',
@@ -113,7 +113,7 @@ const Testimonials = () => {
           </button>
 
           {/* Slider viewport */}
-          <div className="overflow-hidden flex-1">
+          <div className="w-full overflow-hidden sm:flex-1">
             {/* Sliding track */}
             <div
               className="flex"
@@ -125,7 +125,7 @@ const Testimonials = () => {
             {testimonials.map((t) => (
               <div
                 key={t.id}
-                className="shrink-0 px-2.5"
+                className="shrink-0 px-1 sm:px-2.5"
                 style={{ width: `${100 / visible}%` }}
               >
 
@@ -176,7 +176,7 @@ const Testimonials = () => {
             onClick={next}
             disabled={!canNext}
             aria-label="Next"
-            className="shrink-0 cursor-pointer w-10 h-10 rounded-full border flex items-center justify-center transition-colors"
+            className="absolute right-1 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors sm:static sm:h-10 sm:w-10 sm:translate-y-0"
             style={{
               borderColor: canNext ? '#13b8a8' : '#d1d5db',
               color: canNext ? '#13b8a8' : '#d1d5db',

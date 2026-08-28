@@ -8,7 +8,7 @@ const missionPoints = [
 
 export default function AboutMissionSection() {
   return (
-    <section className="py-12 sm:py-16 lg:py-20">
+    <section className="py-10 sm:py-12 lg:py-14">
       <div className="max-w-[90%] mx-auto">
         {/* Badge */}
         <span className="inline-flex items-center rounded-full border border-[#10B7A6] px-5 py-2 text-[12px] font-medium text-[#01AEAD]">

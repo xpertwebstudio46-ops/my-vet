@@ -52,7 +52,7 @@ export default function TeamMembers() {
     const member = members[active];
 
     return (
-        <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+        <section className="max-w-7xl mx-auto px-4 py-10 sm:px-6 sm:py-12 lg:py-14">
             {/* Heading */}
             <div className="mb-10 sm:mb-16">
                 <div className="flex items-center gap-2 mb-4">

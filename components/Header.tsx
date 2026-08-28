@@ -32,7 +32,10 @@ const Header = () => {
             <header className="w-full bg-transparent">
                 <div className="mx-4 flex items-center justify-between gap-4 sm:mx-6 lg:justify-evenly lg:gap-8">
                     <Link href="/" className="shrink-0">
-                        <img src="/images/header-logo.png" alt="MY VET" className="h-auto w-[132px] sm:w-[150px] lg:w-[166px]" />
+                        <picture>
+                            <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
+                            <img src="/images/white-logo.png" alt="MY VET" className="h-auto w-[132px] sm:w-[150px] lg:w-[166px]" />
+                        </picture>
                     </Link>
 
                     <div className="hidden items-center justify-center gap-12 lg:flex">

@@ -49,10 +49,10 @@ function CheckIcon() {
 
 export default function HowWe() {
   return (
-    <section className=" py-16  ">
+    <section className="py-10 sm:py-12 lg:py-14">
       <div className="mx-auto max-w-[90%]">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="mb-8 text-center sm:mb-10">
           <div className="flex flex-col items-center gap-2">
 
             {/* Top Wave */}

@@ -11,7 +11,7 @@ const features = [
 
 export default function OurStorySection() {
     return (
-        <section className="py-12 sm:py-16 lg:py-20">
+        <section className="py-10 sm:py-12 lg:py-14">
             <div className="max-w-[90%] mx-auto grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
                 {/* Left Content */}
                 <div className="relative">

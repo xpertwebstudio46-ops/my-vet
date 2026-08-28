@@ -14,7 +14,7 @@ const page = () => {
        <AboutMissionSection/>
        <OurStorySection/>
        <HowWe/>
-       <div className='mt-14'>
+       <div className='mt-4 sm:mt-8'>
 
        <WhyChooseUs/>
        <TeamSection/>

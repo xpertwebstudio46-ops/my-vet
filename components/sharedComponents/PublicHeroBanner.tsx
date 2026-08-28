@@ -20,6 +20,7 @@ type PublicHeroBannerProps = {
     rightImageSrc?: string
     rightImageAlt?: string
     rightImageBottomClassName?: string
+    innerLayout?: boolean
 }
 
 const defaultDescription =
@@ -44,7 +45,13 @@ export function PublicHeroBanner({
     rightImageSrc = '/images/about-hero.png',
     rightImageAlt = 'Pet',
     rightImageBottomClassName = 'bottom-0',
+    innerLayout = true,
 }: PublicHeroBannerProps) {
+    const textColumnClassName = innerLayout ? 'lg:w-[45%]' : 'lg:w-[42%]'
+    const imageGroupClassName = innerLayout
+        ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
+        : 'absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-[-60px] lg:h-[620px] lg:w-[60%]'
+
     return (
         <section className={`relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
             <div className="absolute inset-0 overflow-hidden">
@@ -68,8 +75,8 @@ export function PublicHeroBanner({
                     <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
                 </div>
 
-                <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-                    <div className="relative w-full pt-32 sm:pt-40 lg:w-[42%] lg:pt-52">
+                <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
+                    <div className={`relative w-full pt-32 sm:pt-40 ${textColumnClassName} lg:pt-52`}>
                         <div className="absolute top-[128px] -left-3 z-20 pointer-events-none sm:top-50 sm:-left-6">
                             <img src="/images/mek.png" alt="" className="h-12 w-12 object-contain sm:h-18 sm:w-18" />
                         </div>
@@ -93,7 +100,7 @@ export function PublicHeroBanner({
                         ) : null}
                     </div>
 
-                    <div className="absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-[-60px] lg:h-[620px] lg:w-[60%]">
+                    <div className={imageGroupClassName}>
                         <div className="absolute top-4 left-[42%] z-20 pointer-events-none sm:top-0 sm:left-32">
                             <img src="/images/half-right.png" alt="" className="w-6 h-6 object-contain " />
                         </div>
