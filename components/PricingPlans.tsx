@@ -263,20 +263,23 @@ function PlanCard({ plan, billing }: { plan: MembershipPlan; billing: BillingCyc
 
 function FeatureComparison({ plans, sections, billing }: { plans: MembershipPlan[]; sections: FeatureSection[]; billing: BillingCycle }) {
   return (
-    <details className="group mt-10 overflow-hidden rounded-3xl border border-white/15 bg-white/[0.07]">
+    <details className="group mt-10 rounded-3xl border border-white/15 bg-white/[0.07]">
       <summary className="flex list-none cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left text-base font-semibold text-white marker:content-none sm:px-7">
         <span>Compare every feature</span>
         <ChevronDown className="size-5 shrink-0 text-[#4de0d3] transition-transform group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <div className="overflow-x-auto border-t border-white/10">
-        <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+      <p className="border-t border-white/10 px-5 pb-3 pt-4 text-xs text-blue-200 sm:hidden">
+        Swipe sideways to compare all plans.
+      </p>
+      <div className="max-w-full overflow-x-auto overscroll-x-contain border-t border-white/10 pb-3" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <table className="min-w-[920px] border-collapse text-left text-sm sm:min-w-[760px] lg:w-full">
           <thead>
             <tr className="bg-[#032846] text-white">
-              <th scope="col" className="sticky left-0 z-10 min-w-56 bg-[#032846] px-5 py-4 font-semibold">Feature</th>
+              <th scope="col" className="sticky left-0 z-10 min-w-44 bg-[#032846] px-3 py-4 font-semibold sm:min-w-56 sm:px-5">Feature</th>
               {plans.map((plan) => (
-                <th scope="col" key={plan.slug} className="min-w-36 px-4 py-4 text-center">
-                  <span className="block font-semibold">{plan.name}</span>
-                  <span className="mt-1 block text-[11px] font-normal text-blue-200">{formatPlanPrice(plan, billing)}</span>
+                <th scope="col" key={plan.slug} className="min-w-36 px-3 py-4 text-center sm:px-4">
+                  <span className="block whitespace-nowrap font-semibold">{plan.name}</span>
+                  <span className="mt-1 block whitespace-nowrap text-[11px] font-normal text-blue-200">{formatPlanPrice(plan, billing)}</span>
                 </th>
               ))}
             </tr>
@@ -296,11 +299,11 @@ function FeatureRows({ section, columnCount }: { section: FeatureSection; column
   return (
     <>
       <tr>
-        <th colSpan={columnCount + 1} className="bg-[#13b8a8]/20 px-5 py-3 text-xs font-bold uppercase tracking-widest text-[#70f2e8]">{section.title}</th>
+        <th colSpan={columnCount + 1} className="bg-[#13b8a8]/20 px-3 py-3 text-xs font-bold uppercase tracking-widest text-[#70f2e8] sm:px-5">{section.title}</th>
       </tr>
       {section.rows.map((row) => (
         <tr key={row.label} className="border-t border-white/10 text-blue-50">
-          <th scope="row" className="sticky left-0 bg-[#123c5e] px-5 py-3.5 font-medium">{row.label}</th>
+          <th scope="row" className="sticky left-0 bg-[#123c5e] px-3 py-3.5 font-medium sm:px-5">{row.label}</th>
           {row.values.map((value, index) => <FeatureCell key={`${row.label}-${index}`} value={value} />)}
         </tr>
       ))}
@@ -311,7 +314,7 @@ function FeatureRows({ section, columnCount }: { section: FeatureSection; column
 function FeatureCell({ value }: { value: FeatureValue }) {
   if (value === true) return <td className="px-4 py-3.5 text-center"><Check className="mx-auto size-4 text-[#4de0d3]" strokeWidth={2.5} aria-label="Included" /></td>
   if (value === false) return <td className="px-4 py-3.5 text-center"><X className="mx-auto size-4 text-blue-300/40" aria-label="Not included" /></td>
-  return <td className="px-4 py-3.5 text-center text-xs text-blue-100">{value}</td>
+  return <td className="whitespace-nowrap px-4 py-3.5 text-center text-xs text-blue-100">{value}</td>
 }
 
 function PawPrint({ size, className }: { size: number; className?: string }) {

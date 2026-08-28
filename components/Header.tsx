@@ -94,7 +94,7 @@ const Header = () => {
                         onClick={closeMenu}
                         className="absolute inset-0 bg-black/45"
                     />
-                    <aside className="absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-white p-5 shadow-2xl">
+                    <aside className="mobile-menu-sheet absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-white p-5 shadow-2xl">
                         <div className="flex items-center justify-between gap-4">
                             <Link href="/" onClick={closeMenu} className="shrink-0">
                                 <img src="/images/header-logo.png" alt="MY VET" className="h-auto w-[132px]" />
@@ -110,12 +110,13 @@ const Header = () => {
                         </div>
 
                         <nav className="mt-8 grid gap-2">
-                            {navLinks.map((link) => (
+                            {navLinks.map((link, index) => (
                                 <Link
                                     key={link.label}
                                     href={link.href}
                                     onClick={closeMenu}
-                                    className="rounded-xl px-4 py-3 text-base font-semibold text-[#064071] hover:bg-[#EEF7F5] hover:text-[#13b8a8]"
+                                    className="mobile-menu-item rounded-xl px-4 py-3 text-base font-semibold text-[#064071] hover:bg-[#EEF7F5] hover:text-[#13b8a8]"
+                                    style={{ animationDelay: `${120 + index * 45}ms` }}
                                 >
                                     {link.label}
                                 </Link>
@@ -127,7 +128,8 @@ const Header = () => {
                                 <Link
                                     href={dashboardForRole(user.role)}
                                     onClick={closeMenu}
-                                    className="inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
+                                    className="mobile-menu-item inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
+                                    style={{ animationDelay: `${120 + navLinks.length * 45}ms` }}
                                 >
                                     My account
                                 </Link>
@@ -135,7 +137,8 @@ const Header = () => {
                                 <button
                                     type="button"
                                     onClick={openLogin}
-                                    className="inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
+                                    className="mobile-menu-item inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
+                                    style={{ animationDelay: `${120 + navLinks.length * 45}ms` }}
                                 >
                                     Login
                                 </button>
@@ -143,7 +146,8 @@ const Header = () => {
                             <Link
                                 href="/register?role=vet"
                                 onClick={closeMenu}
-                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#085A9E] px-5 text-sm font-semibold text-white"
+                                className="mobile-menu-item inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#085A9E] px-5 text-sm font-semibold text-white"
+                                style={{ animationDelay: `${165 + navLinks.length * 45}ms` }}
                             >
                                 Register Your Practice
                                 <img src="/images/arrow.png" alt="" className="h-4 w-4 object-contain" aria-hidden="true" />
@@ -152,6 +156,39 @@ const Header = () => {
                     </aside>
                 </div>
             ) : null}
+
+            <style>{`
+                @keyframes mobileMenuSlideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateX(-100%);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+
+                @keyframes mobileMenuItemFadeUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(18px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .mobile-menu-sheet {
+                    animation: mobileMenuSlideIn 260ms ease-out both;
+                }
+
+                .mobile-menu-item {
+                    opacity: 0;
+                    animation: mobileMenuItemFadeUp 320ms ease-out both;
+                }
+            `}</style>
 
             <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
         </>

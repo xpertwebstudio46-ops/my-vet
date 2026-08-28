@@ -1,18 +1,17 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 const VetPracticeCallout = () => {
   return (
-    <section
-      className="relative mx-auto mt-10 min-h-[520px] w-[94%] overflow-hidden rounded-xl sm:mt-16 sm:w-[98%] lg:h-[75vh]"
-      style={{
-        backgroundImage: "url('/images/use.png')",
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-      }}
-    >
-     
-     
+    <section className="relative mx-auto mt-10 min-h-[520px] w-[94%] overflow-hidden rounded-xl bg-[#13b8a8] sm:mt-16 sm:w-[98%] lg:h-[75vh]">
+      <Image
+        src="/images/use.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-contain object-center lg:object-cover"
+        priority
+      />
 
       {/* Text content — right half */}
       <div className="absolute inset-x-0 bottom-0 top-0 z-10 flex flex-col justify-center bg-black/20 p-6 sm:p-10 lg:right-0 lg:left-auto lg:bottom-12 lg:w-[80%] lg:bg-transparent lg:pl-[500px]">
