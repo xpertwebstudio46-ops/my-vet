@@ -16,10 +16,10 @@ export default function DirectoryClient({ practices }: { practices: PracticeCard
   else visible = [...visible].sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating);
 
   return (
-    <div className="w-full bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl grid lg:grid-cols-[260px_1fr] gap-6 items-start">
+    <div className="w-full bg-slate-50 py-8 px-4 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto grid max-w-6xl min-w-0 gap-6 lg:grid-cols-[260px_1fr] items-start">
         <FiltersSidebar onChange={setFilters} />
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SortTabs onChange={setSortTab} />
             <p className="text-sm text-slate-500">{visible.length} practices</p>

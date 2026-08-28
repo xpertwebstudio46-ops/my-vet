@@ -20,10 +20,10 @@ export default function FindVetToolbar({ total }: { total: number }) {
   return (
     <div className="mb-8 flex flex-col gap-4 bg-white border border-gray-500/15 rounded-lg shadow-lg p-5 md:flex-row md:items-center md:justify-between">
       <h2 className="text-[16px] font-medium text-[#475569]">Showing <span className="font-bold text-[#064071]">{total}</span> Practices</h2>
-      <div className="flex items-center gap-3">
+      <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
         <span className="text-sm font-medium text-gray-500">Sort By</span>
         <Select value={currentSort} onValueChange={changeSort}>
-          <SelectTrigger className="w-[200px] rounded-md bg-gray-500/10 p-5 border-gray-200"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full rounded-md bg-gray-500/10 p-5 border-gray-200 sm:w-[200px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="rating">Highest Rated</SelectItem>
             <SelectItem value="newest">Newest</SelectItem>

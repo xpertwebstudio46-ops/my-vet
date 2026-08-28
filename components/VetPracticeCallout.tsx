@@ -3,18 +3,21 @@ import Link from 'next/link'
 
 const VetPracticeCallout = () => {
   return (
-    <section className="relative mx-auto mt-10 min-h-[520px] w-[94%] overflow-hidden rounded-xl bg-[#13b8a8] sm:mt-16 sm:w-[98%] lg:h-[75vh]">
+    <section className="relative mx-auto mt-10 min-h-[440px] w-[94%] overflow-hidden rounded-xl bg-[#13b8a8] sm:mt-16 sm:w-[98%] lg:min-h-[520px] lg:h-[75vh]">
       <Image
         src="/images/use.png"
         alt=""
         fill
         sizes="100vw"
-        className="object-contain object-center lg:object-cover"
+        className="hidden object-cover object-center lg:block"
         priority
       />
+      <PawPrint className="absolute -right-10 -top-8 h-40 w-40 text-white/10 lg:hidden" />
+      <PawPrint className="absolute -bottom-12 -left-8 h-48 w-48 text-white/10 lg:hidden" />
+      <PawPrint className="absolute bottom-12 right-8 h-24 w-24 text-[#064071]/10 lg:hidden" />
 
       {/* Text content — right half */}
-      <div className="absolute inset-x-0 bottom-0 top-0 z-10 flex flex-col justify-center bg-black/20 p-6 sm:p-10 lg:right-0 lg:left-auto lg:bottom-12 lg:w-[80%] lg:bg-transparent lg:pl-[500px]">
+      <div className="absolute inset-x-0 bottom-0 top-0 z-10 flex flex-col justify-center p-6 sm:p-10 lg:right-0 lg:left-auto lg:bottom-12 lg:w-[80%] lg:pl-[500px]">
         <h2 className="font-heading text-[32px] font-bold text-[#064071] leading-tight mb-3 sm:text-[40px]">
           Are You a
           <br />
@@ -42,3 +45,15 @@ const VetPracticeCallout = () => {
 
 
 export default VetPracticeCallout
+
+function PawPrint({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="currentColor" className={className} aria-hidden="true">
+      <ellipse cx="50" cy="72" rx="22" ry="18" />
+      <ellipse cx="24" cy="46" rx="10" ry="13" transform="rotate(-15 24 46)" />
+      <ellipse cx="40" cy="36" rx="10" ry="13" transform="rotate(-5 40 36)" />
+      <ellipse cx="60" cy="36" rx="10" ry="13" transform="rotate(5 60 36)" />
+      <ellipse cx="76" cy="46" rx="10" ry="13" transform="rotate(15 76 46)" />
+    </svg>
+  )
+}

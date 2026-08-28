@@ -268,10 +268,31 @@ function FeatureComparison({ plans, sections, billing }: { plans: MembershipPlan
         <span>Compare every feature</span>
         <ChevronDown className="size-5 shrink-0 text-[#4de0d3] transition-transform group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <p className="border-t border-white/10 px-5 pb-3 pt-4 text-xs text-blue-200 sm:hidden">
-        Swipe sideways to compare all plans.
-      </p>
-      <div className="max-w-full overflow-x-auto overscroll-x-contain border-t border-white/10 pb-3" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="grid gap-4 border-t border-white/10 p-4 sm:hidden">
+        {sections.map((section) => (
+          <section key={section.title} className="rounded-2xl border border-white/10 bg-white/[0.05]">
+            <h3 className="rounded-t-2xl bg-[#13b8a8]/20 px-4 py-3 text-xs font-bold uppercase tracking-widest text-[#70f2e8]">
+              {section.title}
+            </h3>
+            <div className="divide-y divide-white/10">
+              {section.rows.map((row) => (
+                <article key={row.label} className="p-4">
+                  <h4 className="text-sm font-semibold text-white">{row.label}</h4>
+                  <div className="mt-3 grid gap-2">
+                    {plans.map((plan, index) => (
+                      <div key={`${row.label}-${plan.slug}`} className="flex items-center justify-between gap-3 rounded-xl bg-[#032846]/80 px-3 py-2">
+                        <span className="min-w-0 text-xs font-semibold text-blue-100">{plan.name}</span>
+                        <FeatureValuePill value={row.values[index]} />
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+      <div className="hidden max-w-full overflow-x-auto overscroll-x-contain border-t border-white/10 pb-3 sm:block" style={{ WebkitOverflowScrolling: 'touch' }}>
         <table className="min-w-[920px] border-collapse text-left text-sm sm:min-w-[760px] lg:w-full">
           <thead>
             <tr className="bg-[#032846] text-white">
@@ -293,6 +314,18 @@ function FeatureComparison({ plans, sections, billing }: { plans: MembershipPlan
       </div>
     </details>
   )
+}
+
+function FeatureValuePill({ value }: { value: FeatureValue }) {
+  if (value === true) {
+    return <Check className="size-4 shrink-0 text-[#4de0d3]" strokeWidth={2.5} aria-label="Included" />
+  }
+
+  if (value === false) {
+    return <X className="size-4 shrink-0 text-blue-300/50" aria-label="Not included" />
+  }
+
+  return <span className="shrink-0 rounded-full bg-white/10 px-2 py-1 text-right text-[11px] font-semibold text-white">{value}</span>
 }
 
 function FeatureRows({ section, columnCount }: { section: FeatureSection; columnCount: number }) {

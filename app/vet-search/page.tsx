@@ -26,11 +26,11 @@ export default async function Page({
   return (
     <>
       <Hero />
-      <section className="py-16">
+      <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid gap-8 lg:grid-cols-[280px_1fr] items-start">
+          <div className="grid min-w-0 gap-6 lg:grid-cols-[280px_1fr] lg:gap-8 items-start">
             <FindVetFilters />
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-6 sm:space-y-8">
               <FindVetToolbar total={result.total} />
               <VetGrid practices={result.items.map(toPracticeCard)} />
               <FindVetPagination page={result.page} totalPages={result.totalPages} sort={sort} filters={{ q, city, animalType, service }} />

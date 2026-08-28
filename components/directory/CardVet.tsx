@@ -36,17 +36,17 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
       <div className="flex flex-col flex-1 p-5">
         <h3 className="text-base font-bold text-slate-900">{vet.name}</h3>
 
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-500">
-          <span className="flex items-center gap-1">
+        <div className="mt-1.5 flex flex-col gap-1.5 text-xs text-slate-500 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+          <span className="flex min-w-0 items-center gap-1">
             <Star className="h-3.5 w-3.5" fill="#f5a623" stroke="#f5a623" />
             <span className="font-semibold text-slate-900">
               {vet.rating.toFixed(1)}
             </span>
             <span>({vet.reviewCount} reviews)</span>
           </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" style={{ color: "#13b8a8" }} />
-            {vet.location}
+          <span className="flex min-w-0 items-center gap-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: "#13b8a8" }} />
+            <span className="min-w-0 truncate">{vet.location}</span>
           </span>
         </div>
 

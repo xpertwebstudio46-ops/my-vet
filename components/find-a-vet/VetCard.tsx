@@ -29,17 +29,17 @@ const VetCard = ({ vet }: VetCardProps) => {
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-[20px] font-bold text-black">
+      <div className="p-5 sm:p-6">
+        <h3 className="break-words text-[20px] font-bold text-black">
           {vet.name}
         </h3>
 
 
         {/* Rating */}
-        <div className=" flex items-center justify-start gap-4 mt-2">
-          <div className=" flex items-center gap-2 text-gray-500">
-            <MapPin size={16} className="text-[#01AEAD]" />
-            <span className="font-sans text-[14px] font-normal text-[#64748B]">{vet.location}</span>
+        <div className="mt-2 flex flex-col justify-start gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex min-w-0 items-center gap-2 text-gray-500">
+            <MapPin size={16} className="shrink-0 text-[#01AEAD]" />
+            <span className="min-w-0 truncate font-sans text-[14px] font-normal text-[#64748B]">{vet.location}</span>
           </div>
           <span className="font-sans text-[14px] font-normal text-[#64748B]">
             · UK listing
@@ -69,13 +69,13 @@ const VetCard = ({ vet }: VetCardProps) => {
 
         {/* Button */}
 
-        <div className="flex items-center justify-between mt-2">
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-sans text-[14px] font-normal text-[#64748B]">
             ({vet.reviewCount} Reviews)
           </span>
           <Link
             href={`/vet-search/${vet.slug}`}
-            className="inline-flex rounded-full bg-[#163B6D] px-4 py-2 font-medium text-white transition hover:bg-[#0F2E56]"
+            className="inline-flex justify-center rounded-full bg-[#163B6D] px-4 py-2 font-medium text-white transition hover:bg-[#0F2E56]"
           >
             View Profile
           </Link>
