@@ -30,11 +30,12 @@ analyticsRouter.get('/vet', validateQuery(querySchema), async (request, response
   }
   const keys = monthKeys(months)
   const start = new Date(`${keys[0]}-01T00:00:00.000Z`)
-  const [views, actions] = await Promise.all([
+  const [views, actions, reviews] = await Promise.all([
     prisma.profileView.findMany({ where: { practiceId: practice.id, date: { gte: start } }, select: { date: true } }),
     prisma.contactAction.findMany({ where: { practiceId: practice.id, date: { gte: start } }, select: { date: true, type: true } }),
+    prisma.review.findMany({ where: { practiceId: practice.id, createdAt: { gte: start } }, select: { createdAt: true } }),
   ])
-  const buckets = keys.map((month) => ({ month, views: 0, contacts: 0, bookings: 0 }))
+  const buckets = keys.map((month) => ({ month, views: 0, contacts: 0, bookings: 0, reviews: 0 }))
   const byMonth = new Map(buckets.map((bucket) => [bucket.month, bucket]))
   for (const view of views) {
     const bucket = byMonth.get(view.date.toISOString().slice(0, 7))
@@ -47,5 +48,9 @@ analyticsRouter.get('/vet', validateQuery(querySchema), async (request, response
       if (action.type === 'BOOKING') bucket.bookings += 1
     }
   }
-  sendSuccess(response, { buckets, totals: { views: views.length, contacts: actions.length } })
+  for (const review of reviews) {
+    const bucket = byMonth.get(review.createdAt.toISOString().slice(0, 7))
+    if (bucket) bucket.reviews += 1
+  }
+  sendSuccess(response, { buckets, totals: { views: views.length, contacts: actions.length, reviews: reviews.length } })
 })
