@@ -77,7 +77,7 @@ const holidaySchema = z.object({
   note: z.string().trim().max(300).nullable().optional(),
 })
 const emergencySchema = z.object({
-  enabled: z.boolean(),
+  enabled: z.boolean().optional(),
   phone: z.string().trim().max(30).nullable().optional(),
   calloutAddress: z.string().trim().max(500).nullable().optional(),
   instructions: z.string().trim().max(2_000).nullable().optional(),
