@@ -1,11 +1,14 @@
+import { randomBytes } from 'node:crypto'
 import { Router } from 'express'
 import { z } from 'zod'
+import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../../config/database.js'
 import { getStripe } from '../../config/stripe.js'
 import { authenticate, requireRole } from '../auth/auth.middleware.js'
 import { validateBody, validateParams } from '../../shared/middleware/validate.js'
 import { ApiError } from '../../shared/utils/api-error.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
+import { toSlug } from '../../shared/utils/slug.js'
 import { deleteR2Object } from '../upload/upload.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
@@ -15,6 +18,15 @@ import { STRIPE_APP } from '../subscriptions/stripe-catalog.service.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const animalParams = z.object({ animalTypeId: z.string().min(1) })
+const animalTypeSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  description: z.string().trim().max(1_000).nullable().optional(),
+  icon: z.string().trim().max(100).nullable().optional(),
+  imageAssetId: z.string().min(1).nullable().optional(),
+})
+const animalTypeUpdateSchema = animalTypeSchema.partial().refine((value) => Object.keys(value).length > 0, {
+  message: 'At least one animal type field is required',
+})
 const serviceSchema = z.object({
   categoryId: z.string().min(1).nullable().optional(),
   name: z.string().trim().min(1).max(150),
@@ -94,6 +106,23 @@ const pricingSchema = z.object({
   active: z.boolean().default(true),
 })
 const checkoutSchema = z.object({ planId: z.string().min(1) })
+
+async function uniqueAnimalTypeSlug(name: string, excludingId?: string) {
+  const baseSlug = toSlug(name) || 'animal-type'
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const slug = attempt === 0 ? baseSlug : `${baseSlug}-${randomBytes(3).toString('hex')}`
+    const existing = await prisma.animalType.findUnique({ where: { slug }, select: { id: true } })
+    if (!existing || existing.id === excludingId) return slug
+  }
+  throw new ApiError(409, 'ANIMAL_TYPE_SLUG_CONFLICT', 'Could not create a unique animal type URL')
+}
+
+function mapAnimalTypeConflict(error: unknown): never {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    throw new ApiError(409, 'ANIMAL_TYPE_ALREADY_EXISTS', 'An animal type with this name already exists')
+  }
+  throw error
+}
 
 export const vetRouter = Router()
 vetRouter.use(authenticate, requireRole('VET'))
@@ -326,6 +355,84 @@ vetRouter.get('/animal-types', async (request, response) => {
     orderBy: { name: 'asc' },
   })
   sendSuccess(response, types.map((type) => ({ ...type, selected: type.practices.length > 0, practices: undefined })))
+})
+
+vetRouter.post('/animal-types', validateBody(animalTypeSchema), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof animalTypeSchema>
+  const duplicate = await prisma.animalType.findFirst({
+    where: { name: { equals: body.name, mode: 'insensitive' } },
+    select: { id: true },
+  })
+  if (duplicate) throw new ApiError(409, 'ANIMAL_TYPE_ALREADY_EXISTS', 'An animal type with this name already exists')
+
+  const asset = imageAssetId
+    ? await requireUploadForAttachment(imageAssetId, 'TAXONOMY', { ownerUserId: request.user!.userId })
+    : null
+  const slug = await uniqueAnimalTypeSlug(body.name)
+  try {
+    const type = await prisma.$transaction(async (transaction) => {
+      const created = await transaction.animalType.create({
+        data: {
+          name: body.name,
+          slug,
+          description: body.description ?? null,
+          icon: body.icon ?? null,
+          imageUrl: asset?.url ?? null,
+          active: true,
+        },
+      })
+      await transaction.practiceAnimalType.create({
+        data: { practiceId: practice.id, animalTypeId: created.id },
+      })
+      if (asset) await markUploadAttached(transaction, asset.id)
+      return created
+    })
+    sendSuccess(response, { ...type, selected: true }, 'Animal type added', 201)
+  } catch (error) {
+    mapAnimalTypeConflict(error)
+  }
+})
+
+vetRouter.put('/animal-types/:animalTypeId', validateParams(animalParams), validateBody(animalTypeUpdateSchema), async (request, response) => {
+  const practice = await getOwnedPractice(request.user!.userId)
+  const { animalTypeId } = request.validatedParams as z.infer<typeof animalParams>
+  const { imageAssetId, ...body } = request.validatedBody as z.infer<typeof animalTypeUpdateSchema>
+  const existing = await prisma.animalType.findUnique({ where: { id: animalTypeId }, select: { id: true, imageUrl: true } })
+  if (!existing) throw new ApiError(404, 'ANIMAL_TYPE_NOT_FOUND', 'Animal type was not found')
+  if (body.name) {
+    const duplicate = await prisma.animalType.findFirst({
+      where: { id: { not: animalTypeId }, name: { equals: body.name, mode: 'insensitive' } },
+      select: { id: true },
+    })
+    if (duplicate) throw new ApiError(409, 'ANIMAL_TYPE_ALREADY_EXISTS', 'An animal type with this name already exists')
+  }
+
+  const asset = imageAssetId
+    ? await requireUploadForAttachment(imageAssetId, 'TAXONOMY', { ownerUserId: request.user!.userId })
+    : null
+  const slug = body.name ? await uniqueAnimalTypeSlug(body.name, animalTypeId) : undefined
+  try {
+    const type = await prisma.$transaction(async (transaction) => {
+      const updated = await transaction.animalType.update({
+        where: { id: animalTypeId },
+        data: {
+          ...body,
+          ...(slug ? { slug } : {}),
+          ...(imageAssetId !== undefined ? { imageUrl: asset?.url ?? null } : {}),
+        },
+        include: { practices: { where: { practiceId: practice.id }, select: { practiceId: true } } },
+      })
+      if (asset) await markUploadAttached(transaction, asset.id)
+      return updated
+    })
+    if (imageAssetId !== undefined && existing.imageUrl !== type.imageUrl) {
+      await deleteUploadedAssetByUrl(existing.imageUrl, ['TAXONOMY'], {}).catch(() => undefined)
+    }
+    sendSuccess(response, { ...type, selected: type.practices.length > 0, practices: undefined }, 'Animal type updated')
+  } catch (error) {
+    mapAnimalTypeConflict(error)
+  }
 })
 
 vetRouter.post('/animal-types/:animalTypeId/toggle', validateParams(animalParams), async (request, response) => {

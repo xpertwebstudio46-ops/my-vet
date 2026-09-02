@@ -22,8 +22,11 @@ async function ownerFor(userId: string, role: string, purpose: UploadPurpose) {
   if (purpose === 'PET' && role !== 'PET_OWNER') {
     throw new ApiError(403, 'FORBIDDEN', 'Only pet owners may upload pet images')
   }
-  if (purpose === 'BLOG' || purpose === 'SPONSORSHIP' || purpose === 'TAXONOMY') {
+  if (purpose === 'BLOG' || purpose === 'SPONSORSHIP') {
     if (role !== 'ADMIN') throw new ApiError(403, 'FORBIDDEN', 'This upload purpose requires an admin account')
+  }
+  if (purpose === 'TAXONOMY' && role !== 'ADMIN' && role !== 'VET') {
+    throw new ApiError(403, 'FORBIDDEN', 'This upload purpose requires an admin or vet account')
   }
   return { userId }
 }
