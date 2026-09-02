@@ -1,10 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import { Check, ImagePlus, Pencil, Plus } from 'lucide-react'
+import { Check, ImagePlus, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Modal } from '@/components/dashboard/modal'
 import { Card, PageHeader } from '@/components/dashboard/ui'
+import { ConfirmDeleteModal } from '@/components/admin-dashboard/shared/confirm-delete-modal'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 import { discardUpload, uploadImage } from '@/lib/api/uploads'
 
@@ -148,6 +149,7 @@ function AnimalTypeFormModal({
 export function VetAnimalTypePage() {
   const [items, setItems] = useState<AnimalType[]>([])
   const [editing, setEditing] = useState<AnimalType | null>(null)
+  const [deleting, setDeleting] = useState<AnimalType | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [error, setError] = useState('')
 
@@ -193,6 +195,17 @@ export function VetAnimalTypePage() {
     setFormOpen(false)
   }
 
+  async function removeAnimalType(item: AnimalType) {
+    try {
+      await apiClient(`/api/vet/animal-types/${item.id}`, { method: 'DELETE' })
+      setItems((current) => current.filter((value) => value.id !== item.id))
+    } catch (caught) {
+      setError(caught instanceof ApiClientError ? caught.message : 'Animal type could not be deleted.')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader title="Animal types" description="Select the animals your practice treats. Add or edit animal types when you need more options.">
@@ -232,17 +245,27 @@ export function VetAnimalTypePage() {
             </button>
 
             <div className="flex shrink-0 flex-col items-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing(item)
-                  setFormOpen(true)
-                }}
-                className="inline-flex size-8 items-center justify-center rounded-md border border-gray-200 text-[#064071] hover:border-[#01AEAD] hover:bg-[#EEF7F5]"
-                aria-label={`Edit ${item.name}`}
-              >
-                <Pencil className="size-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditing(item)
+                    setFormOpen(true)
+                  }}
+                  className="inline-flex size-8 items-center justify-center rounded-md border border-gray-200 text-[#064071] hover:border-[#01AEAD] hover:bg-[#EEF7F5]"
+                  aria-label={`Edit ${item.name}`}
+                >
+                  <Pencil className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleting(item)}
+                  className="inline-flex size-8 items-center justify-center rounded-md border border-red-100 text-red-600 hover:bg-red-50"
+                  aria-label={`Delete ${item.name}`}
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => void toggle(item)}
@@ -256,6 +279,7 @@ export function VetAnimalTypePage() {
             </div>
           </div>
         ))}
+        {!items.length && <p className="text-sm text-muted-foreground">No animal types added.</p>}
       </Card>
 
       {formOpen && (
@@ -266,6 +290,15 @@ export function VetAnimalTypePage() {
             setFormOpen(false)
           }}
           onSave={saveAnimalType}
+        />
+      )}
+
+      {deleting && (
+        <ConfirmDeleteModal
+          title="Delete animal type?"
+          description={`This permanently removes ${deleting.name} from the animal type list.`}
+          onClose={() => setDeleting(null)}
+          onConfirm={() => void removeAnimalType(deleting)}
         />
       )}
     </div>

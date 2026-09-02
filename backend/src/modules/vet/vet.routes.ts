@@ -435,6 +435,19 @@ vetRouter.put('/animal-types/:animalTypeId', validateParams(animalParams), valid
   }
 })
 
+vetRouter.delete('/animal-types/:animalTypeId', validateParams(animalParams), async (request, response) => {
+  const { animalTypeId } = request.validatedParams as z.infer<typeof animalParams>
+  const existing = await prisma.animalType.findUnique({
+    where: { id: animalTypeId },
+    select: { id: true, imageUrl: true },
+  })
+  if (!existing) throw new ApiError(404, 'ANIMAL_TYPE_NOT_FOUND', 'Animal type was not found')
+
+  await prisma.animalType.delete({ where: { id: animalTypeId } })
+  await deleteUploadedAssetByUrl(existing.imageUrl, ['TAXONOMY'], {}).catch(() => undefined)
+  sendSuccess(response, { deleted: true }, 'Animal type deleted')
+})
+
 vetRouter.post('/animal-types/:animalTypeId/toggle', validateParams(animalParams), async (request, response) => {
   const practice = await getOwnedPractice(request.user!.userId)
   const { animalTypeId } = request.validatedParams as z.infer<typeof animalParams>
