@@ -79,6 +79,7 @@ const holidaySchema = z.object({
 const emergencySchema = z.object({
   enabled: z.boolean(),
   phone: z.string().trim().max(30).nullable().optional(),
+  calloutAddress: z.string().trim().max(500).nullable().optional(),
   instructions: z.string().trim().max(2_000).nullable().optional(),
 })
 const gallerySchema = z.object({
@@ -129,14 +130,20 @@ vetRouter.use(authenticate, requireRole('VET'))
 
 vetRouter.get('/dashboard', async (request, response) => {
   const practice = await getOwnedPractice(request.user!.userId)
-  const [upcomingAppointments, pendingReviews, views, contacts] = await Promise.all([
+  const [upcomingAppointments, pendingReviews, views, contacts, emergencyHours] = await Promise.all([
     prisma.appointment.count({ where: { practiceId: practice.id, date: { gte: new Date() }, status: { in: ['PENDING', 'CONFIRMED', 'RESCHEDULED'] } } }),
     prisma.review.count({ where: { practiceId: practice.id, status: 'PENDING' } }),
     prisma.profileView.count({ where: { practiceId: practice.id } }),
     prisma.contactAction.count({ where: { practiceId: practice.id } }),
+    prisma.emergencyHours.findUnique({ where: { practiceId: practice.id }, select: { phone: true, calloutAddress: true } }),
   ])
   sendSuccess(response, {
-    practice: { ...practice, rating: practice.rating.toString() },
+    practice: {
+      ...practice,
+      rating: practice.rating.toString(),
+      emergencyNumber: emergencyHours?.phone ?? null,
+      emergencyCalloutAddress: emergencyHours?.calloutAddress ?? null,
+    },
     stats: { upcomingAppointments, pendingReviews, views, contacts },
   })
 })

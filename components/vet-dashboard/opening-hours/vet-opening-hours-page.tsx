@@ -23,6 +23,7 @@ type Holiday = {
 type Emergency = {
   enabled: boolean;
   phone: string | null;
+  calloutAddress: string | null;
   instructions: string | null;
 };
 const days = [
@@ -47,6 +48,7 @@ export function VetOpeningHoursPage() {
   const [emergency, setEmergency] = useState<Emergency>({
     enabled: false,
     phone: null,
+    calloutAddress: null,
     instructions: null,
   });
   const [holiday, setHoliday] = useState({ date: "", note: "" });
@@ -262,7 +264,18 @@ export function VetOpeningHoursPage() {
             onChange={(e) =>
               setEmergency({ ...emergency, phone: e.target.value || null })
             }
-            placeholder="Emergency phone"
+            placeholder="Emergency number"
+            className="h-10 rounded-md border px-3 text-sm"
+          />
+          <input
+            value={emergency.calloutAddress ?? ""}
+            onChange={(e) =>
+              setEmergency({
+                ...emergency,
+                calloutAddress: e.target.value || null,
+              })
+            }
+            placeholder="Emergency callout address"
             className="h-10 rounded-md border px-3 text-sm"
           />
           <textarea
