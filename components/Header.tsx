@@ -38,7 +38,7 @@ const Header = () => {
                         </picture>
                     </Link>
 
-                    <div className="hidden items-center justify-center gap-10 lg:flex">
+                    <div className="hidden items-center justify-center gap-2 lg:flex">
                         <nav className="flex items-center gap-12">
                             {navLinks.map((link) => (
                                 <Link
