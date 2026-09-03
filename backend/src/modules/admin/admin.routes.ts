@@ -36,6 +36,7 @@ const blogSchema = z.object({
   title: z.string().trim().min(3).max(180),
   excerpt: z.string().trim().max(500).nullable().optional(),
   content: z.string().trim().min(20).max(100_000),
+  category: z.enum(['HORSES', 'DOGS', 'CATS', 'EXOTIC', 'POULTRY']).default('DOGS'),
   coverAssetId: z.string().min(1).nullable().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
 })

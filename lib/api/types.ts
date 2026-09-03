@@ -1,5 +1,6 @@
 export type Role = "PET_OWNER" | "VET" | "ADMIN";
 export type PracticeMembershipType = "INDEPENDENT" | "GROUP";
+export type BlogCategory = "HORSES" | "DOGS" | "CATS" | "EXOTIC" | "POULTRY";
 
 export interface ApiEnvelope<T> {
   success: boolean;
@@ -110,6 +111,7 @@ export interface BlogPostSummary {
   title: string;
   excerpt: string | null;
   coverUrl: string | null;
+  category: BlogCategory | null;
   publishedAt: string;
   author: { firstName: string; lastName: string; avatar: string | null };
 }

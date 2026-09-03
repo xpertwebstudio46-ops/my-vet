@@ -48,6 +48,14 @@ enum BlogStatus {
   ARCHIVED
 }
 
+enum BlogCategory {
+  HORSES
+  DOGS
+  CATS
+  EXOTIC
+  POULTRY
+}
+
 enum EnquiryStatus {
   NEW
   IN_PROGRESS
@@ -645,6 +653,7 @@ model BlogPost {
   excerpt     String?
   content     String
   coverUrl    String?
+  category    BlogCategory?
   status      BlogStatus @default(DRAFT)
   publishedAt DateTime?
   createdAt   DateTime   @default(now())
@@ -652,6 +661,7 @@ model BlogPost {
   author      User       @relation(fields: [authorId], references: [id], onDelete: Restrict)
 
   @@index([status, publishedAt])
+  @@index([category])
   @@index([authorId])
 }
 
