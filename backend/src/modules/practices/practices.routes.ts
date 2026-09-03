@@ -68,6 +68,7 @@ const searchSchema = paginationSchema.extend({
   city: z.string().trim().max(100).optional(),
   animalType: z.string().trim().max(300).optional(),
   service: z.string().trim().max(300).optional(),
+  membershipType: z.enum(['INDEPENDENT', 'GROUP']).optional(),
   sort: z.enum(['rating', 'newest', 'name']).default('rating'),
 })
 
@@ -118,6 +119,7 @@ practicesRouter.get('/', validateQuery(searchSchema), async (request, response) 
       { animalTypes: { some: { animalType: { active: true, name: { contains: query.q, mode: 'insensitive' } } } } },
     ]
   }
+  if (query.membershipType) where.membershipType = query.membershipType
   if (query.city) where.city = { contains: query.city, mode: 'insensitive' }
   if (query.animalType) {
     const animalTypes = query.animalType.split(',').map((value) => value.trim()).filter(Boolean)

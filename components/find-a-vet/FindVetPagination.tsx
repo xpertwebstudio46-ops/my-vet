@@ -1,6 +1,6 @@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
-type Filters = { q?: string; city?: string; animalType?: string; service?: string };
+type Filters = { q?: string; city?: string; animalType?: string; service?: string; membershipType?: string };
 
 function href(page: number, sort: string, filters: Filters) {
   const query = new URLSearchParams({ page: String(page), sort });

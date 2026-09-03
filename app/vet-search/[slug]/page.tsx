@@ -38,7 +38,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
     <div>
       <div className="relative">
         <div className="absolute top-4 left-0 right-0 z-50"><Header /></div>
-        <VetProfile name={practice.name} bannerUrl={practice.bannerUrl} rating={Number(practice.rating)} reviewCount={practice.reviewCount} address={address} phone={practice.phone} practiceId={practice.id} />
+        <VetProfile name={practice.name} bannerUrl={practice.bannerUrl} rating={Number(practice.rating)} reviewCount={practice.reviewCount} address={address} phone={practice.phone} practiceId={practice.id} membershipType={practice.membershipType} />
       </div>
       <div className="w-full bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl grid lg:grid-cols-3 gap-8 items-start">

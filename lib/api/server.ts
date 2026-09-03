@@ -1,5 +1,5 @@
 import "server-only";
-import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeReview, Sponsorship, SubscriptionPlan } from "./types";
+import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeMembershipType, PracticeReview, Sponsorship, SubscriptionPlan } from "./types";
 
 const API_URL = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/$/, "");
 
@@ -29,6 +29,7 @@ export function getPractices(options: {
   city?: string;
   animalType?: string;
   service?: string;
+  membershipType?: PracticeMembershipType;
   sort?: "rating" | "newest" | "name";
 } = {}) {
   const query = new URLSearchParams();
@@ -38,6 +39,7 @@ export function getPractices(options: {
   if (options.city) query.set("city", options.city);
   if (options.animalType) query.set("animalType", options.animalType);
   if (options.service) query.set("service", options.service);
+  if (options.membershipType) query.set("membershipType", options.membershipType);
   if (options.sort) query.set("sort", options.sort);
   return apiFetch<Paginated<Practice>>(`/api/practices?${query.toString()}`);
 }

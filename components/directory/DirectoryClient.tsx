@@ -8,9 +8,13 @@ import type { PracticeCardData } from "@/lib/practice-cards";
 
 export default function DirectoryClient({ practices }: { practices: PracticeCardData[] }) {
   const [sortTab, setSortTab] = useState<SortTab>("Featured");
-  const [filters, setFilters] = useState<FiltersState>({ minRating: null, facilities: [], openingHours: [] });
+  const [filters, setFilters] = useState<FiltersState>({ minRating: null, membershipTypes: [], facilities: [], openingHours: [] });
 
-  let visible = practices.filter((item) => !filters.minRating || item.rating >= filters.minRating);
+  let visible = practices.filter((item) => {
+    const matchesRating = !filters.minRating || item.rating >= filters.minRating;
+    const matchesMembership = !filters.membershipTypes.length || filters.membershipTypes.includes(item.membershipType);
+    return matchesRating && matchesMembership;
+  });
   if (sortTab === "Highest Rated") visible = [...visible].sort((a, b) => b.rating - a.rating);
   else if (sortTab === "Newest") visible = [...visible].reverse();
   else visible = [...visible].sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating);

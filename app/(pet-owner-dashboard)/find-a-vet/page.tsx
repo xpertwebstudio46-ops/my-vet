@@ -6,10 +6,14 @@ import { EmptyState } from '@/components/dashboard/feedback'
 import { PracticeCard, type PracticeCardItem } from '@/components/dashboard/practice-card'
 import { Card, PageHeader } from '@/components/dashboard/ui'
 import { apiClient, ApiClientError } from '@/lib/api/client'
-import type { Paginated, Practice } from '@/lib/api/types'
+import type { Paginated, Practice, PracticeMembershipType } from '@/lib/api/types'
 
 const animalTypes = ['Small Animals', 'Cats', 'Dogs', 'Equine', 'Farm Animals', 'Exotics']
 const services = ['Emergency Care', 'Surgery', 'Dental Care', 'Vaccinations', 'Diagnostics', 'Holistic Care']
+const practiceTypes: Array<{ label: string; value: PracticeMembershipType }> = [
+  { label: 'Independent Practice', value: 'INDEPENDENT' },
+  { label: 'Vet Group', value: 'GROUP' },
+]
 const pageSize = 12
 
 function toCard(practice: Practice): PracticeCardItem {
@@ -35,6 +39,7 @@ function toCard(practice: Practice): PracticeCardItem {
 export default function FindAVetPage() {
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
+  const [selectedPracticeTypes, setSelectedPracticeTypes] = useState<PracticeMembershipType[]>([])
   const [selectedAnimals, setSelectedAnimals] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [sort, setSort] = useState<'rating' | 'newest' | 'name'>('rating')
@@ -49,6 +54,7 @@ export default function FindAVetPage() {
     setError('')
     const params = new URLSearchParams({ page: String(page), limit: String(pageSize), sort })
     if (submittedQuery) params.set('q', submittedQuery)
+    if (selectedPracticeTypes.length === 1) params.set('membershipType', selectedPracticeTypes[0])
     if (selectedAnimals.length) params.set('animalType', selectedAnimals.join(','))
     if (selectedServices.length) params.set('service', selectedServices.join(','))
     try {
@@ -58,19 +64,20 @@ export default function FindAVetPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, selectedAnimals, selectedServices, sort, submittedQuery])
+  }, [page, selectedAnimals, selectedPracticeTypes, selectedServices, sort, submittedQuery])
 
   useEffect(() => { queueMicrotask(() => void load()) }, [load])
 
-  function toggle(current: string[], value: string, update: (next: string[]) => void) {
+  function toggle<T extends string>(current: T[], value: T, update: (next: T[]) => void) {
     update(current.includes(value) ? current.filter((item) => item !== value) : [...current, value])
     setPage(1)
   }
 
   const filterContent = <div className="space-y-6">
+    <FilterGroup title="Practice type" options={practiceTypes} selected={selectedPracticeTypes} onToggle={(value) => toggle(selectedPracticeTypes, value as PracticeMembershipType, setSelectedPracticeTypes)} />
     <FilterGroup title="Animal type" options={animalTypes} selected={selectedAnimals} onToggle={(value) => toggle(selectedAnimals, value, setSelectedAnimals)} />
     <FilterGroup title="Services" options={services} selected={selectedServices} onToggle={(value) => toggle(selectedServices, value, setSelectedServices)} />
-    {(selectedAnimals.length > 0 || selectedServices.length > 0) && <button type="button" onClick={() => { setSelectedAnimals([]); setSelectedServices([]); setPage(1) }} className="text-xs font-semibold text-[#01AEAD] hover:underline">Clear all filters</button>}
+    {(selectedPracticeTypes.length > 0 || selectedAnimals.length > 0 || selectedServices.length > 0) && <button type="button" onClick={() => { setSelectedPracticeTypes([]); setSelectedAnimals([]); setSelectedServices([]); setPage(1) }} className="text-xs font-semibold text-[#01AEAD] hover:underline">Clear all filters</button>}
   </div>
 
   const cards = result?.items.map(toCard) ?? []
@@ -90,6 +97,6 @@ export default function FindAVetPage() {
   </div>
 }
 
-function FilterGroup({ title, options, selected, onToggle }: { title: string; options: string[]; selected: string[]; onToggle: (value: string) => void }) {
-  return <fieldset className="border-t pt-5 first:border-t-0 first:pt-0"><legend className="mb-3 text-sm font-semibold">{title}</legend><div className="space-y-2.5">{options.map((option) => <label key={option} className="flex items-center gap-2.5 text-sm"><input type="checkbox" checked={selected.includes(option)} onChange={() => onToggle(option)} className="size-4 accent-[#01AEAD]" />{option}</label>)}</div></fieldset>
+function FilterGroup({ title, options, selected, onToggle }: { title: string; options: Array<string | { label: string; value: string }>; selected: string[]; onToggle: (value: string) => void }) {
+  return <fieldset className="border-t pt-5 first:border-t-0 first:pt-0"><legend className="mb-3 text-sm font-semibold">{title}</legend><div className="space-y-2.5">{options.map((option) => { const value = typeof option === 'string' ? option : option.value; const label = typeof option === 'string' ? option : option.label; return <label key={value} className="flex items-center gap-2.5 text-sm"><input type="checkbox" checked={selected.includes(value)} onChange={() => onToggle(value)} className="size-4 accent-[#01AEAD]" />{label}</label> })}</div></fieldset>
 }

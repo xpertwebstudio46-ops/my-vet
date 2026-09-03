@@ -4,6 +4,7 @@ import FindVetToolbar from "@/components/find-a-vet/FindVetToolbar";
 import VetGrid from "@/components/find-a-vet/VetGrid";
 import FindVetPagination from "@/components/find-a-vet/FindVetPagination";
 import { getPractices } from "@/lib/api/server";
+import type { PracticeMembershipType } from "@/lib/api/types";
 import { toPracticeCard } from "@/lib/practice-cards";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +21,10 @@ export default async function Page({
   const city = Array.isArray(params.city) ? params.city[0] : params.city;
   const animalType = Array.isArray(params.animalType) ? params.animalType[0] : params.animalType;
   const service = Array.isArray(params.service) ? params.service[0] : params.service;
+  const membershipTypeValue = Array.isArray(params.membershipType) ? params.membershipType[0] : params.membershipType;
+  const membershipType: PracticeMembershipType | undefined = membershipTypeValue === "INDEPENDENT" || membershipTypeValue === "GROUP" ? membershipTypeValue : undefined;
   const sort = sortValue === "newest" || sortValue === "name" ? sortValue : "rating";
-  const result = await getPractices({ page, limit: 12, sort, q, city, animalType, service });
+  const result = await getPractices({ page, limit: 12, sort, q, city, animalType, service, membershipType });
 
   return (
     <>
@@ -33,7 +36,7 @@ export default async function Page({
             <div className="min-w-0 space-y-6 sm:space-y-8">
               <FindVetToolbar total={result.total} />
               <VetGrid practices={result.items.map(toPracticeCard)} />
-              <FindVetPagination page={result.page} totalPages={result.totalPages} sort={sort} filters={{ q, city, animalType, service }} />
+              <FindVetPagination page={result.page} totalPages={result.totalPages} sort={sort} filters={{ q, city, animalType, service, membershipType }} />
             </div>
           </div>
         </div>

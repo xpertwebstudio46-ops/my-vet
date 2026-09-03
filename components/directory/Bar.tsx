@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SlidersHorizontal, Star } from "lucide-react";
+import type { PracticeMembershipType } from "@/lib/api/types";
 
 const facilities = [
   "On-site Parking",
@@ -14,8 +15,14 @@ const openingHours = ["Open Now", "Open Weekends"];
 
 const ratingOptions = [4, 3, 2];
 
+const practiceTypes: Array<{ label: string; value: PracticeMembershipType }> = [
+  { label: "Independent Practice", value: "INDEPENDENT" },
+  { label: "Vet Group", value: "GROUP" },
+];
+
 export interface FiltersState {
   minRating: number | null;
+  membershipTypes: PracticeMembershipType[];
   facilities: string[];
   openingHours: string[];
 }
@@ -26,16 +33,26 @@ export default function FiltersSidebar({
   onChange?: (filters: FiltersState) => void;
 }) {
   const [minRating, setMinRating] = useState<number | null>(null);
+  const [selectedMembershipTypes, setSelectedMembershipTypes] = useState<PracticeMembershipType[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
 
   const emit = (next: Partial<FiltersState>) => {
     onChange?.({
       minRating,
+      membershipTypes: selectedMembershipTypes,
       facilities: selectedFacilities,
       openingHours: selectedHours,
       ...next,
     });
+  };
+
+  const toggleMembershipType = (membershipType: PracticeMembershipType) => {
+    const next = selectedMembershipTypes.includes(membershipType)
+      ? selectedMembershipTypes.filter((item) => item !== membershipType)
+      : [...selectedMembershipTypes, membershipType];
+    setSelectedMembershipTypes(next);
+    emit({ membershipTypes: next });
   };
 
   const toggleFacility = (facility: string) => {
@@ -62,9 +79,10 @@ export default function FiltersSidebar({
 
   const clearAll = () => {
     setMinRating(null);
+    setSelectedMembershipTypes([]);
     setSelectedFacilities([]);
     setSelectedHours([]);
-    onChange?.({ minRating: null, facilities: [], openingHours: [] });
+    onChange?.({ minRating: null, membershipTypes: [], facilities: [], openingHours: [] });
   };
 
   return (
@@ -117,6 +135,29 @@ export default function FiltersSidebar({
               </span>
               <span className="text-xs text-slate-500">& Up</span>
             </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Practice Type */}
+      <div className="mt-5">
+        <p className="text-xs font-semibold text-slate-900 mb-2.5">
+          Practice Type
+        </p>
+        <div className="flex flex-col gap-2">
+          {practiceTypes.map((practiceType) => (
+            <label
+              key={practiceType.value}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={selectedMembershipTypes.includes(practiceType.value)}
+                onChange={() => toggleMembershipType(practiceType.value)}
+                className="h-4 w-4 rounded border-slate-300 accent-[#13b8a8]"
+              />
+              <span className="text-xs text-slate-600">{practiceType.label}</span>
+            </label>
           ))}
         </div>
       </div>

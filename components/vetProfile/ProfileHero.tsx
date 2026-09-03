@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { Star, MapPin, ShieldCheck, Phone } from "lucide-react";
 import { BookAppointmentButton } from "@/components/appointments/book-appointment-modal";
+import { practiceMembershipLabel } from "@/lib/practice-cards";
+import type { PracticeMembershipType } from "@/lib/api/types";
 
-export default function VetProfile({ name, bannerUrl, rating, reviewCount, address, phone, practiceId }: {
+export default function VetProfile({ name, bannerUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
   name: string;
   bannerUrl: string | null;
   rating: number;
@@ -10,11 +12,15 @@ export default function VetProfile({ name, bannerUrl, rating, reviewCount, addre
   address: string;
   phone: string;
   practiceId: string;
+  membershipType?: PracticeMembershipType | null;
 }) {
   return (
     <section className="relative min-h-[560px] w-full overflow-hidden sm:h-[70vh]">
       <Image src={bannerUrl ?? "/images/profile-banner.png"} alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-black/45" />
+      <span className="absolute left-4 top-24 z-10 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm sm:left-6 md:left-12">
+        {practiceMembershipLabel(membershipType)}
+      </span>
       <div className="absolute inset-x-0 bottom-8 z-10 flex flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-end md:justify-between md:px-12">
         <div className="min-w-0">
           <h1 className="break-words font-heading text-[32px] font-bold leading-tight text-white md:text-[40px]">{name}</h1>
