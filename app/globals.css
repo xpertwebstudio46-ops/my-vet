@@ -233,6 +233,6 @@ body {
 
 @media (min-width: 1440px) and (max-width: 1660px) {
   .public-hero-banner {
-    /* Add 1440px-1660px banner overrides here. */
+    max-width:90rem;
   }
 }
