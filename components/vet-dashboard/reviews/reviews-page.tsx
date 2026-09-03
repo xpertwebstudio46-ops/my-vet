@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Flag, MessageSquareReply, Star } from "lucide-react";
+import { Modal } from "@/components/dashboard/modal";
 import { Card } from "@/components/dashboard/ui";
 import { apiClient, ApiClientError } from "@/lib/api/client";
 
@@ -22,6 +23,8 @@ export function VetReviewsPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [reportingId, setReportingId] = useState<string | null>(null);
+  const [replying, setReplying] = useState<Review | null>(null);
+  const [reporting, setReporting] = useState<Review | null>(null);
   useEffect(() => {
     void apiClient<Review[]>("/api/vet/reviews")
       .then(setItems)
@@ -40,9 +43,7 @@ export function VetReviewsPage() {
         : 0,
     [items],
   );
-  async function reply(item: Review) {
-    const text = window.prompt("Reply to this review:", item.reply ?? "");
-    if (!text) return;
+  async function reply(item: Review, text: string) {
     try {
       const updated = await apiClient<Review>(`/api/reviews/${item.id}/reply`, {
         method: "POST",
@@ -55,15 +56,15 @@ export function VetReviewsPage() {
             : value,
         ),
       );
+      setReplying(null);
+      setMessage("Reply saved.");
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "Reply could not be posted.",
       );
     }
   }
-  async function report(item: Review) {
-    const reason = window.prompt("Why are you reporting this review?");
-    if (!reason) return;
+  async function report(item: Review, reason: string) {
     setReportingId(item.id);
     setError("");
     setMessage("");
@@ -73,6 +74,7 @@ export function VetReviewsPage() {
         body: JSON.stringify({ reason }),
       });
       setItems((current) => current.filter((value) => value.id !== item.id));
+      setReporting(null);
       setMessage("Review reported and sent to admin for review.");
     } catch (caught) {
       setError(
@@ -145,7 +147,7 @@ export function VetReviewsPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
-                  onClick={() => void reply(item)}
+                  onClick={() => setReplying(item)}
                   className="inline-flex h-10 items-center gap-2 rounded-md border px-4 text-sm font-semibold"
                 >
                   <MessageSquareReply className="size-4" />
@@ -153,7 +155,7 @@ export function VetReviewsPage() {
                 </button>
                 <button
                   disabled={reportingId === item.id}
-                  onClick={() => void report(item)}
+                  onClick={() => setReporting(item)}
                   className="inline-flex h-10 items-center gap-2 rounded-md border border-red-200 px-4 text-sm font-semibold text-red-600 disabled:opacity-50"
                 >
                   <Flag className="size-4" />
@@ -169,6 +171,48 @@ export function VetReviewsPage() {
           </Card>
         )}
       </div>
+      {replying && <ReplyModal review={replying} onClose={() => setReplying(null)} onConfirm={reply} />}
+      {reporting && <ReportReviewModal review={reporting} saving={reportingId === reporting.id} onClose={() => setReporting(null)} onConfirm={report} />}
     </div>
+  );
+}
+
+function ReplyModal({ review, onClose, onConfirm }: { review: Review; onClose: () => void; onConfirm: (review: Review, reply: string) => Promise<void> }) {
+  const [reply, setReply] = useState(review.reply ?? "");
+  const [saving, setSaving] = useState(false);
+
+  return (
+    <Modal open onClose={onClose} title={review.reply ? "Edit reply" : "Reply to review"} description={`${review.user.firstName} ${review.user.lastName}`}>
+      <form onSubmit={(event) => { event.preventDefault(); if (reply.trim().length < 2) return; setSaving(true); void onConfirm(review, reply.trim()).finally(() => setSaving(false)); }}>
+        <label className="block text-sm font-medium">
+          Your reply
+          <textarea autoFocus required minLength={2} maxLength={3000} rows={5} value={reply} onChange={(event) => setReply(event.target.value)} className="mt-2 w-full rounded-lg border p-3 text-sm" />
+        </label>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="h-10 rounded-md border px-4 text-sm font-semibold">Cancel</button>
+          <button disabled={saving || reply.trim().length < 2} className="h-10 rounded-md bg-[#064071] px-4 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Saving..." : "Save reply"}</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function ReportReviewModal({ review, saving, onClose, onConfirm }: { review: Review; saving: boolean; onClose: () => void; onConfirm: (review: Review, reason: string) => Promise<void> }) {
+  const [reason, setReason] = useState("");
+
+  return (
+    <Modal open onClose={onClose} title="Report review" description="Send this review to admin for moderation. It will be hidden while admin reviews your report.">
+      <form onSubmit={(event) => { event.preventDefault(); if (reason.trim().length < 3) return; void onConfirm(review, reason.trim()); }}>
+        <div className="rounded-lg bg-slate-50 p-3 text-sm text-muted-foreground">{review.comment}</div>
+        <label className="mt-4 block text-sm font-medium">
+          Reason
+          <textarea autoFocus required minLength={3} maxLength={1000} rows={4} value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 w-full rounded-lg border p-3 text-sm" />
+        </label>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="h-10 rounded-md border px-4 text-sm font-semibold">Cancel</button>
+          <button disabled={saving || reason.trim().length < 3} className="h-10 rounded-md bg-red-600 px-4 text-sm font-semibold text-white disabled:opacity-50">{saving ? "Reporting..." : "Send report"}</button>
+        </div>
+      </form>
+    </Modal>
   );
 }

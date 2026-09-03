@@ -168,7 +168,16 @@ adminRouter.get('/reviews', validateQuery(statusQuery), async (request, response
 adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBody(reviewModerationSchema), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
   const body = request.validatedBody as z.infer<typeof reviewModerationSchema>
-  const review = await prisma.review.findUnique({ where: { id }, select: { id: true, practiceId: true, userId: true } })
+  const review = await prisma.review.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      practiceId: true,
+      userId: true,
+      status: true,
+      practice: { select: { name: true, ownerId: true } },
+    },
+  })
   if (!review) throw new ApiError(404, 'REVIEW_NOT_FOUND', 'Review was not found')
   const result = await prisma.$transaction(async (transaction) => {
     const updated = await transaction.review.update({
@@ -186,16 +195,35 @@ adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBod
     await transaction.auditLog.create({
       data: { actorId: request.user!.userId, action: `REVIEW_${body.status}`, entityType: 'Review', entityId: id, reason: body.reason },
     })
-    const notification = await createNotification(transaction, {
+    const reviewerNotification = await createNotification(transaction, {
       userId: review.userId,
       category: 'REVIEW',
       title: `Review ${body.status.toLowerCase()}`,
       message: body.reason ?? `Your review was ${body.status.toLowerCase()}`,
       actionUrl: '/my-reviews',
     })
-    return { updated, notification }
+    const vetNotification = body.status === 'APPROVED'
+      ? await createNotification(transaction, {
+        userId: review.practice.ownerId,
+        category: 'REVIEW',
+        title: review.status === 'DISPUTED' ? 'Review dispute resolved' : 'Review approved',
+        message: review.status === 'DISPUTED'
+          ? `Admin reviewed your report for ${review.practice.name} and kept the review published`
+          : `${review.practice.name} has a new approved review`,
+        actionUrl: '/vet-dashboard/reviews',
+      })
+      : review.status === 'DISPUTED'
+        ? await createNotification(transaction, {
+          userId: review.practice.ownerId,
+          category: 'REVIEW',
+          title: 'Disputed review removed',
+          message: `Admin reviewed your report for ${review.practice.name} and removed the inappropriate review`,
+          actionUrl: '/vet-dashboard/reviews',
+        })
+        : null
+    return { updated, notifications: vetNotification ? [reviewerNotification, vetNotification] : [reviewerNotification] }
   })
-  emitNotifications([result.notification])
+  emitNotifications(result.notifications)
   sendSuccess(response, result.updated, 'Review moderated')
 })
 
