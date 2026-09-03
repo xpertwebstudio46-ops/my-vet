@@ -30,7 +30,7 @@ const Header = () => {
     return (
         <>
             <header className="w-full bg-transparent">
-                <div className="mx-4 flex items-center justify-between gap-4 sm:mx-6 lg:justify-evenly lg:gap-8">
+                <div className="mx-4 flex items-center justify-between gap-4 sm:mx-6 lg:justify-around lg:gap-8">
                     <Link href="/" className="shrink-0">
                         <picture>
                             <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />

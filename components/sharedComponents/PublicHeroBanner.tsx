@@ -59,7 +59,7 @@ export function PublicHeroBanner({
         : 'absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20'
 
     return (
-        <section className={`relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
+        <section className={`public-hero-banner relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
             <div className="absolute inset-0 overflow-hidden">
                 <Image
                     src="/images/hero.png"
