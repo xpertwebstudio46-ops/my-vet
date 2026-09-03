@@ -231,8 +231,14 @@ body {
   );
 }
 
-@media (min-width: 1440px) and (max-width: 1660px) {
+@media (min-width: 1540px) and (max-width: 1660px) {
   .public-hero-banner {
     max-width:90rem;
+  }
+}
+
+@media (min-width: 1440px) and (max-width: 1539px) {
+  .public-hero-banner {
+    max-width:85rem;
   }
 }
