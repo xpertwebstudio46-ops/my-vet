@@ -34,6 +34,7 @@ enum ReviewStatus {
   PENDING
   APPROVED
   REJECTED
+  DISPUTED
 }
 
 enum BlogStatus {
@@ -136,6 +137,7 @@ model User {
   appointments          Appointment[]
   reviews               Review[]              @relation("ReviewAuthor")
   moderatedReviews      Review[]              @relation("ReviewModerator")
+  disputedReviews       Review[]              @relation("ReviewDisputer")
   helpfulVotes          HelpfulVote[]
   savedPractices        SavedPractice[]
   notifications         Notification[]
@@ -497,6 +499,9 @@ model Review {
   reply         String?
   repliedAt     DateTime?
   moderatedAt   DateTime?
+  disputeReason String?
+  disputedAt    DateTime?
+  disputedById  String?
   helpfulCount  Int          @default(0)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
@@ -504,6 +509,7 @@ model Review {
   practice      Practice     @relation(fields: [practiceId], references: [id], onDelete: Restrict)
   appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
   moderatedBy   User?        @relation("ReviewModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  disputedBy    User?        @relation("ReviewDisputer", fields: [disputedById], references: [id], onDelete: SetNull)
   helpfulVotes  HelpfulVote[]
 
   @@unique([userId, practiceId])
@@ -511,6 +517,7 @@ model Review {
   @@index([practiceId])
   @@index([createdAt])
   @@index([moderatedById])
+  @@index([disputedById])
 }
 
 model HelpfulVote {

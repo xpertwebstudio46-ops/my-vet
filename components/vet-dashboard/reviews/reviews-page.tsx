@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { MessageSquareReply, Star } from "lucide-react";
+import { Flag, MessageSquareReply, Star } from "lucide-react";
 import { Card } from "@/components/dashboard/ui";
 import { apiClient, ApiClientError } from "@/lib/api/client";
 
@@ -20,6 +20,8 @@ type Review = {
 export function VetReviewsPage() {
   const [items, setItems] = useState<Review[]>([]);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [reportingId, setReportingId] = useState<string | null>(null);
   useEffect(() => {
     void apiClient<Review[]>("/api/vet/reviews")
       .then(setItems)
@@ -59,6 +61,27 @@ export function VetReviewsPage() {
       );
     }
   }
+  async function report(item: Review) {
+    const reason = window.prompt("Why are you reporting this review?");
+    if (!reason) return;
+    setReportingId(item.id);
+    setError("");
+    setMessage("");
+    try {
+      await apiClient(`/api/reviews/${item.id}/dispute`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      });
+      setItems((current) => current.filter((value) => value.id !== item.id));
+      setMessage("Review reported and sent to admin for review.");
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Review could not be reported.",
+      );
+    } finally {
+      setReportingId(null);
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="rounded-2xl bg-white p-5 shadow-lg">
@@ -73,6 +96,11 @@ export function VetReviewsPage() {
           className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
         >
           {error}
+        </div>
+      )}
+      {message && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+          {message}
         </div>
       )}
       <section className="grid gap-4 sm:grid-cols-2">
@@ -115,13 +143,23 @@ export function VetReviewsPage() {
                   </div>
                 )}
               </div>
-              <button
-                onClick={() => void reply(item)}
-                className="inline-flex h-10 items-center gap-2 rounded-md border px-4 text-sm font-semibold"
-              >
-                <MessageSquareReply className="size-4" />
-                {item.reply ? "Edit reply" : "Reply"}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => void reply(item)}
+                  className="inline-flex h-10 items-center gap-2 rounded-md border px-4 text-sm font-semibold"
+                >
+                  <MessageSquareReply className="size-4" />
+                  {item.reply ? "Edit reply" : "Reply"}
+                </button>
+                <button
+                  disabled={reportingId === item.id}
+                  onClick={() => void report(item)}
+                  className="inline-flex h-10 items-center gap-2 rounded-md border border-red-200 px-4 text-sm font-semibold text-red-600 disabled:opacity-50"
+                >
+                  <Flag className="size-4" />
+                  {reportingId === item.id ? "Reporting..." : "Report review"}
+                </button>
+              </div>
             </div>
           </Card>
         ))}

@@ -24,6 +24,7 @@ const updateSchema = z.object({
   comment: z.string().trim().min(10).max(5_000).optional(),
 })
 const replySchema = z.object({ reply: z.string().trim().min(2).max(3_000) })
+const disputeSchema = z.object({ reason: z.string().trim().min(3).max(1_000) })
 const idParams = z.object({ id: z.string().min(1) })
 const practiceParams = z.object({ practiceId: z.string().min(1) })
 
@@ -75,7 +76,7 @@ reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBod
       userId: request.user!.userId,
       status: 'COMPLETED',
     },
-    include: { practice: { select: { ownerId: true } } },
+    include: { practice: { select: { name: true } } },
   })
   if (!appointment) {
     throw new ApiError(400, 'COMPLETED_APPOINTMENT_REQUIRED', 'A completed appointment is required to review this practice')
@@ -85,16 +86,17 @@ reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBod
       const review = await transaction.review.create({
         data: { ...body, userId: request.user!.userId, status: 'PENDING' },
       })
-      const notification = await createNotification(transaction, {
-        userId: appointment.practice.ownerId,
+      const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
+      const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
+        userId: admin.id,
         category: 'REVIEW',
-        title: 'New review submitted',
-        message: 'A new review is awaiting moderation',
-        actionUrl: '/vet-dashboard/reviews',
-      })
-      return { review, notification }
+        title: 'New review awaiting moderation',
+        message: `${appointment.practice.name} received a new review`,
+        actionUrl: '/admin-dashboard/review-management?status=PENDING',
+      })))
+      return { review, notifications }
     })
-    emitNotifications([result.notification])
+    emitNotifications(result.notifications)
     sendSuccess(response, result.review, 'Review submitted for moderation', 201)
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -151,6 +153,51 @@ reviewsRouter.post('/:id/reply', requireRole('VET'), validateParams(idParams), v
   })
   emitNotifications([result.notification])
   sendSuccess(response, result.updated, 'Reply posted')
+})
+
+reviewsRouter.post('/:id/dispute', requireRole('VET'), validateParams(idParams), validateBody(disputeSchema), async (request, response) => {
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const { reason } = request.validatedBody as z.infer<typeof disputeSchema>
+  const review = await prisma.review.findFirst({
+    where: { id, practice: { ownerId: request.user!.userId } },
+    select: { id: true, status: true, practiceId: true, practice: { select: { name: true } } },
+  })
+  if (!review) throw new ApiError(404, 'REVIEW_NOT_FOUND', 'Review was not found')
+  if (review.status !== 'APPROVED') {
+    throw new ApiError(409, 'REVIEW_CANNOT_BE_DISPUTED', 'Only approved reviews can be disputed')
+  }
+  const result = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.review.update({
+      where: { id },
+      data: {
+        status: 'DISPUTED',
+        disputeReason: reason,
+        disputedAt: new Date(),
+        disputedById: request.user!.userId,
+      },
+    })
+    await recalculatePracticeRating(transaction, review.practiceId)
+    await transaction.auditLog.create({
+      data: {
+        actorId: request.user!.userId,
+        action: 'REVIEW_DISPUTED',
+        entityType: 'Review',
+        entityId: id,
+        reason,
+      },
+    })
+    const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
+    const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
+      userId: admin.id,
+      category: 'REVIEW',
+      title: 'Review disputed',
+      message: `${review.practice.name} reported a review: ${reason}`,
+      actionUrl: '/admin-dashboard/review-management?status=DISPUTED',
+    })))
+    return { updated, notifications }
+  })
+  emitNotifications(result.notifications)
+  sendSuccess(response, result.updated, 'Review disputed and sent to admin')
 })
 
 reviewsRouter.post('/:id/helpful', validateParams(idParams), async (request, response) => {

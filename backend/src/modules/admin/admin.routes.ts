@@ -155,7 +155,7 @@ adminRouter.patch('/practices/:id/status', validateParams(idParams), validateBod
 adminRouter.get('/reviews', validateQuery(statusQuery), async (request, response) => {
   const query = request.validatedQuery as z.infer<typeof statusQuery>
   const where: Prisma.ReviewWhereInput = {}
-  if (query.status && ['PENDING', 'APPROVED', 'REJECTED'].includes(query.status)) {
+  if (query.status && ['PENDING', 'APPROVED', 'REJECTED', 'DISPUTED'].includes(query.status)) {
     where.status = query.status as Prisma.EnumReviewStatusFilter['equals']
   }
   const [items, total] = await Promise.all([
@@ -173,7 +173,14 @@ adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBod
   const result = await prisma.$transaction(async (transaction) => {
     const updated = await transaction.review.update({
       where: { id },
-      data: { status: body.status, moderatedAt: new Date(), moderatedById: request.user!.userId },
+      data: {
+        status: body.status,
+        moderatedAt: new Date(),
+        moderatedById: request.user!.userId,
+        disputeReason: null,
+        disputedAt: null,
+        disputedById: null,
+      },
     })
     await recalculatePracticeRating(transaction, review.practiceId)
     await transaction.auditLog.create({
