@@ -237,8 +237,4 @@ body {
   }
 }
 
-@media (min-width: 1440px) and (max-width: 1539px) {
-  .public-hero-banner {
-    max-width:85rem;
-  }
-}
+
