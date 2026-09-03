@@ -60,5 +60,7 @@ function toCard(practice: Practice): PracticeCardItem {
     reviews: practice.reviewCount,
     tags: [...(practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []), ...(practice.services?.map((service) => service.name) ?? [])].slice(0, 5),
     description: practice.description || 'View the practice profile for services and booking information.',
+    membershipType: practice.membershipType,
+    branchCount: practice.branchCount,
   }
 }

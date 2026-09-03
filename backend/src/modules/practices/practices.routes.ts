@@ -169,12 +169,14 @@ practicesRouter.post('/', authenticate, requireRole('VET'), validateBody(createP
   const body = request.validatedBody as z.infer<typeof createPracticeSchema>
   const { membershipSelection, ...practiceFields } = body
   const userId = request.user!.userId
+  const membershipType = membershipSelection?.membership === 'group' ? 'GROUP' : 'INDEPENDENT'
+  const branchCount = membershipSelection?.membership === 'group' ? membershipSelection.branchCount : 1
   const baseSlug = toSlug(body.name) || 'practice'
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${randomBytes(3).toString('hex')}`
     try {
       const result = await prisma.$transaction(async (transaction) => {
-        const practice = await transaction.practice.create({ data: { ...practiceFields, slug, ownerId: userId } })
+        const practice = await transaction.practice.create({ data: { ...practiceFields, slug, ownerId: userId, membershipType, branchCount } })
         if (membershipSelection) {
           await transaction.contactEnquiry.create({
             data: {

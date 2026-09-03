@@ -1,4 +1,5 @@
 export type Role = "PET_OWNER" | "VET" | "ADMIN";
+export type PracticeMembershipType = "INDEPENDENT" | "GROUP";
 
 export interface ApiEnvelope<T> {
   success: boolean;
@@ -73,6 +74,8 @@ export interface Practice {
   rating: string;
   reviewCount: number;
   isFeatured: boolean;
+  membershipType: PracticeMembershipType;
+  branchCount: number;
   services?: PracticeService[];
   facilities?: Array<{ id: string; name: string; description: string | null; icon: string | null }>;
   animalTypes?: PracticeAnimalType[];

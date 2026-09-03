@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
-import type { PracticeCardData } from "@/lib/practice-cards";
+import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 interface VetCardProps {
   vet: PracticeCardData;
@@ -18,6 +18,9 @@ const VetCard = ({ vet }: VetCardProps) => {
           fill
           className="object-cover"
         />
+        <span className="absolute left-2 top-2 max-w-[calc(100%-4.5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm">
+          {practiceMembershipLabel(vet.membershipType)}
+        </span>
         <div className="absolute right-2 top-2 bg-white rounded-md  p-1 flex items-center gap-2">
           <Star
             size={14}

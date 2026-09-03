@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Star, MapPin } from "lucide-react";
-import type { PracticeCardData } from "@/lib/practice-cards";
+import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 export default function VetCard({ vet }: { vet: PracticeCardData }) {
   return (
@@ -15,14 +15,19 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
           sizes="(max-width: 768px) 100vw, 320px"
           className="object-cover"
         />
-        {vet.featured && (
-          <span
-            className="absolute top-3 left-3 rounded-full px-2.5 py-1 text-[10px] font-semibold text-white"
-            style={{ backgroundColor: "#13b8a8" }}
-          >
-            Featured
+        <div className="absolute left-3 top-3 flex max-w-[calc(100%-4rem)] flex-col items-start gap-2">
+          <span className="max-w-full truncate rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-[#064071] shadow-sm">
+            {practiceMembershipLabel(vet.membershipType)}
           </span>
-        )}
+          {vet.featured && (
+            <span
+              className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm"
+              style={{ backgroundColor: "#13b8a8" }}
+            >
+              Featured
+            </span>
+          )}
+        </div>
         <button
           type="button"
           aria-label="Save to favorites"

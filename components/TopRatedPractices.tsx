@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { apiClient } from "@/lib/api/client";
 import type { Paginated, Practice } from "@/lib/api/types";
-import { toPracticeCard, type PracticeCardData } from "@/lib/practice-cards";
+import { practiceMembershipLabel, toPracticeCard, type PracticeCardData } from "@/lib/practice-cards";
 
 export default function TopRatedPractices() {
   const [practices, setPractices] = useState<PracticeCardData[]>([]);
@@ -27,7 +27,7 @@ export default function TopRatedPractices() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         {practices.map((practice) => (
           <div key={practice.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
-            <div className="relative w-full h-[220px]"><Image src={practice.image} alt={practice.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /></div>
+            <div className="relative w-full h-[220px]"><Image src={practice.image} alt={practice.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" /><span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm">{practiceMembershipLabel(practice.membershipType)}</span></div>
             <div className="p-5 flex flex-col flex-1">
               <h3 className="font-heading font-bold text-[20px] text-black mb-1">{practice.name}</h3>
               <div className="flex items-center gap-1 mb-3"><img src="/images/location.png" alt="" className="w-3.5 h-3.5 object-contain shrink-0" aria-hidden="true" /><span className="text-[12px] text-black">{practice.location}</span></div>

@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { ArrowRight, MapPin, Star } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
+import { practiceMembershipLabel } from '@/lib/practice-cards'
+import type { PracticeMembershipType } from '@/lib/api/types'
 
 export type PracticeCardItem = {
   id: string
@@ -15,6 +17,8 @@ export type PracticeCardItem = {
   reviews: number
   tags: string[]
   description: string
+  membershipType?: PracticeMembershipType
+  branchCount?: number
 }
 
 export function PracticeCard({
@@ -31,6 +35,9 @@ export function PracticeCard({
           alt={practice.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
+        <span className="absolute left-3 top-3 max-w-[calc(100%-5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm shadow-black/10">
+          {practiceMembershipLabel(practice.membershipType)}
+        </span>
         <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 font-sans text-xs shadow-md shadow-black/10">
           <Star className="size-3.5 fill-warning text-warning" />
           <span className="font-semibold text-foreground">

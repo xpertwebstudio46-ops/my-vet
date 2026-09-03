@@ -27,6 +27,8 @@ function toCard(practice: Practice): PracticeCardItem {
       ...(practice.services?.map((service) => service.name) ?? []),
     ].slice(0, 5),
     description: practice.description || 'View this practice profile for services, opening hours and booking information.',
+    membershipType: practice.membershipType,
+    branchCount: practice.branchCount,
   }
 }
 

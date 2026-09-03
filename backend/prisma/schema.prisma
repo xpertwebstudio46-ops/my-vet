@@ -21,6 +21,11 @@ enum PracticeStatus {
   ARCHIVED
 }
 
+enum PracticeMembershipType {
+  INDEPENDENT
+  GROUP
+}
+
 enum AppointmentStatus {
   PENDING
   CONFIRMED
@@ -207,6 +212,8 @@ model Practice {
   latitude               Decimal?           @db.Decimal(10, 7)
   longitude              Decimal?           @db.Decimal(10, 7)
   status                 PracticeStatus     @default(PENDING)
+  membershipType         PracticeMembershipType @default(INDEPENDENT)
+  branchCount            Int                @default(1)
   moderationReason       String?
   rating                 Decimal            @default(0) @db.Decimal(3, 2)
   reviewCount            Int                @default(0)
@@ -238,6 +245,7 @@ model Practice {
   contactActions         ContactAction[]
 
   @@index([status])
+  @@index([membershipType])
   @@index([rating])
   @@index([createdAt])
   @@index([city, status])
