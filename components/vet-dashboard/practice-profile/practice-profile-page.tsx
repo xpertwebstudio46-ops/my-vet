@@ -8,7 +8,7 @@ export function PracticeProfilePage() {
       <ProfileBanner />
       <ProfileHeroCard />
 
-      <PracticeEditor heading="Public profile details" />
+      <PracticeEditor heading="Public profile details" showEmergencyFields />
     </div>
   )
 }

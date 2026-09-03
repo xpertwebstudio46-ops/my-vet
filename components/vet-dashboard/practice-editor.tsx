@@ -21,7 +21,7 @@ type Practice = {
   emergencyCalloutAddress: string | null
 }
 
-export function PracticeEditor({ heading = 'Practice information' }: { heading?: string }) {
+export function PracticeEditor({ heading = 'Practice information', showEmergencyFields = false }: { heading?: string; showEmergencyFields?: boolean }) {
   const [practice, setPractice] = useState<Practice | null>(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -59,13 +59,15 @@ export function PracticeEditor({ heading = 'Practice information' }: { heading?:
           }),
         },
       )
-      await apiClient('/api/vet/emergency-hours', {
-        method: 'PUT',
-        body: JSON.stringify({
-          phone: practice.emergencyNumber || null,
-          calloutAddress: practice.emergencyCalloutAddress || null,
-        }),
-      })
+      if (showEmergencyFields) {
+        await apiClient('/api/vet/emergency-hours', {
+          method: 'PUT',
+          body: JSON.stringify({
+            phone: practice.emergencyNumber || null,
+            calloutAddress: practice.emergencyCalloutAddress || null,
+          }),
+        })
+      }
       setPractice((current) => current ? { ...current, ...saved } : current)
       window.dispatchEvent(new CustomEvent('myvet:practice-updated', { detail: saved }))
       setMessage('Practice information saved and published to your listing.')
@@ -99,8 +101,12 @@ export function PracticeEditor({ heading = 'Practice information' }: { heading?:
         <Field label="County" value={practice.county ?? ''} onChange={(value) => set('county', value || null)} />
         <Field label="Postcode" value={practice.postcode} onChange={(value) => set('postcode', value)} />
         <Field label="Timezone" value={practice.timezone} onChange={(value) => set('timezone', value)} />
-        <Field label="Emergency number" value={practice.emergencyNumber ?? ''} onChange={(value) => set('emergencyNumber', value || null)} />
-        <Field label="Emergency callout address" value={practice.emergencyCalloutAddress ?? ''} onChange={(value) => set('emergencyCalloutAddress', value || null)} />
+        {showEmergencyFields && (
+          <>
+            <Field label="Emergency number" value={practice.emergencyNumber ?? ''} onChange={(value) => set('emergencyNumber', value || null)} />
+            <Field label="Emergency callout address" value={practice.emergencyCalloutAddress ?? ''} onChange={(value) => set('emergencyCalloutAddress', value || null)} />
+          </>
+        )}
         <label className="text-sm font-medium sm:col-span-2">
           Description
           <textarea value={practice.description ?? ''} onChange={(event) => set('description', event.target.value || null)} rows={6} className="mt-2 w-full rounded-md border p-3 text-sm" />
