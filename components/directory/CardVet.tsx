@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Star, MapPin } from "lucide-react";
+import { PawPrint, Star, MapPin } from "lucide-react";
 import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 export default function VetCard({ vet }: { vet: PracticeCardData }) {
@@ -33,7 +33,7 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
           aria-label="Save to favorites"
           className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90"
         >
-          <Heart className="h-3.5 w-3.5 text-slate-500" />
+          <PawPrint className="h-3.5 w-3.5 text-slate-500" />
         </button>
       </div>
 

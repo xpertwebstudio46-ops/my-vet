@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowRight, CalendarCheck, Heart, MapPin, Star } from 'lucide-react'
+import { ArrowRight, CalendarCheck, MapPin, PawPrint, Star } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { BookAppointmentButton } from '@/components/appointments/book-appointment-modal'
 import { Card, HighlightedTitle } from '@/components/dashboard/ui'
@@ -46,5 +46,5 @@ export default function DashboardPage() {
 
 function PracticeMiniCard({ practice, saved, onToggle }: { practice: Practice; saved: boolean; onToggle: () => void }) {
   const tags = [...(practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []), ...(practice.services?.map((service) => service.name) ?? [])].slice(0, 3)
-  return <Card className="flex flex-col border p-4"><div className="flex-1"><p className="font-semibold">{practice.name}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3 text-[#01AEAD]" />{practice.city}</p><p className="mt-2 flex items-center gap-1 text-xs"><Star className="size-3.5 fill-warning text-warning" />{Number(practice.rating).toFixed(1)} ({practice.reviewCount})</p><div className="mt-3 flex flex-wrap gap-1">{tags.map((tag) => <span key={tag} className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">{tag}</span>)}</div></div><div className="mt-4 flex justify-between border-t pt-3"><Link href={`/vet-search/${practice.slug}`} className="inline-flex items-center gap-1 text-xs font-semibold text-[#064071]">View profile <ArrowRight className="size-3" /></Link><button type="button" onClick={onToggle} aria-pressed={saved} className="inline-flex items-center gap-1 text-xs font-semibold text-[#064071]"><Heart className={`size-3.5 ${saved ? 'fill-[#01AEAD] text-[#01AEAD]' : ''}`} />{saved ? 'Saved' : 'Save'}</button></div></Card>
+  return <Card className="flex flex-col border p-4"><div className="flex-1"><p className="font-semibold">{practice.name}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3 text-[#01AEAD]" />{practice.city}</p><p className="mt-2 flex items-center gap-1 text-xs"><Star className="size-3.5 fill-warning text-warning" />{Number(practice.rating).toFixed(1)} ({practice.reviewCount})</p><div className="mt-3 flex flex-wrap gap-1">{tags.map((tag) => <span key={tag} className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">{tag}</span>)}</div></div><div className="mt-4 flex justify-between border-t pt-3"><Link href={`/vet-search/${practice.slug}`} className="inline-flex items-center gap-1 text-xs font-semibold text-[#064071]">View profile <ArrowRight className="size-3" /></Link><button type="button" onClick={onToggle} aria-pressed={saved} className="inline-flex items-center gap-1 text-xs font-semibold text-[#064071]"><PawPrint className={`size-3.5 ${saved ? 'fill-[#01AEAD] text-[#01AEAD]' : ''}`} />{saved ? 'Saved' : 'Save'}</button></div></Card>
 }
