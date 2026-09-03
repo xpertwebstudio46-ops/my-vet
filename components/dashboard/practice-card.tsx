@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowRight, MapPin, Star } from 'lucide-react'
+import { SavePracticeButton } from '@/components/practices/save-practice-button'
 import { buttonVariants } from '@/components/ui/button'
 import { practiceMembershipLabel } from '@/lib/practice-cards'
 import type { PracticeMembershipType } from '@/lib/api/types'
@@ -23,9 +24,11 @@ export type PracticeCardItem = {
 
 export function PracticeCard({
   practice,
+  showSaveAction = true,
 }: {
   practice: PracticeCardItem
   favourited?: boolean
+  showSaveAction?: boolean
 }) {
   return (
     <div className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white bg-white font-sans shadow-lg shadow-black/10 transition-shadow hover:shadow-xl">
@@ -38,11 +41,19 @@ export function PracticeCard({
         <span className="absolute left-3 top-3 max-w-[calc(100%-5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm shadow-black/10">
           {practiceMembershipLabel(practice.membershipType)}
         </span>
-        <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 font-sans text-xs shadow-md shadow-black/10">
-          <Star className="size-3.5 fill-warning text-warning" />
-          <span className="font-semibold text-foreground">
-            {practice.rating.toFixed(1)}
-          </span>
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
+          <div className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 font-sans text-xs shadow-md shadow-black/10">
+            <Star className="size-3.5 fill-warning text-warning" />
+            <span className="font-semibold text-foreground">
+              {practice.rating.toFixed(1)}
+            </span>
+          </div>
+          {showSaveAction && (
+            <SavePracticeButton
+              practiceId={practice.id}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm disabled:opacity-60"
+            />
+          )}
         </div>
       </div>
 

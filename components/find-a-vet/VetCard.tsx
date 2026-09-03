@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
+import { SavePracticeButton } from "@/components/practices/save-practice-button";
 import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 interface VetCardProps {
@@ -21,14 +22,19 @@ const VetCard = ({ vet }: VetCardProps) => {
         <span className="absolute left-2 top-2 max-w-[calc(100%-4.5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm">
           {practiceMembershipLabel(vet.membershipType)}
         </span>
-        <div className="absolute right-2 top-2 bg-white rounded-md  p-1 flex items-center gap-2">
-          <Star
-            size={14}
-            className="fill-yellow-400 text-yellow-400"
+        <div className="absolute right-2 top-2 flex flex-col items-end gap-2">
+          <div className="bg-white rounded-md  p-1 flex items-center gap-2">
+            <Star
+              size={14}
+              className="fill-yellow-400 text-yellow-400"
+            />
+
+            <span className="font-bold font-sans text-[14px]">{vet.rating}</span>
+          </div>
+          <SavePracticeButton
+            practiceId={vet.id}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm disabled:opacity-60"
           />
-
-          <span className="font-bold font-sans text-[14px]">{vet.rating}</span>
-
         </div>
       </div>
 

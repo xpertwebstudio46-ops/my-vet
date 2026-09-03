@@ -2,11 +2,11 @@ import {
   Bell,
   Bookmark,
   CalendarDays,
-  Heart,
   HelpCircle,
   Home,
   LogOut,
   MessageSquare,
+  PawPrint,
   Search,
   Settings,
   User,
@@ -42,7 +42,7 @@ export const navSections: Array<{
       {
         label: 'Favourite vets',
         href: '/favourite-vets',
-        icon: Heart,
+        icon: PawPrint,
       },
       {
         label: 'Saved practices',

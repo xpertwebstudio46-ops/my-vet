@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PawPrint, Star, MapPin } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
+import { SavePracticeButton } from "@/components/practices/save-practice-button";
 import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 export default function VetCard({ vet }: { vet: PracticeCardData }) {
@@ -28,13 +29,10 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
             </span>
           )}
         </div>
-        <button
-          type="button"
-          aria-label="Save to favorites"
-          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90"
-        >
-          <PawPrint className="h-3.5 w-3.5 text-slate-500" />
-        </button>
+        <SavePracticeButton
+          practiceId={vet.id}
+          className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 disabled:opacity-60"
+        />
       </div>
 
       {/* Content */}
