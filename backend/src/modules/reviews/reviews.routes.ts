@@ -13,7 +13,7 @@ import { recalculatePracticeRating } from './review-rating.service.js'
 
 const createSchema = z.object({
   practiceId: z.string().min(1),
-  appointmentId: z.string().min(1),
+  appointmentId: z.string().min(1).optional(),
   rating: z.number().int().min(1).max(5),
   title: z.string().trim().max(120).nullable().optional(),
   comment: z.string().trim().min(10).max(5_000),
@@ -69,17 +69,21 @@ reviewsRouter.get('/me', async (request, response) => {
 
 reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBody(createSchema), async (request, response) => {
   const body = request.validatedBody as z.infer<typeof createSchema>
-  const appointment = await prisma.appointment.findFirst({
-    where: {
-      id: body.appointmentId,
-      practiceId: body.practiceId,
-      userId: request.user!.userId,
-      status: 'COMPLETED',
-    },
-    include: { practice: { select: { name: true } } },
+  const practice = await prisma.practice.findFirst({
+    where: { id: body.practiceId, status: 'APPROVED', owner: { deletedAt: null } },
+    select: { id: true, name: true },
   })
-  if (!appointment) {
-    throw new ApiError(400, 'COMPLETED_APPOINTMENT_REQUIRED', 'A completed appointment is required to review this practice')
+  if (!practice) throw new ApiError(404, 'PRACTICE_NOT_FOUND', 'Practice was not found')
+  if (body.appointmentId) {
+    const appointment = await prisma.appointment.findFirst({
+      where: {
+        id: body.appointmentId,
+        practiceId: body.practiceId,
+        userId: request.user!.userId,
+      },
+      select: { id: true },
+    })
+    if (!appointment) throw new ApiError(400, 'INVALID_APPOINTMENT', 'Appointment does not belong to this review')
   }
   try {
     const result = await prisma.$transaction(async (transaction) => {
@@ -91,7 +95,7 @@ reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBod
         userId: admin.id,
         category: 'REVIEW',
         title: 'New review awaiting moderation',
-        message: `${appointment.practice.name} received a new review`,
+        message: `${practice.name} received a new review`,
         actionUrl: '/admin-dashboard/review-management?status=PENDING',
       })))
       return { review, notifications }

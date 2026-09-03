@@ -1,34 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Star } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { apiClient, ApiClientError } from "@/lib/api/client";
-import type { Paginated } from "@/lib/api/types";
-
-type Appointment = { id: string; status: string; practice: { id: string; name: string } };
 
 export default function LeaveReviewForm({ practiceId }: { practiceId: string }) {
   const { user, loading } = useAuth();
-  const [appointmentId, setAppointmentId] = useState<string | null>(null);
-  const [checkedAppointments, setCheckedAppointments] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  useEffect(() => {
-    if (!user || user.role !== "PET_OWNER") return;
-    void apiClient<Paginated<Appointment>>("/api/appointments?view=all&status=COMPLETED&page=1&limit=100")
-      .then((result) => setAppointmentId(result.items.find((item) => item.practice.id === practiceId)?.id ?? null))
-      .catch(() => setAppointmentId(null))
-      .finally(() => setCheckedAppointments(true));
-  }, [practiceId, user]);
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!appointmentId || rating === 0) return;
+    if (rating === 0) return;
     const form = new FormData(event.currentTarget);
     setError("");
     setSuccess("");
@@ -37,7 +24,6 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
         method: "POST",
         body: JSON.stringify({
           practiceId,
-          appointmentId,
           rating,
           title: String(form.get("title") || "") || null,
           comment: String(form.get("comment")),
@@ -54,7 +40,6 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
   if (loading) return null;
   if (!user) return <div className="rounded-2xl bg-[#eef1f5] p-6 text-sm text-slate-600"><Link href="/login" className="font-semibold text-[#064071]">Sign in</Link> with a pet-owner account to leave a verified review.</div>;
   if (user.role !== "PET_OWNER") return null;
-  if (checkedAppointments && !appointmentId) return <div className="rounded-2xl bg-[#eef1f5] p-6 text-sm text-slate-600">Reviews are verified. You can review this practice after it marks one of your appointments as completed.</div>;
 
   return (
     <div className="rounded-2xl bg-[#eef1f5] p-6 sm:p-8">
@@ -69,7 +54,7 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
         <textarea name="comment" required minLength={10} maxLength={5000} rows={4} placeholder="Share your experience..." className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm" />
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         {success && <p role="status" className="text-sm text-emerald-700">{success}</p>}
-        <button type="submit" disabled={!appointmentId || rating === 0} className="self-start rounded-lg bg-[#0d2e5e] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Submit Review</button>
+        <button type="submit" disabled={rating === 0} className="self-start rounded-lg bg-[#0d2e5e] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Submit Review</button>
       </form>
     </div>
   );
