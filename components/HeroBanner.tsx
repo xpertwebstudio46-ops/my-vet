@@ -10,10 +10,11 @@ const HeroBanner = () => {
                 { src: '/images/pet.png', alt: 'Pet' },
                 { src: '/images/slide-2.png', alt: 'Pet care' },
                 { src: '/images/slide-3.png', alt: 'Pet' },
-                   { src: '/images/slide-4.png', alt: 'Pet' },
+                //    { src: '/images/slide-4.png', alt: 'Pet' },
             ]}
             rightImageBottomClassName="bottom-6"
             showSearch
+
         />
     )
 }
