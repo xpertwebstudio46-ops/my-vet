@@ -19,6 +19,10 @@ type PublicHeroBannerProps = {
     stats?: HeroStat[]
     rightImageSrc?: string
     rightImageAlt?: string
+    rightImageSlides?: {
+        src: string
+        alt?: string
+    }[]
     rightImageBottomClassName?: string
     innerLayout?: boolean
 }
@@ -44,9 +48,12 @@ export function PublicHeroBanner({
     stats,
     rightImageSrc = '/images/about-hero.png',
     rightImageAlt = 'Pet',
+    rightImageSlides,
     rightImageBottomClassName = 'bottom-0',
     innerLayout = true,
 }: PublicHeroBannerProps) {
+    const imageSlides = rightImageSlides?.length ? rightImageSlides : [{ src: rightImageSrc, alt: rightImageAlt }]
+    const isImageSlider = imageSlides.length > 1
     const textColumnClassName = 'lg:w-[45%]'
     const imageGroupClassName = innerLayout
         ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
@@ -117,14 +124,17 @@ export function PublicHeroBanner({
                             <img src="/images/back-shapes.png" alt="" className="w-full h-full object-contain object-right-bottom" />
                         </div>
                         <div className={`absolute ${rightImageBottomClassName} top-0 left-0 ${innerLayout ? 'right-0 lg:right-4' : 'right-4'} z-10`}>
-                            <Image
-                                src={rightImageSrc}
-                                alt={rightImageAlt}
-                                fill
-                                sizes="(min-width: 1024px) 60vw, 100vw"
-                                className={`object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`}
-                                priority
-                            />
+                            {imageSlides.map((slide, index) => (
+                                <Image
+                                    key={`${slide.src}-${index}`}
+                                    src={slide.src}
+                                    alt={slide.alt ?? rightImageAlt}
+                                    fill
+                                    sizes="(min-width: 1024px) 60vw, 100vw"
+                                    className={`${isImageSlider ? 'hero-image-slide' : ''} object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`}
+                                    priority={index === 0}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

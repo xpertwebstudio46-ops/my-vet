@@ -237,4 +237,33 @@ body {
   }
 }
 
+.hero-image-slide {
+  animation: heroImageFade 9s ease-in-out infinite;
+  opacity: 0;
+}
+
+.hero-image-slide:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.hero-image-slide:nth-child(2) {
+  animation-delay: 3s;
+}
+
+.hero-image-slide:nth-child(3) {
+  animation-delay: 6s;
+}
+
+@keyframes heroImageFade {
+  0%,
+  30% {
+    opacity: 1;
+  }
+
+  36%,
+  100% {
+    opacity: 0;
+  }
+}
+
 
