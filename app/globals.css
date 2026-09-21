@@ -238,31 +238,62 @@ body {
 }
 
 .hero-image-slide {
-  animation: heroImageFade 9s ease-in-out infinite;
+  animation: heroImageFade4 12s ease-in-out infinite;
   opacity: 0;
+  visibility: hidden;
 }
 
-.hero-image-slide:nth-child(1) {
+.hero-image-slider--3 .hero-image-slide {
+  animation-duration: 9s;
+  animation-name: heroImageFade3;
+}
+
+.hero-image-slider--4 .hero-image-slide {
+  animation-duration: 12s;
+  animation-name: heroImageFade4;
+}
+
+.hero-image-slide-1 {
   animation-delay: 0s;
 }
 
-.hero-image-slide:nth-child(2) {
+.hero-image-slide-2 {
   animation-delay: 3s;
 }
 
-.hero-image-slide:nth-child(3) {
+.hero-image-slide-3 {
   animation-delay: 6s;
 }
 
-@keyframes heroImageFade {
+.hero-image-slide-4 {
+  animation-delay: 9s;
+}
+
+@keyframes heroImageFade3 {
   0%,
-  30% {
+  33% {
     opacity: 1;
+    visibility: visible;
   }
 
-  36%,
+  40%,
   100% {
     opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes heroImageFade4 {
+  0%,
+  25% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  30%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
   }
 }
 

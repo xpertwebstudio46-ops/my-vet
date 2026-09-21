@@ -54,6 +54,7 @@ export function PublicHeroBanner({
 }: PublicHeroBannerProps) {
     const imageSlides = rightImageSlides?.length ? rightImageSlides : [{ src: rightImageSrc, alt: rightImageAlt }]
     const isImageSlider = imageSlides.length > 1
+    const imageSliderClassName = isImageSlider ? `hero-image-slider hero-image-slider--${imageSlides.length}` : ''
     const textColumnClassName = 'lg:w-[45%]'
     const imageGroupClassName = innerLayout
         ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
@@ -123,7 +124,7 @@ export function PublicHeroBanner({
                         <div className={`absolute inset-0 z-0 pointer-events-none ${innerLayout ? 'top-10 sm:top-20 lg:top-16' : 'top-16 sm:top-30'}`}>
                             <img src="/images/back-shapes.png" alt="" className="w-full h-full object-contain object-right-bottom" />
                         </div>
-                        <div className={`absolute ${rightImageBottomClassName} top-0 left-0 ${innerLayout ? 'right-0 lg:right-4' : 'right-4'} z-10`}>
+                        <div className={`absolute ${rightImageBottomClassName} top-0 left-0 ${innerLayout ? 'right-0 lg:right-4' : 'right-4'} z-10 ${imageSliderClassName}`}>
                             {imageSlides.map((slide, index) => (
                                 <Image
                                     key={`${slide.src}-${index}`}
@@ -131,7 +132,7 @@ export function PublicHeroBanner({
                                     alt={slide.alt ?? rightImageAlt}
                                     fill
                                     sizes="(min-width: 1024px) 60vw, 100vw"
-                                    className={`${isImageSlider ? 'hero-image-slide' : ''} object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`}
+                                    className={`${isImageSlider ? `hero-image-slide hero-image-slide-${index + 1}` : ''} object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'}`}
                                     priority={index === 0}
                                 />
                             ))}
