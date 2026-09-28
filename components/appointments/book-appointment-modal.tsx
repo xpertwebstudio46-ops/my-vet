@@ -25,7 +25,7 @@ export function BookAppointmentButton({ practiceId, practiceName, className }: {
     const requests: [Promise<Pet[]>, Promise<Paginated<Practice>> | null] = [apiClient<Pet[]>('/api/pets'), practiceId ? null : apiClient<Paginated<Practice>>('/api/practices?page=1&limit=100&sort=rating', {}, { authenticated: false })]
     void Promise.all([requests[0], requests[1] ?? Promise.resolve({ items: [], total: 0, page: 1, limit: 100, totalPages: 1 })]).then(([petItems, practiceResult]) => {
       setPets(petItems); setPractices(practiceResult.items)
-      setForm((current) => ({ ...current, practiceId: practiceId ?? current.practiceId, petId: current.petId || petItems[0]?.id || '' }))
+      setForm((current) => ({ ...current, practiceId: practiceId ?? current.practiceId }))
     }).catch((caught) => setError(caught instanceof ApiClientError ? caught.message : 'Booking options could not be loaded.'))
   }, [open, practiceId, user?.role])
 
