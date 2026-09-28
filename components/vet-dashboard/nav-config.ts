@@ -2,6 +2,7 @@ import {
   Bell,
   BarChart3,
   Building2,
+  CalendarCheck,
   CalendarClock,
   Camera,
   Cat,
@@ -33,6 +34,7 @@ export const vetNavSections: Array<{
     heading: 'Overview',
     items: [
       { label: 'Dashboard', href: '/vet-dashboard', icon: Home },
+      { label: 'Bookings', href: '/vet-dashboard/bookings', icon: CalendarCheck },
       { label: 'Analytics', href: '/vet-dashboard/analytics', icon: BarChart3 },
       { label: 'Reviews', href: '/vet-dashboard/reviews', icon: Star },
     ],
