@@ -62,6 +62,8 @@ export interface Practice {
   slug: string;
   name: string;
   description: string | null;
+  whatWeDo: string | null;
+  careOptions: string[];
   addressLine1: string;
   addressLine2: string | null;
   city: string;

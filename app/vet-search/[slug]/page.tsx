@@ -43,7 +43,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
       <div className="w-full bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 flex flex-col gap-8">
-            <AboutPracticeSection name={practice.name} description={description} mission={mission} services={practice.services ?? []} facilities={practice.facilities ?? []} animalTypes={practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []} />
+            <AboutPracticeSection name={practice.name} description={description} mission={mission} whatWeDo={practice.whatWeDo} careOptions={practice.careOptions ?? []} services={practice.services ?? []} facilities={practice.facilities ?? []} animalTypes={practice.animalTypes?.map(({ animalType }) => animalType.name) ?? []} />
             <PublicPracticeDetails practice={practice} />
             <PetOwnerReviews reviews={reviewCards} averageRating={Number(practice.rating)} totalReviews={practice.reviewCount} />
             <LeaveReviewForm practiceId={practice.id} />

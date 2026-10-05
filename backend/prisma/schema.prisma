@@ -206,6 +206,8 @@ model Practice {
   slug                   String             @unique
   name                   String
   description            String?
+  whatWeDo               String?
+  careOptions            String[]           @default([])
   addressLine1           String
   addressLine2           String?
   city                   String

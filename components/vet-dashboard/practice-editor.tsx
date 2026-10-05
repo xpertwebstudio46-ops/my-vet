@@ -8,6 +8,8 @@ type Practice = {
   id: string
   name: string
   description: string | null
+  whatWeDo: string | null
+  careOptions: string[]
   addressLine1: string
   addressLine2: string | null
   city: string
@@ -21,6 +23,19 @@ type Practice = {
   emergencyCalloutAddress: string | null
 }
 
+const careOptions = [
+  'Consultations',
+  'Vaccinations',
+  'Surgery',
+  'Dental care',
+  'Diagnostics',
+  'Emergency care',
+  'Microchipping',
+  'Neutering',
+  'Home visits',
+  'Pet health plans',
+]
+
 export function PracticeEditor({ heading = 'Practice information', showEmergencyFields = false }: { heading?: string; showEmergencyFields?: boolean }) {
   const [practice, setPractice] = useState<Practice | null>(null)
   const [error, setError] = useState('')
@@ -28,7 +43,7 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
 
   useEffect(() => {
     void apiClient<{ practice: Practice }>('/api/vet/dashboard')
-      .then((result) => setPractice(result.practice))
+      .then((result) => setPractice({ ...result.practice, careOptions: result.practice.careOptions ?? [] }))
       .catch((caught) =>
         setError(caught instanceof ApiClientError ? caught.message : 'Practice could not be loaded.'),
       )
@@ -47,6 +62,8 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
           body: JSON.stringify({
             name: practice.name,
             description: practice.description,
+            whatWeDo: practice.whatWeDo,
+            careOptions: practice.careOptions,
             addressLine1: practice.addressLine1,
             addressLine2: practice.addressLine2,
             city: practice.city,
@@ -81,6 +98,12 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
   }
 
   const set = (key: keyof Practice, value: string | null) => setPractice({ ...practice, [key]: value })
+  const toggleCareOption = (option: string) => setPractice({
+    ...practice,
+    careOptions: practice.careOptions.includes(option)
+      ? practice.careOptions.filter((value) => value !== option)
+      : [...practice.careOptions, option],
+  })
 
   return (
     <form onSubmit={(event) => void save(event)} className="space-y-4">
@@ -108,9 +131,24 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
           </>
         )}
         <label className="text-sm font-medium sm:col-span-2">
-          Description
+          About the practice
           <textarea value={practice.description ?? ''} onChange={(event) => set('description', event.target.value || null)} rows={6} className="mt-2 w-full rounded-md border p-3 text-sm" />
         </label>
+        <label className="text-sm font-medium sm:col-span-2">
+          What we do
+          <textarea value={practice.whatWeDo ?? ''} onChange={(event) => set('whatWeDo', event.target.value || null)} rows={5} className="mt-2 w-full rounded-md border p-3 text-sm" />
+        </label>
+        <fieldset className="sm:col-span-2">
+          <legend className="text-sm font-medium">Care offered</legend>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {careOptions.map((option) => (
+              <label key={option} className="flex items-center gap-2 rounded-md border p-3 text-sm">
+                <input type="checkbox" checked={practice.careOptions.includes(option)} onChange={() => toggleCareOption(option)} className="size-4 accent-[#01AEAD]" />
+                {option}
+              </label>
+            ))}
+          </div>
+        </fieldset>
       </Card>
     </form>
   )

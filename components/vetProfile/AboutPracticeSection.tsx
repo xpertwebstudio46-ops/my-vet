@@ -3,10 +3,12 @@ import { Stethoscope } from "lucide-react";
 type Service = { id: string; name: string; description: string | null; price: string | null; currency: string };
 type Facility = { id: string; name: string; description: string | null };
 
-export default function AboutPracticeSection({ name, description, mission, services, facilities, animalTypes }: {
+export default function AboutPracticeSection({ name, description, mission, whatWeDo, careOptions, services, facilities, animalTypes }: {
   name: string;
   description: string;
   mission?: string;
+  whatWeDo?: string | null;
+  careOptions: string[];
   services: Service[];
   facilities: Facility[];
   animalTypes: string[];
@@ -17,6 +19,8 @@ export default function AboutPracticeSection({ name, description, mission, servi
         <h2 className="text-xl sm:text-2xl font-bold text-[#0d2e5e]">About {name}</h2>
         <p className="mt-3 whitespace-pre-line text-sm text-slate-500 leading-relaxed">{description}</p>
         {mission && <div className="mt-5 rounded-xl border-l-4 border-[#13b8a8] bg-[#eafaf8] p-4"><p className="text-xs font-semibold text-[#0f9c8e]">Our Mission</p><p className="mt-1 text-sm text-slate-600 italic leading-relaxed">“{mission}”</p></div>}
+        {whatWeDo && <div className="mt-6"><h3 className="text-sm font-semibold text-slate-900">What we do</h3><p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-500">{whatWeDo}</p></div>}
+        {!!careOptions.length && <div className="mt-6"><h3 className="text-sm font-semibold text-slate-900">Care offered</h3><div className="mt-3 flex flex-wrap gap-2">{careOptions.map((option) => <span key={option} className="rounded-full border border-[#13b8a8]/25 bg-[#eafaf8] px-3 py-1.5 text-xs font-medium text-[#0f766e]">{option}</span>)}</div></div>}
         {!!animalTypes.length && <p className="mt-5 text-xs text-slate-500"><span className="font-semibold text-slate-700">Animals cared for:</span> {animalTypes.join(", ")}</p>}
       </div>
       <div>

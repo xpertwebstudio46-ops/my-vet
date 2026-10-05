@@ -16,6 +16,8 @@ import { createNotification, emitNotifications } from '../../shared/services/not
 const practiceFields = z.object({
   name: z.string().trim().min(2).max(150),
   description: z.string().trim().max(5_000).nullable().optional(),
+  whatWeDo: z.string().trim().max(5_000).nullable().optional(),
+  careOptions: z.array(z.string().trim().min(1).max(100)).max(40).optional(),
   addressLine1: z.string().trim().min(2).max(200),
   addressLine2: z.string().trim().max(200).nullable().optional(),
   city: z.string().trim().min(2).max(100),

@@ -1,0 +1,3 @@
+ALTER TABLE "Practice"
+  ADD COLUMN "whatWeDo" TEXT,
+  ADD COLUMN "careOptions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
