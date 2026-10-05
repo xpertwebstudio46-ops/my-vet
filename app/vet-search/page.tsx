@@ -24,7 +24,11 @@ export default async function Page({
   const membershipTypeValue = Array.isArray(params.membershipType) ? params.membershipType[0] : params.membershipType;
   const membershipType: PracticeMembershipType | undefined = membershipTypeValue === "INDEPENDENT" || membershipTypeValue === "GROUP" ? membershipTypeValue : undefined;
   const sort = sortValue === "newest" || sortValue === "name" ? sortValue : "rating";
-  const result = await getPractices({ page, limit: 12, sort, q, city, animalType, service, membershipType });
+  const [result, serviceSource] = await Promise.all([
+    getPractices({ page, limit: 12, sort, q, city, animalType, service, membershipType }),
+    getPractices({ page: 1, limit: 100, sort: "name" }),
+  ]);
+  const serviceOptions = [...new Set(serviceSource.items.flatMap((practice) => practice.services?.map((item) => item.name) ?? []))].sort((a, b) => a.localeCompare(b));
 
   return (
     <>
@@ -32,7 +36,7 @@ export default async function Page({
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="grid min-w-0 gap-6 lg:grid-cols-[280px_1fr] lg:gap-8 items-start">
-            <FindVetFilters />
+            <FindVetFilters serviceOptions={serviceOptions} />
             <div className="min-w-0 space-y-6 sm:space-y-8">
               <FindVetToolbar total={result.total} />
               <VetGrid practices={result.items.map(toPracticeCard)} />

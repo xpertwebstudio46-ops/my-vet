@@ -173,20 +173,22 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
         </label>
         <fieldset className="sm:col-span-2">
           <legend className="text-sm font-medium">Care offered</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {availableCareOptions.map((option) => (
-              <label key={option} className="flex items-center gap-2 rounded-md border p-3 text-sm">
-                <input type="checkbox" checked={practice.careOptions.includes(option)} onChange={() => toggleCareOption(option)} className="size-4 accent-[#01AEAD]" />
-                {option}
-              </label>
-            ))}
+          <div className="mt-2 max-h-64 overflow-y-auto pr-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {availableCareOptions.map((option) => (
+                <label key={option} className="flex items-center gap-2 rounded-md border p-3 text-sm">
+                  <input type="checkbox" checked={practice.careOptions.includes(option)} onChange={() => toggleCareOption(option)} className="size-4 accent-[#01AEAD]" />
+                  {option}
+                </label>
+              ))}
+            </div>
           </div>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input value={newCareOption} onChange={(event) => setNewCareOption(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addCareOption() } }} placeholder="Add care offered" className="h-10 flex-1 rounded-md border px-3 text-sm" />
             <button type="button" onClick={addCareOption} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold"><Plus className="size-4" />Add</button>
           </div>
           {!!practice.careOptions.length && (
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-2">
               {practice.careOptions.map((option) => (
                 <div key={option} className="flex flex-col gap-2 rounded-md border bg-slate-50 p-2 sm:flex-row sm:items-center">
                   {editingCareOption === option ? (
