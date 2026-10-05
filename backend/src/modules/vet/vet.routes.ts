@@ -102,6 +102,7 @@ const pricingSchema = z.object({
   description: z.string().trim().max(2_000).nullable().optional(),
   price: z.coerce.number().nonnegative().max(1_000_000),
   currency: z.string().length(3).transform((value) => value.toUpperCase()).default('GBP'),
+  vatMode: z.enum(['INC_VAT', 'EX_VAT']).default('INC_VAT'),
   billingPeriod: z.enum(['ONE_OFF', 'MONTHLY', 'YEARLY']).nullable().optional(),
   sortOrder: z.number().int().min(0).default(0),
   active: z.boolean().default(true),

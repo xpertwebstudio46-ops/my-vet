@@ -107,6 +107,7 @@ function PricingGroup({ title, items }: { title: string; items: NonNullable<Prac
               </div>
               <div className="shrink-0 rounded-lg bg-white px-3 py-2 text-left shadow-sm sm:min-w-32 sm:text-right">
                 <strong className="block whitespace-nowrap text-lg text-[#064071]">{formatPrice(item.price, item.currency)}</strong>
+                <span className="mt-0.5 block text-xs font-semibold uppercase text-slate-500">{vatLabel(item.vatMode ?? 'INC_VAT')}</span>
                 {item.billingPeriod && item.billingPeriod !== 'ONE_OFF' && <span className="mt-0.5 block text-xs text-slate-500">{billingLabel(item.billingPeriod)}</span>}
               </div>
             </div>
@@ -145,4 +146,8 @@ function billingLabel(period: 'ONE_OFF' | 'MONTHLY' | 'YEARLY') {
   if (period === 'MONTHLY') return 'Billed monthly'
   if (period === 'YEARLY') return 'Billed yearly'
   return 'One off'
+}
+
+function vatLabel(mode: 'INC_VAT' | 'EX_VAT') {
+  return mode === 'EX_VAT' ? 'ex VAT' : 'inc VAT'
 }

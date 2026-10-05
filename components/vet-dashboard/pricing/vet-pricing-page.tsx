@@ -14,6 +14,7 @@ type Pricing = {
   description: string | null;
   price: string;
   currency: string;
+  vatMode: "INC_VAT" | "EX_VAT";
   billingPeriod: "ONE_OFF" | "MONTHLY" | "YEARLY" | null;
   active: boolean;
   sortOrder: number;
@@ -25,6 +26,7 @@ type PricingForm = {
   name: string;
   description: string;
   price: string;
+  vatMode: Pricing["vatMode"];
   billingPeriod: NonNullable<Pricing["billingPeriod"]>;
 };
 
@@ -34,6 +36,7 @@ const empty: PricingForm = {
   name: "",
   description: "",
   price: "",
+  vatMode: "INC_VAT",
   billingPeriod: "ONE_OFF",
 };
 
@@ -46,6 +49,10 @@ function formatPrice(item: Pricing) {
   }).format(Number(item.price));
   const suffix = item.billingPeriod === "MONTHLY" ? "/mo" : item.billingPeriod === "YEARLY" ? "/yr" : "";
   return `${price}${suffix}`;
+}
+
+function vatLabel(mode: Pricing["vatMode"]) {
+  return mode === "EX_VAT" ? "ex VAT" : "inc VAT";
 }
 
 export function VetPricingPage() {
@@ -83,6 +90,7 @@ export function VetPricingPage() {
       name: item.name,
       description: item.description ?? "",
       price: item.price,
+      vatMode: item.vatMode ?? "INC_VAT",
       billingPeriod: item.billingPeriod ?? "ONE_OFF",
     });
     setFormOpen(true);
@@ -106,6 +114,7 @@ export function VetPricingPage() {
             ...form,
             price: Number(form.price),
             currency: "GBP",
+            vatMode: form.vatMode,
             description: form.description.trim() || null,
             billingPeriod:
               form.kind === "HEALTH_PACKAGE" ? form.billingPeriod : "ONE_OFF",
@@ -211,7 +220,10 @@ export function VetPricingPage() {
                       )}
                     </div>
                     <div className="flex shrink-0 items-center justify-between gap-3 md:min-w-40 md:justify-end">
-                      <strong className="text-right text-lg text-[#064071]">{formatPrice(item)}</strong>
+                      <div className="text-left md:text-right">
+                        <strong className="block text-lg text-[#064071]">{formatPrice(item)}</strong>
+                        <span className="text-xs font-semibold uppercase text-slate-500">{vatLabel(item.vatMode ?? "INC_VAT")}</span>
+                      </div>
                       <div className="flex items-center gap-1">
                         <button type="button" onClick={() => openEdit(item)} aria-label={`Edit ${item.name}`} className="inline-flex size-9 items-center justify-center rounded-md border text-slate-500 hover:bg-slate-50 hover:text-[#064071]">
                           <Pencil className="size-4" />
@@ -256,13 +268,23 @@ export function VetPricingPage() {
               <input required value={form.section} onChange={(event) => setForm({ ...form, section: event.target.value })} placeholder="Consultations" className="mt-2 h-10 w-full rounded-md border px-3 text-sm" />
             </label>
             <label className="text-sm font-medium">
-              Item name
+              Title
               <input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Initial consultation" className="mt-2 h-10 w-full rounded-md border px-3 text-sm" />
             </label>
             <label className="text-sm font-medium">
               Price GBP
               <input required type="number" min="0" step="0.01" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} placeholder="45.00" className="mt-2 h-10 w-full rounded-md border px-3 text-sm" />
             </label>
+            <fieldset className="sm:col-span-2">
+              <legend className="text-sm font-medium">VAT display</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2 rounded-md border bg-slate-50 p-1">
+                {(["INC_VAT", "EX_VAT"] as const).map((mode) => (
+                  <button key={mode} type="button" onClick={() => setForm({ ...form, vatMode: mode })} className={`h-10 rounded-md text-sm font-semibold transition ${form.vatMode === mode ? "bg-white text-[#064071] shadow-sm" : "text-slate-500 hover:text-[#064071]"}`}>
+                    {vatLabel(mode)}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
             {form.kind === "HEALTH_PACKAGE" && (
               <label className="text-sm font-medium sm:col-span-2">
                 Billing period
