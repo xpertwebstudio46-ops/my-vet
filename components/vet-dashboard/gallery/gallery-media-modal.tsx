@@ -64,18 +64,16 @@ export function GalleryMediaModal({ item, onClose, onSave }: GalleryMediaModalPr
           Gallery title
           <input type="text" value={title} maxLength={200} onChange={(event) => setTitle(event.target.value)} className="mt-2 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-[#01AEAD] focus:ring-3 focus:ring-[#01AEAD]/15" />
         </label>
-        {!item && (
-          <div>
-            <p className="text-sm font-medium text-black">Image</p>
-            <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-gray-300 p-3 hover:border-[#01AEAD] hover:bg-[#EEF7F5]">
-              <span className="relative size-20 overflow-hidden rounded-md bg-slate-100">
-                <Image src={preview} alt="Gallery preview" fill sizes="80px" unoptimized={preview.startsWith('blob:')} className="object-cover" />
-              </span>
-              <span><span className="inline-flex items-center gap-2 text-sm font-semibold text-[#064071]"><ImagePlus className="size-4 text-[#01AEAD]" />Choose image</span><span className="mt-1 block text-xs text-muted-foreground">JPEG, PNG, WebP or GIF · max 8 MB</span></span>
-              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={(event) => chooseImage(event.target.files?.[0])} />
-            </label>
-          </div>
-        )}
+        <div>
+          <p className="text-sm font-medium text-black">{item ? 'Replace image' : 'Image'}</p>
+          <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-gray-300 p-3 hover:border-[#01AEAD] hover:bg-[#EEF7F5]">
+            <span className="relative size-20 overflow-hidden rounded-md bg-slate-100">
+              <Image src={preview} alt="Gallery preview" fill sizes="80px" unoptimized={preview.startsWith('blob:')} className="object-cover" />
+            </span>
+            <span><span className="inline-flex items-center gap-2 text-sm font-semibold text-[#064071]"><ImagePlus className="size-4 text-[#01AEAD]" />{item ? 'Choose new image' : 'Choose image'}</span><span className="mt-1 block text-xs text-muted-foreground">JPEG, PNG, WebP or GIF · max 8 MB</span></span>
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={(event) => chooseImage(event.target.files?.[0])} />
+          </label>
+        </div>
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       </div>
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

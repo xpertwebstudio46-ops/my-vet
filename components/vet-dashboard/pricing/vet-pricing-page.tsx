@@ -273,7 +273,7 @@ export function VetPricingPage() {
             </label>
             <label className="text-sm font-medium">
               Price GBP
-              <input required type="number" min="0" step="0.01" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} placeholder="45.00" className="mt-2 h-10 w-full rounded-md border px-3 text-sm" />
+              <input required type="number" min="0" step="0.01" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} placeholder="90.00 - 500.00" className="mt-2 h-10 w-full rounded-md border px-3 text-sm" />
             </label>
             <fieldset className="sm:col-span-2">
               <legend className="text-sm font-medium">VAT display</legend>

@@ -32,6 +32,13 @@ function assetDeletePath(key: string) {
   return `/api/upload/${key.split('/').map(encodeURIComponent).join('/')}`
 }
 
+async function uploadGalleryImage(file: File) {
+  const form = new FormData()
+  form.set('purpose', 'GALLERY')
+  form.set('image', file)
+  return apiClient<UploadedAsset>('/api/upload/image', { method: 'POST', body: form })
+}
+
 export function VetGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([])
   const [activeTab, setActiveTab] = useState<GalleryTab>('all')
@@ -57,17 +64,20 @@ export function VetGalleryPage() {
   async function saveMedia(input: { title: string; file?: File }) {
     setError('')
     if (editing) {
-      const media = await apiClient<GalleryMedia>(`/api/vet/gallery/${editing.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ caption: input.title, altText: input.title }),
-      })
-      setItems((current) => current.map((item) => (item.id === editing.id ? toGalleryItem(media) : item)))
+      const asset = input.file ? await uploadGalleryImage(input.file) : null
+      try {
+        const media = await apiClient<GalleryMedia>(`/api/vet/gallery/${editing.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ caption: input.title, altText: input.title, ...(asset ? { assetId: asset.id } : {}) }),
+        })
+        setItems((current) => current.map((item) => (item.id === editing.id ? toGalleryItem(media) : item)))
+      } catch (caught) {
+        if (asset) await apiClient(assetDeletePath(asset.key), { method: 'DELETE' }).catch(() => undefined)
+        throw caught
+      }
     } else {
       if (!input.file) throw new Error('Choose an image to upload.')
-      const form = new FormData()
-      form.set('purpose', 'GALLERY')
-      form.set('image', input.file)
-      const asset = await apiClient<UploadedAsset>('/api/upload/image', { method: 'POST', body: form })
+      const asset = await uploadGalleryImage(input.file)
       try {
         const media = await apiClient<GalleryMedia>('/api/vet/gallery', {
           method: 'POST',

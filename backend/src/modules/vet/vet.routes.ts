@@ -90,6 +90,7 @@ const gallerySchema = z.object({
 })
 const galleryUpdateSchema = z
   .object({
+    assetId: z.string().min(1).optional(),
     altText: z.string().trim().max(200).nullable().optional(),
     caption: z.string().trim().max(500).nullable().optional(),
     sortOrder: z.number().int().min(0).optional(),
@@ -497,12 +498,26 @@ vetRouter.post('/gallery', validateBody(gallerySchema), async (request, response
 vetRouter.put('/gallery/:id', validateParams(idParams), validateBody(galleryUpdateSchema), async (request, response) => {
   const practice = await getOwnedPractice(request.user!.userId)
   const { id } = request.validatedParams as z.infer<typeof idParams>
-  const existing = await prisma.galleryMedia.findFirst({ where: { id, practiceId: practice.id }, select: { id: true } })
+  const existing = await prisma.galleryMedia.findFirst({ where: { id, practiceId: practice.id }, select: { id: true, assetId: true, url: true } })
   if (!existing) throw new ApiError(404, 'GALLERY_MEDIA_NOT_FOUND', 'Gallery media was not found')
-  const media = await prisma.galleryMedia.update({
-    where: { id },
-    data: request.validatedBody as z.infer<typeof galleryUpdateSchema>,
+  const { assetId, ...body } = request.validatedBody as z.infer<typeof galleryUpdateSchema>
+  const asset = assetId && assetId !== existing.assetId
+    ? await requireUploadForAttachment(assetId, 'GALLERY', { practiceId: practice.id })
+    : null
+  const media = await prisma.$transaction(async (transaction) => {
+    const updated = await transaction.galleryMedia.update({
+      where: { id },
+      data: {
+        ...body,
+        ...(asset ? { assetId: asset.id, key: asset.key, url: asset.url, mediaType: 'IMAGE' as const } : {}),
+      },
+    })
+    if (asset) await markUploadAttached(transaction, asset.id)
+    return updated
   })
+  if (asset && existing.url !== media.url) {
+    await deleteUploadedAssetByUrl(existing.url, ['GALLERY'], { practiceId: practice.id }).catch(() => undefined)
+  }
   sendSuccess(response, media, 'Gallery media updated')
 })
 

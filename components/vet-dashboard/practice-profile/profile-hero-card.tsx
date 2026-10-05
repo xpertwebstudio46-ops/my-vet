@@ -80,13 +80,13 @@ export function ProfileHeroCard() {
           {error}
         </div>
       )}
-      <div className="relative h-[260px] bg-slate-100">
+      <div className="relative h-[340px] bg-slate-100 sm:h-[400px] lg:h-[460px] xl:h-[500px]">
         <Image
           src={practice?.bannerUrl || "/images/profile-banner.png"}
           alt="Practice cover"
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
         <div className="absolute inset-0 bg-black/10" />
@@ -104,13 +104,13 @@ export function ProfileHeroCard() {
             }}
           />
         </label>
-        <span className="absolute -bottom-14 left-5 z-10 size-28 overflow-hidden rounded-md border-4 border-white bg-white shadow-lg shadow-black/20">
+        <span className="absolute -bottom-16 left-5 z-10 size-32 overflow-hidden rounded-md border-4 border-white bg-white shadow-lg shadow-black/20">
           <Image
             src={practice?.logoUrl || "/placeholder.svg"}
             alt={practice?.name || "Practice logo"}
             fill
-            sizes="112px"
-            className="object-cover"
+            sizes="128px"
+            className="object-contain p-1"
           />
           <label
             aria-label="Upload practice logo"
@@ -130,7 +130,7 @@ export function ProfileHeroCard() {
           </label>
         </span>
       </div>
-      <div className="bg-white px-5 pb-5 pt-20">
+      <div className="bg-white px-5 pb-5 pt-24">
         <div className="max-w-3xl">
           <h2 className="dashboard-outfit text-[22px] font-semibold text-[#01AEAD]">
             {practice?.name || "Loading practice..."}
