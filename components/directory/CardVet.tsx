@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle2, Star, MapPin } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import { SavePracticeButton } from "@/components/practices/save-practice-button";
 import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
@@ -67,25 +67,6 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
             </li>
           ))}
         </ul>
-
-        {vet.whatWeDo && (
-          <div className="mt-4 border-t border-slate-100 pt-3">
-            <p className="text-xs font-semibold uppercase text-slate-500">What we do</p>
-            <p className="mt-1 line-clamp-2 text-sm leading-5 text-slate-600">{vet.whatWeDo}</p>
-          </div>
-        )}
-
-        {!!vet.careOptions.length && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {vet.careOptions.slice(0, 4).map((option) => (
-              <span key={option} className="inline-flex items-center gap-1 rounded-full bg-[#eafaf8] px-2.5 py-1 text-[11px] font-medium text-[#0f766e]">
-                <CheckCircle2 className="size-3" />
-                {option}
-              </span>
-            ))}
-            {vet.careOptions.length > 4 && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">+{vet.careOptions.length - 4} more</span>}
-          </div>
-        )}
 
         <Link
           href={`/vet-search/${vet.slug}`}

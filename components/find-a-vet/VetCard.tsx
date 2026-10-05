@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, MapPin, Star } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { SavePracticeButton } from "@/components/practices/save-practice-button";
 import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
@@ -75,25 +75,6 @@ const VetCard = ({ vet }: VetCardProps) => {
         <p className="mt-5 text-sm leading-6 text-gray-600">
           {vet.description}
         </p>
-
-        {vet.whatWeDo && (
-          <div className="mt-4 border-t border-slate-100 pt-4">
-            <p className="text-xs font-semibold uppercase text-slate-500">What we do</p>
-            <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">{vet.whatWeDo}</p>
-          </div>
-        )}
-
-        {!!vet.careOptions.length && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {vet.careOptions.slice(0, 4).map((option) => (
-              <span key={option} className="inline-flex items-center gap-1 rounded-full bg-[#EAF8F6] px-3 py-1 text-xs font-medium text-[#0f766e]">
-                <CheckCircle2 className="size-3" />
-                {option}
-              </span>
-            ))}
-            {vet.careOptions.length > 4 && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">+{vet.careOptions.length - 4} more</span>}
-          </div>
-        )}
 
         {/* Button */}
 
