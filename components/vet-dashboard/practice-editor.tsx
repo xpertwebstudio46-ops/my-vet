@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Check, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 
@@ -40,6 +41,9 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
   const [practice, setPractice] = useState<Practice | null>(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [newCareOption, setNewCareOption] = useState('')
+  const [editingCareOption, setEditingCareOption] = useState<string | null>(null)
+  const [editingCareOptionValue, setEditingCareOptionValue] = useState('')
 
   useEffect(() => {
     void apiClient<{ practice: Practice }>('/api/vet/dashboard')
@@ -98,12 +102,41 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
   }
 
   const set = (key: keyof Practice, value: string | null) => setPractice({ ...practice, [key]: value })
+  const availableCareOptions = [...careOptions, ...practice.careOptions.filter((option) => !careOptions.includes(option))]
   const toggleCareOption = (option: string) => setPractice({
     ...practice,
     careOptions: practice.careOptions.includes(option)
       ? practice.careOptions.filter((value) => value !== option)
       : [...practice.careOptions, option],
   })
+  const addCareOption = () => {
+    const option = newCareOption.trim()
+    if (!option || practice.careOptions.some((value) => value.toLowerCase() === option.toLowerCase())) return
+    setPractice({ ...practice, careOptions: [...practice.careOptions, option] })
+    setNewCareOption('')
+  }
+  const startEditingCareOption = (option: string) => {
+    setEditingCareOption(option)
+    setEditingCareOptionValue(option)
+  }
+  const saveCareOptionEdit = () => {
+    if (!editingCareOption) return
+    const option = editingCareOptionValue.trim()
+    if (!option) return
+    setPractice({
+      ...practice,
+      careOptions: practice.careOptions.map((value) => value === editingCareOption ? option : value).filter((value, index, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === index),
+    })
+    setEditingCareOption(null)
+    setEditingCareOptionValue('')
+  }
+  const removeCareOption = (option: string) => {
+    setPractice({ ...practice, careOptions: practice.careOptions.filter((value) => value !== option) })
+    if (editingCareOption === option) {
+      setEditingCareOption(null)
+      setEditingCareOptionValue('')
+    }
+  }
 
   return (
     <form onSubmit={(event) => void save(event)} className="space-y-4">
@@ -141,13 +174,41 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
         <fieldset className="sm:col-span-2">
           <legend className="text-sm font-medium">Care offered</legend>
           <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {careOptions.map((option) => (
+            {availableCareOptions.map((option) => (
               <label key={option} className="flex items-center gap-2 rounded-md border p-3 text-sm">
                 <input type="checkbox" checked={practice.careOptions.includes(option)} onChange={() => toggleCareOption(option)} className="size-4 accent-[#01AEAD]" />
                 {option}
               </label>
             ))}
           </div>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <input value={newCareOption} onChange={(event) => setNewCareOption(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addCareOption() } }} placeholder="Add care offered" className="h-10 flex-1 rounded-md border px-3 text-sm" />
+            <button type="button" onClick={addCareOption} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border px-4 text-sm font-semibold"><Plus className="size-4" />Add</button>
+          </div>
+          {!!practice.careOptions.length && (
+            <div className="mt-4 space-y-2">
+              {practice.careOptions.map((option) => (
+                <div key={option} className="flex flex-col gap-2 rounded-md border bg-slate-50 p-2 sm:flex-row sm:items-center">
+                  {editingCareOption === option ? (
+                    <input value={editingCareOptionValue} onChange={(event) => setEditingCareOptionValue(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); saveCareOptionEdit() } }} className="h-9 flex-1 rounded-md border bg-white px-3 text-sm" />
+                  ) : (
+                    <span className="flex-1 px-1 text-sm font-medium">{option}</span>
+                  )}
+                  <div className="flex gap-1">
+                    {editingCareOption === option ? (
+                      <>
+                        <button type="button" onClick={saveCareOptionEdit} aria-label={`Save ${option}`} className="rounded-md p-2 text-emerald-700 hover:bg-white"><Check className="size-4" /></button>
+                        <button type="button" onClick={() => { setEditingCareOption(null); setEditingCareOptionValue('') }} aria-label={`Cancel editing ${option}`} className="rounded-md p-2 text-slate-600 hover:bg-white"><X className="size-4" /></button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={() => startEditingCareOption(option)} aria-label={`Edit ${option}`} className="rounded-md p-2 text-[#064071] hover:bg-white"><Pencil className="size-4" /></button>
+                    )}
+                    <button type="button" onClick={() => removeCareOption(option)} aria-label={`Remove ${option}`} className="rounded-md p-2 text-red-600 hover:bg-white"><Trash2 className="size-4" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </fieldset>
       </Card>
     </form>

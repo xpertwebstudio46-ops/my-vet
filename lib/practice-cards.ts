@@ -10,6 +10,8 @@ export interface PracticeCardData {
   reviewCount: number;
   tags: string[];
   description: string;
+  whatWeDo: string | null;
+  careOptions: string[];
   featured: boolean;
   membershipType: PracticeMembershipType;
   branchCount: number;
@@ -32,6 +34,8 @@ export function toPracticeCard(practice: Practice): PracticeCardData {
     reviewCount: practice.reviewCount,
     tags: [...new Set([...serviceTags, ...animalTags])].slice(0, 4),
     description: practice.description ?? "View this practice’s services, opening hours and contact details.",
+    whatWeDo: practice.whatWeDo,
+    careOptions: practice.careOptions ?? [],
     featured: practice.isFeatured,
     membershipType: practice.membershipType ?? "INDEPENDENT",
     branchCount: practice.branchCount ?? 1,
