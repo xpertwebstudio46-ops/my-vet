@@ -1,6 +1,10 @@
 import { CalendarDays, Images, MapPin, PhoneCall, UsersRound } from 'lucide-react'
 import type { Practice } from '@/lib/api/types'
 
+function getQualifications(value: string | null | undefined) {
+  return value?.split(/\r?\n/).map((item) => item.trim()).filter(Boolean) ?? []
+}
+
 export function PublicPracticeDetails({ practice }: { practice: Practice }) {
   const pricing = practice.pricing ?? []
   const servicePricing = pricing.filter((item) => item.kind === 'SERVICE')
@@ -47,15 +51,7 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
           <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-[#0d2e5e]"><UsersRound className="size-5 text-[#13b8a8]" />Meet the team</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {team.map((member) => (
-              <article key={member.id} className="flex gap-4 rounded-xl border bg-white p-4">
-                {member.imageUrl ? <img src={member.imageUrl} alt={member.name} className="size-20 shrink-0 rounded-xl object-cover" /> : <span className="flex size-20 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-2xl font-semibold text-teal-700">{member.name.slice(0, 1)}</span>}
-                <div>
-                  <h3 className="font-semibold">{member.name}</h3>
-                  <p className="text-sm font-medium text-[#13b8a8]">{member.role}</p>
-                  {member.qualifications && <p className="mt-1 text-xs text-slate-500">{member.qualifications}</p>}
-                  {member.bio && <p className="mt-2 text-sm text-slate-600">{member.bio}</p>}
-                </div>
-              </article>
+              <TeamMemberArticle key={member.id} member={member} />
             ))}
           </div>
         </section>
@@ -89,6 +85,30 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
         </section>
       )}
     </div>
+  )
+}
+
+function TeamMemberArticle({ member }: { member: NonNullable<Practice['teamMembers']>[number] }) {
+  const qualifications = getQualifications(member.qualifications)
+
+  return (
+    <article className="flex gap-4 rounded-xl border bg-white p-4">
+      {member.imageUrl ? <img src={member.imageUrl} alt={member.name} className="size-20 shrink-0 rounded-xl object-cover" /> : <span className="flex size-20 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-2xl font-semibold text-teal-700">{member.name.slice(0, 1)}</span>}
+      <div>
+        <h3 className="font-semibold">{member.name}</h3>
+        <p className="text-sm font-medium text-[#13b8a8]">{member.role}</p>
+        {qualifications.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {qualifications.map((qualification, index) => (
+              <span key={`${qualification}-${index}`} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                {qualification}
+              </span>
+            ))}
+          </div>
+        )}
+        {member.bio && <p className="mt-2 text-sm text-slate-600">{member.bio}</p>}
+      </div>
+    </article>
   )
 }
 

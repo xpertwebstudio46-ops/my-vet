@@ -25,20 +25,31 @@ export function TeamMembersPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  async function saveMember(input: TeamMemberInput) {
+  async function saveMember(inputs: TeamMemberInput[]) {
     setError('')
-    const asset = input.file ? await uploadImage(input.file, 'TEAM_MEMBER') : null
-    try {
-      const body = { name: input.name, role: input.role, bio: input.bio, qualifications: input.qualifications, active: input.active, sortOrder: input.sortOrder }
-      const member = await apiClient<TeamMember>(editing ? `/api/vet/team-members/${editing.id}` : '/api/vet/team-members', {
-        method: editing ? 'PUT' : 'POST',
-        body: JSON.stringify({ ...body, ...(asset ? { imageAssetId: asset.id } : {}) }),
-      })
-      setMembers((current) => editing ? current.map((item) => (item.id === member.id ? member : item)) : [...current, member])
-    } catch (caught) {
-      if (asset) await discardUpload(asset)
-      throw caught
+    const savedMembers: TeamMember[] = []
+    for (const [index, input] of inputs.entries()) {
+      const asset = input.file ? await uploadImage(input.file, 'TEAM_MEMBER') : null
+      try {
+        const body = {
+          name: input.name,
+          role: input.role,
+          bio: input.bio,
+          qualifications: input.qualifications,
+          active: input.active,
+          sortOrder: editing ? input.sortOrder : members.length + index,
+        }
+        const member = await apiClient<TeamMember>(editing ? `/api/vet/team-members/${editing.id}` : '/api/vet/team-members', {
+          method: editing ? 'PUT' : 'POST',
+          body: JSON.stringify({ ...body, ...(asset ? { imageAssetId: asset.id } : {}) }),
+        })
+        savedMembers.push(member)
+      } catch (caught) {
+        if (asset) await discardUpload(asset)
+        throw caught
+      }
     }
+    setMembers((current) => editing ? current.map((item) => (item.id === savedMembers[0].id ? savedMembers[0] : item)) : [...current, ...savedMembers])
     setEditing(null)
     setModalOpen(false)
   }

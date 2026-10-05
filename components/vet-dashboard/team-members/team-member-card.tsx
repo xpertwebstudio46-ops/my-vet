@@ -2,6 +2,10 @@ import Image from 'next/image'
 import { Pencil, Trash2 } from 'lucide-react'
 import type { TeamMember } from './team-member-types'
 
+function getQualifications(value: string | null) {
+  return value?.split(/\r?\n/).map((item) => item.trim()).filter(Boolean) ?? []
+}
+
 export function TeamMemberCard({
   member,
   onEdit,
@@ -11,6 +15,8 @@ export function TeamMemberCard({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const qualifications = getQualifications(member.qualifications)
+
   return (
     <div className="rounded-2xl border border-white bg-white p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
@@ -32,10 +38,20 @@ export function TeamMemberCard({
             {member.role}
           </p>
           <div className="mt-3 space-y-1 text-sm leading-5">
-            <p className="flex flex-wrap gap-x-2">
+            <div>
               <span className="font-semibold text-[#01AEAD]">Qualifications</span>
-              <span className="text-slate-500">{member.qualifications || 'Not listed'}</span>
-            </p>
+              {qualifications.length ? (
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {qualifications.map((qualification, index) => (
+                    <span key={`${qualification}-${index}`} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                      {qualification}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="ml-2 text-slate-500">Not listed</span>
+              )}
+            </div>
             <p className="flex flex-wrap gap-x-2">
               <span className="font-semibold text-[#01AEAD]">Bio</span>
               <span className="line-clamp-2 text-slate-500">{member.bio || 'No bio added'}</span>
