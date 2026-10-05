@@ -3,6 +3,8 @@ import type { Practice } from '@/lib/api/types'
 
 export function PublicPracticeDetails({ practice }: { practice: Practice }) {
   const pricing = practice.pricing ?? []
+  const servicePricing = pricing.filter((item) => item.kind === 'SERVICE')
+  const healthPackages = pricing.filter((item) => item.kind === 'HEALTH_PACKAGE')
   const gallery = practice.galleryMedia ?? []
   const team = practice.teamMembers ?? []
   const today = new Date(new Date().toISOString().slice(0, 10))
@@ -12,22 +14,14 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
   return (
     <div className="flex flex-col gap-8">
       {pricing.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-2xl font-bold text-[#0d2e5e]">Pricing</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {pricing.map((item) => (
-              <article key={item.id} className="rounded-xl border border-slate-200 bg-white p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#13b8a8]">{item.kind === 'HEALTH_PACKAGE' ? 'Health package' : item.section}</p>
-                    <h3 className="mt-1 font-semibold text-slate-900">{item.name}</h3>
-                  </div>
-                  <strong className="whitespace-nowrap text-lg text-[#064071]">{formatPrice(item.price, item.currency)}</strong>
-                </div>
-                {item.description && <p className="mt-2 text-sm text-slate-500">{item.description}</p>}
-                {item.billingPeriod && item.billingPeriod !== 'ONE_OFF' && <p className="mt-2 text-xs text-slate-500">Billed {item.billingPeriod.toLowerCase()}</p>}
-              </article>
-            ))}
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+          <div className="mb-5 flex flex-col gap-1">
+            <h2 className="text-2xl font-bold text-[#0d2e5e]">Pricing</h2>
+            <p className="text-sm text-slate-500">Typical fees and packages published by this practice.</p>
+          </div>
+          <div className="grid gap-6">
+            {servicePricing.length > 0 && <PricingGroup title="Service pricing" items={servicePricing} />}
+            {healthPackages.length > 0 && <PricingGroup title="Health packages" items={healthPackages} />}
           </div>
         </section>
       )}
@@ -98,10 +92,57 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
   )
 }
 
+function PricingGroup({ title, items }: { title: string; items: NonNullable<Practice['pricing']> }) {
+  return (
+    <div>
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#13b8a8]">{title}</h3>
+      <div className="grid gap-3">
+        {items.map((item) => (
+          <article key={item.id} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.section}</p>
+                <h4 className="mt-1 break-words font-semibold text-slate-900">{item.name}</h4>
+                {item.description ? <PricingDescription text={item.description} /> : <p className="mt-2 text-sm text-slate-500">Contact the practice for details.</p>}
+              </div>
+              <div className="shrink-0 rounded-lg bg-white px-3 py-2 text-left shadow-sm sm:min-w-32 sm:text-right">
+                <strong className="block whitespace-nowrap text-lg text-[#064071]">{formatPrice(item.price, item.currency)}</strong>
+                {item.billingPeriod && item.billingPeriod !== 'ONE_OFF' && <span className="mt-0.5 block text-xs text-slate-500">{billingLabel(item.billingPeriod)}</span>}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PricingDescription({ text }: { text: string }) {
+  const isLong = text.length > 180
+
+  return (
+    <div className="mt-2 min-w-0 text-sm leading-6 text-slate-500">
+      <p className={`${isLong ? 'line-clamp-3' : ''} whitespace-pre-line break-words [overflow-wrap:anywhere]`}>{text}</p>
+      {isLong && (
+        <details className="mt-1">
+          <summary className="cursor-pointer text-xs font-semibold text-[#064071] hover:underline">Read more</summary>
+          <p className="mt-2 rounded-lg bg-white p-3 text-sm leading-6 text-slate-600 shadow-sm whitespace-pre-line break-words [overflow-wrap:anywhere]">{text}</p>
+        </details>
+      )}
+    </div>
+  )
+}
+
 function formatPrice(price: string, currency: string) {
   try {
-    return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(Number(price))
+    return new Intl.NumberFormat('en-GB', { style: 'currency', currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(price))
   } catch {
     return `${currency} ${price}`
   }
+}
+
+function billingLabel(period: 'ONE_OFF' | 'MONTHLY' | 'YEARLY') {
+  if (period === 'MONTHLY') return 'Billed monthly'
+  if (period === 'YEARLY') return 'Billed yearly'
+  return 'One off'
 }
