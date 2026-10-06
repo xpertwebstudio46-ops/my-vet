@@ -28,7 +28,8 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     setError("");
     setMessage("");
     setFieldErrors({});
@@ -43,7 +44,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
       });
       if (result.requiresApproval) {
         setMessage("Your account has been created and is waiting for admin approval. You can sign in after it is approved.");
-        event.currentTarget.reset();
+        formElement.reset();
         return;
       }
       const user = result.user;

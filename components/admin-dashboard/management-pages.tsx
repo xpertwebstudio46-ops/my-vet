@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check, Search, ShieldBan, X } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
 import { Modal } from '@/components/dashboard/modal'
@@ -14,7 +14,6 @@ type Practice = { id: string; name: string; city: string; email: string; rating:
 type UserApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 type User = { id: string; email: string; role: 'PET_OWNER' | 'VET' | 'ADMIN'; approvalStatus: UserApprovalStatus; firstName: string; lastName: string; deletedAt: string | null; createdAt: string }
 type PracticeAction = { item: Practice; status: PracticeStatus }
-type UserStatusTab = 'ALL' | UserApprovalStatus
 
 function ErrorBox({ message }: { message: string }) {
   return message ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{message}</div> : null
@@ -71,10 +70,21 @@ export function ManageVeterinaryPracticePage() {
 
 export function PendingApprovalsPage() {
   const [items, setItems] = useState<Practice[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [error, setError] = useState('')
   const [action, setAction] = useState<PracticeAction | null>(null)
 
-  useEffect(() => { void apiClient<Paginated<Practice>>('/api/admin/practices?page=1&limit=100&status=PENDING').then((result) => setItems(result.items)).catch((caught) => setError(caught instanceof Error ? caught.message : 'Approvals could not be loaded.')) }, [])
+  useEffect(() => {
+    void Promise.all([
+      apiClient<Paginated<Practice>>('/api/admin/practices?page=1&limit=100&status=PENDING'),
+      apiClient<Paginated<User>>('/api/admin/users?page=1&limit=100&role=PET_OWNER&approvalStatus=PENDING'),
+    ])
+      .then(([practices, petOwners]) => {
+        setItems(practices.items)
+        setUsers(petOwners.items)
+      })
+      .catch((caught) => setError(caught instanceof Error ? caught.message : 'Approvals could not be loaded.'))
+  }, [])
 
   async function moderate(reason: string) {
     if (!action) return
@@ -85,34 +95,32 @@ export function PendingApprovalsPage() {
     } catch (caught) { setError(caught instanceof Error ? caught.message : 'Practice could not be moderated.') }
   }
 
-  return <div className="min-w-0 space-y-6"><AdminPageBanner title="Pending Approvals" description="Review real practice registrations before publication." /><ErrorBox message={error} /><div className="grid gap-4">{items.map((item) => <Card key={item.id} className="flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center"><div className="min-w-0 flex-1"><h2 className="break-words font-semibold text-black">{item.name}</h2><p className="mt-1 break-words text-sm text-muted-foreground">{item.owner.firstName} {item.owner.lastName} &middot; {item.owner.email}</p><p className="mt-1 text-sm text-muted-foreground">{item.city} &middot; Submitted {new Date(item.createdAt).toLocaleDateString('en-GB')}</p></div><div className="grid gap-2 sm:flex"><button type="button" onClick={() => setAction({ item, status: 'REJECTED' })} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-300 px-4 text-sm font-semibold text-red-700"><X className="size-4" />Reject</button><button type="button" onClick={() => setAction({ item, status: 'APPROVED' })} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white"><Check className="size-4" />Approve</button></div></Card>)}{!items.length && <Card className="p-8 text-center text-sm text-muted-foreground">No practices are waiting for approval.</Card>}</div>{action && <ModerationModal action={action} onClose={() => setAction(null)} onConfirm={moderate} />}</div>
+  async function moderateUser(item: User, approvalStatus: UserApprovalStatus) {
+    try {
+      await apiClient(`/api/admin/users/${item.id}`, { method: 'PATCH', body: JSON.stringify({ approvalStatus }) })
+      setUsers((current) => current.filter((value) => value.id !== item.id))
+    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Pet owner could not be moderated.') }
+  }
+
+  return <div className="min-w-0 space-y-6"><AdminPageBanner title="Pending Approvals" description="Review practice registrations and pet-owner accounts before access." /><ErrorBox message={error} /><section className="space-y-3"><h2 className="font-semibold text-black">Practice approvals</h2><div className="grid gap-4">{items.map((item) => <Card key={item.id} className="flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center"><div className="min-w-0 flex-1"><h3 className="break-words font-semibold text-black">{item.name}</h3><p className="mt-1 break-words text-sm text-muted-foreground">{item.owner.firstName} {item.owner.lastName} &middot; {item.owner.email}</p><p className="mt-1 text-sm text-muted-foreground">{item.city} &middot; Submitted {new Date(item.createdAt).toLocaleDateString('en-GB')}</p></div><div className="grid gap-2 sm:flex"><button type="button" onClick={() => setAction({ item, status: 'REJECTED' })} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-300 px-4 text-sm font-semibold text-red-700"><X className="size-4" />Reject</button><button type="button" onClick={() => setAction({ item, status: 'APPROVED' })} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white"><Check className="size-4" />Approve</button></div></Card>)}{!items.length && <Card className="p-8 text-center text-sm text-muted-foreground">No practices are waiting for approval.</Card>}</div></section><section className="space-y-3"><h2 className="font-semibold text-black">Pet owner approvals</h2><div className="grid gap-4">{users.map((item) => <Card key={item.id} className="flex flex-col gap-4 p-4 sm:p-5 md:flex-row md:items-center"><div className="min-w-0 flex-1"><h3 className="break-words font-semibold text-black">{item.firstName} {item.lastName}</h3><p className="mt-1 break-words text-sm text-muted-foreground">{item.email}</p><p className="mt-1 text-sm text-muted-foreground">Joined {new Date(item.createdAt).toLocaleDateString('en-GB')}</p></div><div className="grid gap-2 sm:flex"><button type="button" onClick={() => void moderateUser(item, 'REJECTED')} className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-300 px-4 text-sm font-semibold text-red-700"><X className="size-4" />Reject</button><button type="button" onClick={() => void moderateUser(item, 'APPROVED')} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#01AEAD] px-4 text-sm font-semibold text-white"><Check className="size-4" />Approve</button></div></Card>)}{!users.length && <Card className="p-8 text-center text-sm text-muted-foreground">No pet owners are waiting for approval.</Card>}</div></section>{action && <ModerationModal action={action} onClose={() => setAction(null)} onConfirm={moderate} />}</div>
 }
 
 export function PetOwnerPage() {
   const [items, setItems] = useState<User[]>([])
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
-  const [activeTab, setActiveTab] = useState<UserStatusTab>('ALL')
-  const queryRef = useRef('')
-
-  const load = useCallback(async () => {
-    try {
-      const currentQuery = queryRef.current.trim()
-      const status = activeTab === 'ALL' ? '' : `&approvalStatus=${activeTab}`
-      const result = await apiClient<Paginated<User>>(`/api/admin/users?page=1&limit=100&role=PET_OWNER${status}${currentQuery ? `&q=${encodeURIComponent(currentQuery)}` : ''}`)
-      setItems(result.items)
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Pet owners could not be loaded.') }
-  }, [activeTab])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    void apiClient<Paginated<User>>('/api/admin/users?page=1&limit=100&role=PET_OWNER')
+      .then((result) => setItems(result.items))
+      .catch((caught) => setError(caught instanceof Error ? caught.message : 'Pet owners could not be loaded.'))
+  }, [])
 
-  async function updateApproval(item: User, approvalStatus: UserApprovalStatus) {
+  async function load() {
     try {
-      const updated = await apiClient<{ approvalStatus: UserApprovalStatus; deletedAt: string | null }>(`/api/admin/users/${item.id}`, { method: 'PATCH', body: JSON.stringify({ approvalStatus }) })
-      setItems((current) => current.map((value) => value.id === item.id ? { ...value, approvalStatus: updated.approvalStatus, deletedAt: updated.deletedAt } : value))
-    } catch (caught) { setError(caught instanceof Error ? caught.message : 'User approval could not be updated.') }
+      const result = await apiClient<Paginated<User>>(`/api/admin/users?page=1&limit=100&role=PET_OWNER${query ? `&q=${encodeURIComponent(query)}` : ''}`)
+      setItems(result.items)
+    } catch (caught) { setError(caught instanceof Error ? caught.message : 'Pet owners could not be loaded.') }
   }
 
   async function toggle(item: User) {
@@ -126,7 +134,7 @@ export function PetOwnerPage() {
     if (!downloadCsv('pet-owners.csv', items.map((item) => ({ Owner: `${item.firstName} ${item.lastName}`, Email: item.email, Joined: new Date(item.createdAt).toLocaleDateString('en-GB'), Approval: item.approvalStatus, Status: item.deletedAt ? 'Deactivated' : 'Active' })))) setError('There are no pet owners to export.')
   }
 
-  return <div className="min-w-0 space-y-6"><AdminPageBanner title="Pet Owners" description="Manage pet-owner approval and account access." action={{ label: 'Export CSV', icon: 'download', tone: 'outline', onClick: exportItems }} /><form onSubmit={(event) => { event.preventDefault(); queryRef.current = query; void load() }} className="flex flex-col gap-2 sm:flex-row"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name or email" className="h-10 min-w-0 flex-1 rounded-lg border bg-white px-3 text-sm" /><button className="h-10 rounded-lg bg-[#064071] px-4 text-sm font-semibold text-white">Search</button></form><div className="flex gap-2 overflow-x-auto rounded-xl bg-white p-2 shadow-sm">{(['ALL', 'PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`h-9 shrink-0 rounded-lg px-3 text-sm font-semibold ${activeTab === tab ? 'bg-[#064071] text-white' : 'text-[#064071] hover:bg-slate-50'}`}>{tab.charAt(0) + tab.slice(1).toLowerCase()}</button>)}</div><ErrorBox message={error} /><Card className="overflow-hidden p-0"><div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase text-muted-foreground"><tr><th className="p-4">Owner</th><th className="p-4">Email</th><th className="p-4">Joined</th><th className="p-4">Approval</th><th className="p-4">Status</th><th className="p-4 text-right">Actions</th></tr></thead><tbody>{items.map((item) => <tr key={item.id} className="border-b"><td className="p-4 font-semibold">{item.firstName} {item.lastName}</td><td className="p-4">{item.email}</td><td className="p-4">{new Date(item.createdAt).toLocaleDateString('en-GB')}</td><td className="p-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.approvalStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' : item.approvalStatus === 'REJECTED' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}>{item.approvalStatus}</span></td><td className="p-4">{item.deletedAt ? 'Deactivated' : 'Active'}</td><td className="p-4"><div className="flex flex-wrap justify-end gap-2">{item.approvalStatus !== 'APPROVED' && <button type="button" onClick={() => void updateApproval(item, 'APPROVED')} className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white"><Check className="size-4" />Approve</button>}{item.approvalStatus !== 'REJECTED' && <button type="button" onClick={() => void updateApproval(item, 'REJECTED')} className="inline-flex items-center gap-1 rounded-md border border-red-300 px-3 py-2 text-xs font-semibold text-red-700"><X className="size-4" />Reject</button>}<button type="button" onClick={() => void toggle(item)} className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold"><ShieldBan className="size-4" />{item.deletedAt ? 'Reactivate' : 'Deactivate'}</button></div></td></tr>)}</tbody></table></div></Card></div>
+  return <div className="min-w-0 space-y-6"><AdminPageBanner title="Pet Owners" description="Manage pet-owner accounts and access." action={{ label: 'Export CSV', icon: 'download', tone: 'outline', onClick: exportItems }} /><form onSubmit={(event) => { event.preventDefault(); void load() }} className="flex flex-col gap-2 sm:flex-row"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name or email" className="h-10 min-w-0 flex-1 rounded-lg border bg-white px-3 text-sm" /><button className="h-10 rounded-lg bg-[#064071] px-4 text-sm font-semibold text-white">Search</button></form><ErrorBox message={error} /><Card className="overflow-hidden p-0"><div className="overflow-x-auto"><table className="w-full min-w-[700px] text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase text-muted-foreground"><tr><th className="p-4">Owner</th><th className="p-4">Email</th><th className="p-4">Joined</th><th className="p-4">Status</th><th className="p-4 text-right">Action</th></tr></thead><tbody>{items.map((item) => <tr key={item.id} className="border-b"><td className="p-4 font-semibold">{item.firstName} {item.lastName}</td><td className="p-4">{item.email}</td><td className="p-4">{new Date(item.createdAt).toLocaleDateString('en-GB')}</td><td className="p-4">{item.deletedAt ? 'Deactivated' : 'Active'}</td><td className="p-4 text-right"><button type="button" onClick={() => void toggle(item)} className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold"><ShieldBan className="size-4" />{item.deletedAt ? 'Reactivate' : 'Deactivate'}</button></td></tr>)}</tbody></table></div></Card></div>
 }
 
 function ModerationModal({ action, onClose, onConfirm }: { action: PracticeAction; onClose: () => void; onConfirm: (reason: string) => Promise<void> }) {
