@@ -148,16 +148,15 @@ adminRouter.get('/notifications', validateQuery(notificationQuery), async (reque
       : [query.approvalStatus]
   const where: Prisma.NotificationWhereInput = {
     userId: request.user!.userId,
-    ...(statusFilter ? { category: 'PRACTICE', entityType: 'PRACTICE', statusSnapshot: { in: statusFilter } } : {}),
+    ...(statusFilter ? { statusSnapshot: { in: statusFilter } } : {}),
   }
-  const base = { userId: request.user!.userId, category: 'PRACTICE' as const, entityType: 'PRACTICE' }
   const [items, total, all, pending, approved, rejected] = await Promise.all([
     prisma.notification.findMany({ where, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
     prisma.notification.count({ where }),
     prisma.notification.count({ where: { userId: request.user!.userId } }),
-    prisma.notification.count({ where: { ...base, statusSnapshot: 'PENDING' } }),
-    prisma.notification.count({ where: { ...base, statusSnapshot: 'APPROVED' } }),
-    prisma.notification.count({ where: { ...base, statusSnapshot: 'REJECTED' } }),
+    prisma.notification.count({ where: { userId: request.user!.userId, statusSnapshot: 'PENDING' } }),
+    prisma.notification.count({ where: { userId: request.user!.userId, statusSnapshot: 'APPROVED' } }),
+    prisma.notification.count({ where: { userId: request.user!.userId, statusSnapshot: 'REJECTED' } }),
   ])
   sendSuccess(response, {
     ...paginated(items, total, query.page, query.limit),
@@ -237,6 +236,10 @@ adminRouter.patch('/reviews/:id/moderate', validateParams(idParams), validateBod
     await recalculatePracticeRating(transaction, review.practiceId)
     await transaction.auditLog.create({
       data: { actorId: request.user!.userId, action: `REVIEW_${body.status}`, entityType: 'Review', entityId: id, reason: body.reason },
+    })
+    await transaction.notification.updateMany({
+      where: { entityType: 'REVIEW', entityId: id },
+      data: { statusSnapshot: body.status },
     })
     const reviewerNotification = await createNotification(transaction, {
       userId: review.userId,

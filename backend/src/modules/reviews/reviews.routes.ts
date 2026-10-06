@@ -97,6 +97,9 @@ reviewsRouter.post('/', reviewRateLimiter, requireRole('PET_OWNER'), validateBod
         title: 'New review awaiting moderation',
         message: `${practice.name} received a new review`,
         actionUrl: '/admin-dashboard/review-management?status=PENDING',
+        entityType: 'REVIEW',
+        entityId: review.id,
+        statusSnapshot: 'PENDING',
       })))
       return { review, notifications }
     })
@@ -197,6 +200,9 @@ reviewsRouter.post('/:id/dispute', requireRole('VET'), validateParams(idParams),
       title: 'Review disputed',
       message: `${review.practice.name} reported a review: ${reason}`,
       actionUrl: '/admin-dashboard/review-management?status=DISPUTED',
+      entityType: 'REVIEW',
+      entityId: review.id,
+      statusSnapshot: 'PENDING',
     })))
     return { updated, notifications }
   })
