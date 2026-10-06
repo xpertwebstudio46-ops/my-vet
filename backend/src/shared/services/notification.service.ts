@@ -10,6 +10,9 @@ export interface NotificationInput {
   title: string
   message: string
   actionUrl?: string
+  entityType?: string
+  entityId?: string
+  statusSnapshot?: string
 }
 
 export function createNotification(transaction: Prisma.TransactionClient, input: NotificationInput) {

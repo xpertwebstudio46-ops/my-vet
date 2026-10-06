@@ -164,6 +164,9 @@ vetRouter.post('/practice/resubmit', async (request, response) => {
       title: 'Practice resubmitted',
       message: `${practice.name} is ready for another review`,
       actionUrl: '/admin-dashboard/pending-approvals',
+      entityType: 'PRACTICE',
+      entityId: practice.id,
+      statusSnapshot: 'PENDING',
     })))
     return { updated, notifications }
   })

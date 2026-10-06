@@ -709,18 +709,22 @@ model ContactEnquiry {
 }
 
 model Notification {
-  id        String               @id @default(cuid())
-  userId    String
-  category  NotificationCategory
-  title     String
-  message   String
-  actionUrl String?
-  readAt    DateTime?
-  createdAt DateTime             @default(now())
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String               @id @default(cuid())
+  userId         String
+  category       NotificationCategory
+  title          String
+  message        String
+  actionUrl      String?
+  entityType     String?
+  entityId       String?
+  statusSnapshot String?
+  readAt         DateTime?
+  createdAt      DateTime             @default(now())
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, readAt, createdAt])
+  @@index([userId, entityType, statusSnapshot, createdAt])
 }
 
 model SavedPractice {

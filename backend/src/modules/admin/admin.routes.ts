@@ -17,6 +17,9 @@ import { installAndSyncSubscriptionCatalog, syncSubscriptionPlan } from '../subs
 
 const idParams = z.object({ id: z.string().min(1) })
 const statusQuery = paginationSchema.extend({ status: z.string().trim().max(40).optional(), q: z.string().trim().max(100).optional() })
+const notificationQuery = paginationSchema.extend({
+  approvalStatus: z.enum(['ALL', 'PENDING', 'REVIEWED', 'REJECTED', 'APPROVED']).default('ALL'),
+})
 const practiceModerationSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED', 'SUSPENDED', 'ARCHIVED']),
   reason: z.string().trim().min(3).max(1_000),
@@ -130,6 +133,32 @@ adminRouter.get('/practices', validateQuery(statusQuery), async (request, respon
   sendSuccess(response, paginated(items.map((item) => ({ ...item, rating: item.rating.toString() })), total, query.page, query.limit))
 })
 
+adminRouter.get('/notifications', validateQuery(notificationQuery), async (request, response) => {
+  const query = request.validatedQuery as z.infer<typeof notificationQuery>
+  const statusFilter = query.approvalStatus === 'REVIEWED'
+    ? ['APPROVED', 'REJECTED']
+    : query.approvalStatus === 'ALL'
+      ? null
+      : [query.approvalStatus]
+  const where: Prisma.NotificationWhereInput = {
+    userId: request.user!.userId,
+    ...(statusFilter ? { category: 'PRACTICE', entityType: 'PRACTICE', statusSnapshot: { in: statusFilter } } : {}),
+  }
+  const base = { userId: request.user!.userId, category: 'PRACTICE' as const, entityType: 'PRACTICE' }
+  const [items, total, all, pending, approved, rejected] = await Promise.all([
+    prisma.notification.findMany({ where, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
+    prisma.notification.count({ where }),
+    prisma.notification.count({ where: { userId: request.user!.userId } }),
+    prisma.notification.count({ where: { ...base, statusSnapshot: 'PENDING' } }),
+    prisma.notification.count({ where: { ...base, statusSnapshot: 'APPROVED' } }),
+    prisma.notification.count({ where: { ...base, statusSnapshot: 'REJECTED' } }),
+  ])
+  sendSuccess(response, {
+    ...paginated(items, total, query.page, query.limit),
+    counts: { all, pending, reviewed: approved + rejected, rejected, approved },
+  })
+})
+
 adminRouter.patch('/practices/:id/status', validateParams(idParams), validateBody(practiceModerationSchema), async (request, response) => {
   const { id } = request.validatedParams as z.infer<typeof idParams>
   const body = request.validatedBody as z.infer<typeof practiceModerationSchema>
@@ -140,12 +169,19 @@ adminRouter.patch('/practices/:id/status', validateParams(idParams), validateBod
     await transaction.auditLog.create({
       data: { actorId: request.user!.userId, action: `PRACTICE_${body.status}`, entityType: 'Practice', entityId: id, reason: body.reason },
     })
+    await transaction.notification.updateMany({
+      where: { category: 'PRACTICE', entityType: 'PRACTICE', entityId: id },
+      data: { statusSnapshot: body.status },
+    })
     const notification = await createNotification(transaction, {
       userId: practice.ownerId,
       category: 'PRACTICE',
       title: `Practice ${body.status.toLowerCase()}`,
       message: body.reason,
       actionUrl: '/vet-dashboard/practice-profile',
+      entityType: 'PRACTICE',
+      entityId: practice.id,
+      statusSnapshot: body.status,
     })
     return { updated, notification }
   })

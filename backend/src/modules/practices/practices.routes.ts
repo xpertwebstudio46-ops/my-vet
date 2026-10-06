@@ -199,6 +199,9 @@ practicesRouter.post('/', authenticate, requireRole('VET'), validateBody(createP
           title: 'New practice awaiting approval',
           message: `${practice.name} has submitted a directory listing`,
           actionUrl: '/admin-dashboard/pending-approvals',
+          entityType: 'PRACTICE',
+          entityId: practice.id,
+          statusSnapshot: 'PENDING',
         })))
         return { practice, notifications }
       })
