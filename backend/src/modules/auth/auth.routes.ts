@@ -32,8 +32,8 @@ function setRefreshCookie(response: Parameters<typeof sendSuccess>[0], token: st
 
 authRouter.post('/register', authRateLimiter, validateBody(registerSchema), async (request, response) => {
   const result = await register(request.validatedBody as RegisterInput)
-  setRefreshCookie(response, result.refreshToken)
-  sendSuccess(response, { user: result.user, accessToken: result.accessToken }, 'Account created', 201)
+  if (result.refreshToken) setRefreshCookie(response, result.refreshToken)
+  sendSuccess(response, { user: result.user, accessToken: result.accessToken ?? null, requiresApproval: result.requiresApproval }, 'Account created', 201)
 })
 
 authRouter.post('/login', authRateLimiter, validateBody(loginSchema), async (request, response) => {

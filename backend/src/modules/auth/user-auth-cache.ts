@@ -3,6 +3,7 @@ import { prisma } from '../../config/database.js'
 
 interface CacheEntry {
   role: Role
+  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
   expiresAt: number
 }
 
@@ -11,14 +12,21 @@ const ttl = 60_000
 
 export async function getCurrentAuthUser(userId: string) {
   const cached = cache.get(userId)
-  if (cached && cached.expiresAt > Date.now()) return { id: userId, role: cached.role }
+  if (cached && cached.expiresAt > Date.now()) {
+    if (cached.role === 'PET_OWNER' && cached.approvalStatus !== 'APPROVED') return null
+    return { id: userId, role: cached.role }
+  }
 
   const user = await prisma.user.findFirst({
     where: { id: userId, deletedAt: null },
-    select: { id: true, role: true },
+    select: { id: true, role: true, approvalStatus: true },
   })
-  if (user) cache.set(userId, { role: user.role, expiresAt: Date.now() + ttl })
-  else cache.delete(userId)
+  if (user) {
+    cache.set(userId, { role: user.role, approvalStatus: user.approvalStatus, expiresAt: Date.now() + ttl })
+    if (user.role === 'PET_OWNER' && user.approvalStatus !== 'APPROVED') return null
+  } else {
+    cache.delete(userId)
+  }
   return user
 }
 

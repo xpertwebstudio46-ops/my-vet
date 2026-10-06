@@ -4,6 +4,7 @@ import { prisma } from '../../config/database.js'
 import { env } from '../../config/env.js'
 import { ApiError } from '../../shared/utils/api-error.js'
 import { mailService } from '../../shared/services/mail.service.js'
+import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import type { LoginInput, RegisterInput, ResetPasswordInput } from './auth.validation.js'
 import { invalidateAuthUser } from './user-auth-cache.js'
 import {
@@ -21,23 +22,45 @@ const safeUserSelect = {
   firstName: true,
   lastName: true,
   avatar: true,
+  approvalStatus: true,
   createdAt: true,
 } as const
 
 export async function register(input: RegisterInput) {
   const passwordHash = await bcrypt.hash(input.password, 12)
-  const user = await prisma.user.create({
-    data: {
-      email: input.email,
-      passwordHash,
-      role: input.role,
-      firstName: input.firstName,
-      lastName: input.lastName,
-    },
-    select: safeUserSelect,
+  const result = await prisma.$transaction(async (transaction) => {
+    const user = await transaction.user.create({
+      data: {
+        email: input.email,
+        passwordHash,
+        role: input.role,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        approvalStatus: input.role === 'PET_OWNER' ? 'PENDING' : 'APPROVED',
+      },
+      select: safeUserSelect,
+    })
+    if (user.role !== 'PET_OWNER' || user.approvalStatus !== 'PENDING') return { user, notifications: [] }
+    const admins = await transaction.user.findMany({ where: { role: 'ADMIN', deletedAt: null }, select: { id: true } })
+    const notifications = await Promise.all(admins.map((admin) => createNotification(transaction, {
+      userId: admin.id,
+      category: 'SYSTEM',
+      title: 'Pet owner awaiting approval',
+      message: `${user.firstName} ${user.lastName} has created a pet-owner account`,
+      actionUrl: '/admin-dashboard/pet-owner',
+      entityType: 'USER',
+      entityId: user.id,
+      statusSnapshot: 'PENDING',
+    })))
+    return { user, notifications }
   })
+  emitNotifications(result.notifications)
+  const { user } = result
+  if (user.role === 'PET_OWNER' && user.approvalStatus !== 'APPROVED') {
+    return { user, requiresApproval: true }
+  }
   const refreshToken = await issueRefreshToken(user.id)
-  return { user, accessToken: signAccessToken(user.id, user.role), refreshToken }
+  return { user, accessToken: signAccessToken(user.id, user.role), refreshToken, requiresApproval: false }
 }
 
 export async function login(input: LoginInput) {
@@ -45,6 +68,9 @@ export async function login(input: LoginInput) {
   const valid = user ? await bcrypt.compare(input.password, user.passwordHash) : false
   if (!user || !valid || user.deletedAt) {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect')
+  }
+  if (user.role === 'PET_OWNER' && user.approvalStatus !== 'APPROVED') {
+    throw new ApiError(403, 'ACCOUNT_AWAITING_APPROVAL', user.approvalStatus === 'REJECTED' ? 'Your account has not been approved.' : 'Your account is waiting for admin approval.')
   }
   const refreshToken = await issueRefreshToken(user.id)
   const safeUser = {
@@ -54,6 +80,7 @@ export async function login(input: LoginInput) {
     firstName: user.firstName,
     lastName: user.lastName,
     avatar: user.avatar,
+    approvalStatus: user.approvalStatus,
     createdAt: user.createdAt,
   }
   return { user: safeUser, accessToken: signAccessToken(user.id, user.role), refreshToken }

@@ -22,6 +22,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
   const router = useRouter();
   const [role, setRole] = useState<Exclude<Role, "ADMIN">>(selectedPlan || queryValue(params.role) === 'vet' ? "VET" : "PET_OWNER");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,16 +30,23 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setError("");
+    setMessage("");
     setFieldErrors({});
     setSubmitting(true);
     try {
-      const user = await register({
+      const result = await register({
         firstName: String(form.get("firstName")),
         lastName: String(form.get("lastName")),
         email: String(form.get("email")),
         password: String(form.get("password")),
         role,
       });
+      if (result.requiresApproval) {
+        setMessage("Your account has been created and is waiting for admin approval. You can sign in after it is approved.");
+        event.currentTarget.reset();
+        return;
+      }
+      const user = result.user;
       if (user.role === 'VET') {
         const selection = new URLSearchParams()
         if (selectedPlan) {
@@ -93,6 +101,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
         <Field label="Email" name="email" type="email" autoComplete="email" errors={fieldErrors.email} />
         <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+        {message && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">{message}</p>}
         <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & add practice" : "Create account"}</button>
       </form>
     </main>

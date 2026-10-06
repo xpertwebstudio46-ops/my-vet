@@ -13,6 +13,12 @@ enum Role {
   ADMIN
 }
 
+enum UserApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum PracticeStatus {
   PENDING
   APPROVED
@@ -147,6 +153,7 @@ model User {
   marketingEmails       Boolean              @default(false)
   language              String               @default("en")
   twoFactorEnabled      Boolean              @default(false)
+  approvalStatus        UserApprovalStatus    @default(APPROVED)
   deletedAt             DateTime?
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
@@ -169,6 +176,7 @@ model User {
   adminSettings         AdminSettings?
   auditEntries          AuditLog[]             @relation("AuditActor")
 
+  @@index([role, approvalStatus, createdAt])
   @@index([role, deletedAt])
   @@index([createdAt])
 }

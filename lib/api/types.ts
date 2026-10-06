@@ -1,4 +1,5 @@
 export type Role = "PET_OWNER" | "VET" | "ADMIN";
+export type UserApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type PracticeMembershipType = "INDEPENDENT" | "GROUP";
 export type BlogCategory = "HORSES" | "DOGS" | "CATS" | "EXOTIC" | "POULTRY";
 
@@ -32,6 +33,7 @@ export interface User {
   id: string;
   email: string;
   role: Role;
+  approvalStatus: UserApprovalStatus;
   firstName: string;
   lastName: string;
   avatar: string | null;
@@ -104,7 +106,8 @@ export interface PracticeReview {
 
 export interface AuthResult {
   user: User;
-  accessToken: string;
+  accessToken: string | null;
+  requiresApproval?: boolean;
 }
 
 export interface BlogPostSummary {

@@ -69,7 +69,7 @@ export async function rotateRefreshToken(rawToken: string) {
   const result = await prisma.$transaction<RotationResult>(async (transaction) => {
     const stored = await transaction.refreshToken.findUnique({
       where: { hashedToken },
-      include: { user: { select: { id: true, role: true, deletedAt: true } } },
+      include: { user: { select: { id: true, role: true, approvalStatus: true, deletedAt: true } } },
     })
     if (!stored) return { kind: 'invalid' }
 
@@ -81,7 +81,7 @@ export async function rotateRefreshToken(rawToken: string) {
       return { kind: 'reuse' }
     }
 
-    if (stored.expiresAt <= new Date() || stored.user.deletedAt) return { kind: 'invalid' }
+    if (stored.expiresAt <= new Date() || stored.user.deletedAt || (stored.user.role === 'PET_OWNER' && stored.user.approvalStatus !== 'APPROVED')) return { kind: 'invalid' }
 
     const consumed = await transaction.refreshToken.updateMany({
       where: { id: stored.id, usedAt: null, revokedAt: null },

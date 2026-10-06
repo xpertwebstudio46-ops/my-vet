@@ -18,7 +18,7 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (input: RegisterInput) => Promise<User>;
+  register: (input: RegisterInput) => Promise<AuthResult>;
   logout: () => Promise<void>;
 };
 
@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       { method: "POST", body: JSON.stringify({ email, password }) },
       { authenticated: false },
     );
+    if (!result.accessToken) throw new Error("Login did not return a session.");
     setAccessToken(result.accessToken);
     setUser(result.user);
     return result.user;
@@ -104,9 +105,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       { method: "POST", body: JSON.stringify(input) },
       { authenticated: false },
     );
-    setAccessToken(result.accessToken);
-    setUser(result.user);
-    return result.user;
+    if (result.accessToken) {
+      setAccessToken(result.accessToken);
+      setUser(result.user);
+    } else {
+      setAccessToken(null);
+      setUser(null);
+    }
+    return result;
   }, []);
 
   const logout = useCallback(async () => {

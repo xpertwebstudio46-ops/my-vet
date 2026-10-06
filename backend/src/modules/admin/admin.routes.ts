@@ -17,6 +17,11 @@ import { installAndSyncSubscriptionCatalog, syncSubscriptionPlan } from '../subs
 
 const idParams = z.object({ id: z.string().min(1) })
 const statusQuery = paginationSchema.extend({ status: z.string().trim().max(40).optional(), q: z.string().trim().max(100).optional() })
+const userQuery = paginationSchema.extend({
+  q: z.string().trim().max(100).optional(),
+  role: z.enum(['PET_OWNER', 'VET', 'ADMIN']).optional(),
+  approvalStatus: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
+})
 const notificationQuery = paginationSchema.extend({
   approvalStatus: z.enum(['ALL', 'PENDING', 'REVIEWED', 'REJECTED', 'APPROVED']).default('ALL'),
 })
@@ -64,6 +69,7 @@ const enquirySchema = z.object({ status: z.enum(['NEW', 'IN_PROGRESS', 'REPLIED'
 const replySchema = z.object({ reply: z.string().trim().min(2).max(10_000) })
 const userUpdateSchema = z.object({
   role: z.enum(['PET_OWNER', 'VET', 'ADMIN']).optional(),
+  approvalStatus: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
   deactivated: z.boolean().optional(),
 })
 const settingsSchema = z.object({
@@ -426,13 +432,15 @@ adminRouter.post('/enquiries/:id/reply', validateParams(idParams), validateBody(
   sendSuccess(response, enquiry, 'Reply recorded')
 })
 
-adminRouter.get('/users', validateQuery(statusQuery), async (request, response) => {
-  const query = request.validatedQuery as z.infer<typeof statusQuery>
-  const where: Prisma.UserWhereInput = query.q
-    ? { OR: [{ email: { contains: query.q, mode: 'insensitive' } }, { firstName: { contains: query.q, mode: 'insensitive' } }, { lastName: { contains: query.q, mode: 'insensitive' } }] }
-    : {}
+adminRouter.get('/users', validateQuery(userQuery), async (request, response) => {
+  const query = request.validatedQuery as z.infer<typeof userQuery>
+  const where: Prisma.UserWhereInput = {
+    ...(query.role ? { role: query.role } : {}),
+    ...(query.approvalStatus ? { approvalStatus: query.approvalStatus } : {}),
+    ...(query.q ? { OR: [{ email: { contains: query.q, mode: 'insensitive' } }, { firstName: { contains: query.q, mode: 'insensitive' } }, { lastName: { contains: query.q, mode: 'insensitive' } }] } : {}),
+  }
   const [items, total] = await Promise.all([
-    prisma.user.findMany({ where, select: { id: true, email: true, role: true, firstName: true, lastName: true, deletedAt: true, createdAt: true }, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
+    prisma.user.findMany({ where, select: { id: true, email: true, role: true, approvalStatus: true, firstName: true, lastName: true, deletedAt: true, createdAt: true }, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
     prisma.user.count({ where }),
   ])
   sendSuccess(response, paginated(items, total, query.page, query.limit))
@@ -446,9 +454,15 @@ adminRouter.patch('/users/:id', validateParams(idParams), validateBody(userUpdat
   const user = await prisma.$transaction(async (transaction) => {
     const updated = await transaction.user.update({
       where: { id },
-      data: { ...(body.role ? { role: body.role } : {}), ...(body.deactivated !== undefined ? { deletedAt: body.deactivated ? new Date() : null } : {}) },
-      select: { id: true, email: true, role: true, deletedAt: true },
+      data: { ...(body.role ? { role: body.role } : {}), ...(body.approvalStatus ? { approvalStatus: body.approvalStatus } : {}), ...(body.deactivated !== undefined ? { deletedAt: body.deactivated ? new Date() : null } : {}) },
+      select: { id: true, email: true, role: true, approvalStatus: true, deletedAt: true },
     })
+    if (body.approvalStatus) {
+      await transaction.notification.updateMany({
+        where: { entityType: 'USER', entityId: id },
+        data: { statusSnapshot: body.approvalStatus },
+      })
+    }
     await transaction.refreshToken.updateMany({ where: { userId: id, revokedAt: null }, data: { revokedAt: new Date() } })
     return updated
   })
