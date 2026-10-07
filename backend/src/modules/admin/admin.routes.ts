@@ -29,6 +29,36 @@ const practiceModerationSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED', 'SUSPENDED', 'ARCHIVED']),
   reason: z.string().trim().min(3).max(1_000),
 })
+const adminPracticeUpdateSchema = z.object({
+  slug: z.string().trim().min(2).max(180).optional(),
+  name: z.string().trim().min(2).max(150).optional(),
+  description: z.string().trim().max(5_000).nullable().optional(),
+  whatWeDo: z.string().trim().max(5_000).nullable().optional(),
+  careOptions: z.array(z.string().trim().min(1).max(100)).max(40).optional(),
+  addressLine1: z.string().trim().min(2).max(200).optional(),
+  addressLine2: z.string().trim().max(200).nullable().optional(),
+  city: z.string().trim().min(2).max(100).optional(),
+  county: z.string().trim().max(100).nullable().optional(),
+  postcode: z.string().trim().min(2).max(20).optional(),
+  phone: z.string().trim().min(5).max(30).optional(),
+  email: z.email().optional(),
+  website: z.url().nullable().optional(),
+  logoUrl: z.url().nullable().optional(),
+  bannerUrl: z.url().nullable().optional(),
+  timezone: z.string().trim().min(3).max(80).optional(),
+  latitude: z.coerce.number().min(-90).max(90).nullable().optional(),
+  longitude: z.coerce.number().min(-180).max(180).nullable().optional(),
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'SUSPENDED', 'ARCHIVED']).optional(),
+  membershipType: z.enum(['INDEPENDENT', 'GROUP']).optional(),
+  branchCount: z.number().int().min(1).max(10_000).optional(),
+  moderationReason: z.string().trim().max(1_000).nullable().optional(),
+  rating: z.coerce.number().min(0).max(5).optional(),
+  reviewCount: z.number().int().min(0).optional(),
+  legacyRatingTotal: z.coerce.number().min(0).optional(),
+  legacyReviewCount: z.number().int().min(0).optional(),
+  isFeatured: z.boolean().optional(),
+  featuredUntil: z.coerce.date().nullable().optional(),
+})
 const reviewModerationSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED']),
   reason: z.string().trim().min(3).max(1_000).optional(),
@@ -109,6 +139,16 @@ const reportSchema = z
 export const adminRouter = Router()
 adminRouter.use(authenticate, requireRole('ADMIN'))
 
+function adminPracticeDto<T extends { rating: Prisma.Decimal; legacyRatingTotal: Prisma.Decimal; latitude: Prisma.Decimal | null; longitude: Prisma.Decimal | null }>(practice: T) {
+  return {
+    ...practice,
+    rating: practice.rating.toString(),
+    legacyRatingTotal: practice.legacyRatingTotal.toString(),
+    latitude: practice.latitude?.toString() ?? null,
+    longitude: practice.longitude?.toString() ?? null,
+  }
+}
+
 adminRouter.get('/dashboard', async (_request, response) => {
   const [users, practices, pendingPractices, pendingReviews, activeSubscriptions, revenue, recentPractices] = await Promise.all([
     prisma.user.count({ where: { deletedAt: null } }),
@@ -136,7 +176,60 @@ adminRouter.get('/practices', validateQuery(statusQuery), async (request, respon
     prisma.practice.findMany({ where, include: { owner: { select: { id: true, email: true, firstName: true, lastName: true } } }, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
     prisma.practice.count({ where }),
   ])
-  sendSuccess(response, paginated(items.map((item) => ({ ...item, rating: item.rating.toString() })), total, query.page, query.limit))
+  sendSuccess(response, paginated(items.map(adminPracticeDto), total, query.page, query.limit))
+})
+
+adminRouter.put('/practices/:id', validateParams(idParams), validateBody(adminPracticeUpdateSchema), async (request, response) => {
+  const { id } = request.validatedParams as z.infer<typeof idParams>
+  const body = request.validatedBody as z.infer<typeof adminPracticeUpdateSchema>
+  const existing = await prisma.practice.findUnique({ where: { id }, select: { id: true, ownerId: true, status: true } })
+  if (!existing) throw new ApiError(404, 'PRACTICE_NOT_FOUND', 'Practice was not found')
+
+  try {
+    const result = await prisma.$transaction(async (transaction) => {
+      const practice = await transaction.practice.update({
+        where: { id },
+        data: body,
+        include: { owner: { select: { id: true, email: true, firstName: true, lastName: true } } },
+      })
+      if (body.status) {
+        await transaction.notification.updateMany({
+          where: { category: 'PRACTICE', entityType: 'PRACTICE', entityId: id },
+          data: { statusSnapshot: body.status },
+        })
+      }
+      await transaction.auditLog.create({
+        data: {
+          actorId: request.user!.userId,
+          action: 'PRACTICE_ADMIN_UPDATE',
+          entityType: 'Practice',
+          entityId: id,
+          reason: 'Admin edited practice details',
+          metadata: { fields: Object.keys(body) },
+        },
+      })
+      const notification = body.status && body.status !== existing.status
+        ? await createNotification(transaction, {
+          userId: existing.ownerId,
+          category: 'PRACTICE',
+          title: `Practice ${body.status.toLowerCase()}`,
+          message: body.moderationReason ?? 'Admin updated your practice status',
+          actionUrl: '/vet-dashboard/practice-profile',
+          entityType: 'PRACTICE',
+          entityId: id,
+          statusSnapshot: body.status,
+        })
+        : null
+      return { practice, notification }
+    })
+    if (result.notification) emitNotifications([result.notification])
+    sendSuccess(response, adminPracticeDto(result.practice), 'Practice updated')
+  } catch (caught) {
+    if (caught instanceof Prisma.PrismaClientKnownRequestError && caught.code === 'P2002') {
+      throw new ApiError(409, 'PRACTICE_UNIQUE_CONFLICT', 'Another practice already uses one of those unique values')
+    }
+    throw caught
+  }
 })
 
 adminRouter.get('/notifications', validateQuery(notificationQuery), async (request, response) => {
