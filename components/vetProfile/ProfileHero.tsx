@@ -23,7 +23,7 @@ export default function VetProfile({ name, bannerUrl, logoUrl, rating, reviewCou
         <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white p-3 shadow-lg sm:h-28 sm:w-28">
             <Image
-              src={logoUrl ?? "/images/header-logo.png"}
+              src={logoUrl ?? "/images/logo.png"}
               alt={`${name} logo`}
               width={112}
               height={112}

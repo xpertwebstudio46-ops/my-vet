@@ -18,7 +18,7 @@ export function TeamMembersBanner({ onAdd }: { onAdd: () => void }) {
         className="inline-flex h-11 w-fit items-center justify-center gap-2 rounded-md bg-[#064071] px-4 text-sm font-semibold text-white hover:bg-[#052f52]"
       >
         <Plus className="size-4" />
-         Add Veterinarian
+         Add Team Member
       </button>
     </section>
   )
