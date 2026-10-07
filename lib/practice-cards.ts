@@ -21,6 +21,10 @@ export function practiceMembershipLabel(membershipType?: PracticeMembershipType 
   return membershipType === "GROUP" ? "Vet Group" : "Independent Practice";
 }
 
+export function practiceMembershipBadgeImage(membershipType?: PracticeMembershipType | null) {
+  return membershipType === "GROUP" ? "/images/group-vet.png" : "/images/independent-vet.png";
+}
+
 export function toPracticeCard(practice: Practice): PracticeCardData {
   const serviceTags = practice.services?.map((service) => service.name) ?? [];
   const animalTags = practice.animalTypes?.map(({ animalType }) => animalType.name) ?? [];

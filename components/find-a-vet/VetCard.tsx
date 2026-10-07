@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
 import { SavePracticeButton } from "@/components/practices/save-practice-button";
-import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
+import { practiceMembershipBadgeImage, practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 interface VetCardProps {
   vet: PracticeCardData;
@@ -19,9 +19,13 @@ const VetCard = ({ vet }: VetCardProps) => {
           fill
           className="object-cover"
         />
-        <span className="absolute left-2 top-2 max-w-[calc(100%-4.5rem)] truncate rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#064071] shadow-sm">
-          {practiceMembershipLabel(vet.membershipType)}
-        </span>
+        <Image
+          src={practiceMembershipBadgeImage(vet.membershipType)}
+          alt={practiceMembershipLabel(vet.membershipType)}
+          width={118}
+          height={36}
+          className="absolute left-2 top-2 h-8 w-auto max-w-[calc(100%-4.5rem)] object-contain drop-shadow-sm"
+        />
         <div className="absolute right-2 top-2 flex flex-col items-end gap-2">
           <div className="bg-white rounded-md  p-1 flex items-center gap-2">
             <Star

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Star, MapPin } from "lucide-react";
 import { SavePracticeButton } from "@/components/practices/save-practice-button";
-import { practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
+import { practiceMembershipBadgeImage, practiceMembershipLabel, type PracticeCardData } from "@/lib/practice-cards";
 
 export default function VetCard({ vet }: { vet: PracticeCardData }) {
   return (
@@ -17,9 +17,13 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
           className="object-cover"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-4rem)] flex-col items-start gap-2">
-          <span className="max-w-full truncate rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-[#064071] shadow-sm">
-            {practiceMembershipLabel(vet.membershipType)}
-          </span>
+          <Image
+            src={practiceMembershipBadgeImage(vet.membershipType)}
+            alt={practiceMembershipLabel(vet.membershipType)}
+            width={118}
+            height={36}
+            className="h-8 w-auto max-w-full object-contain drop-shadow-sm"
+          />
           {vet.featured && (
             <span
               className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm"

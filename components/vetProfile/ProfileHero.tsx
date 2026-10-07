@@ -4,9 +4,9 @@ import { BookAppointmentButton } from "@/components/appointments/book-appointmen
 import { practiceMembershipLabel } from "@/lib/practice-cards";
 import type { PracticeMembershipType } from "@/lib/api/types";
 
-export default function VetProfile({ name, bannerUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
+export default function VetProfile({ name, logoUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
   name: string;
-  bannerUrl: string | null;
+  logoUrl: string | null;
   rating: number;
   reviewCount: number;
   address: string;
@@ -16,15 +16,29 @@ export default function VetProfile({ name, bannerUrl, rating, reviewCount, addre
 }) {
   return (
     <section className="relative min-h-[560px] w-full overflow-hidden sm:h-[70vh]">
-      <Image src={bannerUrl ?? "/images/profile-banner.png"} alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
-      <div className="absolute inset-0 bg-black/45" />
+      <Image src="/images/hero.png" alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
+      <div className="absolute inset-0 bg-[#064071]/55" />
+      <div className="absolute bottom-0 left-0 z-10 pointer-events-none">
+        <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
+      </div>
       <div className="absolute inset-x-0 bottom-8 z-10 flex flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-end md:justify-between md:px-12">
-        <div className="min-w-0">
-          <h1 className="break-words font-heading text-[32px] font-bold leading-tight text-white md:text-[40px]">{name}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white">
-            <div className="flex items-center gap-1"><Star size={14} className="fill-[#FFC107] text-[#FFC107]" /><span>{rating.toFixed(1)} ({reviewCount} Reviews)</span></div>
-            <div className="flex min-w-0 items-center gap-1"><MapPin size={14} className="shrink-0" /><span className="break-words">{address}</span></div>
-            <span className="flex items-center gap-1 rounded-full bg-[#4CAF50] px-2 py-1 text-xs font-medium text-white"><ShieldCheck size={12} />Approved listing</span>
+        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white p-3 shadow-lg sm:h-28 sm:w-28">
+            <Image
+              src={logoUrl ?? "/placeholder.svg"}
+              alt={`${name} logo`}
+              width={112}
+              height={112}
+              className="h-full w-full object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+            <h1 className="break-words font-heading text-[32px] font-bold leading-tight text-white md:text-[40px]">{name}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white">
+              <div className="flex items-center gap-1"><Star size={14} className="fill-[#FFC107] text-[#FFC107]" /><span>{rating.toFixed(1)} ({reviewCount} Reviews)</span></div>
+              <div className="flex min-w-0 items-center gap-1"><MapPin size={14} className="shrink-0" /><span className="break-words">{address}</span></div>
+              <span className="flex items-center gap-1 rounded-full bg-[#4CAF50] px-2 py-1 text-xs font-medium text-white"><ShieldCheck size={12} />Approved listing</span>
+            </div>
           </div>
         </div>
         <div className="grid gap-3 sm:flex sm:items-center sm:gap-4">
