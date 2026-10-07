@@ -33,7 +33,7 @@ const blankCounts: NotificationCounts = { all: 0, pending: 0, reviewed: 0, rejec
 
 export function AdminNotificationsPage() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<ApprovalTab>('ALL')
+  const [activeTab, setActiveTab] = useState<ApprovalTab>(initialApprovalTab)
   const [items, setItems] = useState<AdminNotification[]>([])
   const [counts, setCounts] = useState<NotificationCounts>(blankCounts)
   const [error, setError] = useState('')
@@ -50,6 +50,13 @@ export function AdminNotificationsPage() {
       .finally(() => setLoading(false))
   }, [activeTab])
 
+  const openTab = useCallback((tab: ApprovalTab) => {
+    setLoading(true)
+    setError('')
+    setActiveTab(tab)
+    window.history.pushState(null, '', tab === 'ALL' ? '/admin-dashboard/notifications' : `/admin-dashboard/notifications?approvalStatus=${tab}`)
+  }, [])
+
   useEffect(() => {
     loadNotifications()
   }, [loadNotifications])
@@ -58,6 +65,15 @@ export function AdminNotificationsPage() {
     window.addEventListener('myvet:notification', loadNotifications)
     return () => window.removeEventListener('myvet:notification', loadNotifications)
   }, [loadNotifications])
+
+  useEffect(() => {
+    const openNotificationTab = (event: Event) => {
+      const tab = approvalTabFromStatus((event as CustomEvent<string>).detail)
+      if (tab) openTab(tab)
+    }
+    window.addEventListener('myvet:admin-notification-tab', openNotificationTab)
+    return () => window.removeEventListener('myvet:admin-notification-tab', openNotificationTab)
+  }, [openTab])
 
   async function readAll() {
     try {
@@ -76,7 +92,12 @@ export function AdminNotificationsPage() {
         setItems((current) => current.map((value) => value.id === item.id ? { ...value, readAt: new Date().toISOString() } : value))
         window.dispatchEvent(new CustomEvent('myvet:notifications-updated', { detail: { id: item.id } }))
       }
-      if (item.actionUrl) router.push(notificationRoute(item.actionUrl))
+      const tab = approvalTabFromStatus(item.statusSnapshot)
+      if (tab) {
+        openTab(tab)
+      } else if (item.actionUrl) {
+        router.push(notificationRoute(item.actionUrl))
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Notification could not be opened.')
     }
@@ -108,9 +129,7 @@ export function AdminNotificationsPage() {
             key={tab.value}
             type="button"
             onClick={() => {
-              setLoading(true)
-              setError('')
-              setActiveTab(tab.value)
+              openTab(tab.value)
             }}
             className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold ${activeTab === tab.value ? 'bg-[#064071] text-white' : 'text-[#064071] hover:bg-slate-50'}`}
           >
@@ -176,6 +195,18 @@ function nextCountsAfterDelete(counts: NotificationCounts, status: string | null
     rejected: status === 'REJECTED' ? Math.max(0, counts.rejected - 1) : counts.rejected,
     approved: status === 'APPROVED' ? Math.max(0, counts.approved - 1) : counts.approved,
   }
+}
+
+function approvalTabFromStatus(status: string | null): ApprovalTab | null {
+  return status === 'PENDING' || status === 'APPROVED' || status === 'REJECTED' ? status : null
+}
+
+function initialApprovalTab(): ApprovalTab {
+  if (typeof window === 'undefined') return 'ALL'
+  const requestedTab = new URLSearchParams(window.location.search).get('approvalStatus')
+  return requestedTab === 'PENDING' || requestedTab === 'APPROVED' || requestedTab === 'REJECTED' || requestedTab === 'REVIEWED'
+    ? requestedTab
+    : 'ALL'
 }
 
 function notificationRoute(path: string) {

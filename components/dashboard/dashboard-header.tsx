@@ -21,6 +21,7 @@ type Notification = {
   title: string
   message: string
   actionUrl: string | null
+  statusSnapshot?: string | null
   readAt: string | null
   createdAt: string
 }
@@ -174,13 +175,12 @@ export function DashboardHeader({
                   notifications.map((item) => (
                     <li key={item.id}>
                       <Link
-                        href={
-                          item.actionUrl
-                            ? notificationRoute(item.actionUrl)
-                            : notificationsHref
-                        }
+                        href={notificationRoute(item.actionUrl ?? notificationsHref, item.statusSnapshot, notificationsHref)}
                         onClick={() => {
                           markRead(item)
+                          if (notificationsHref === '/admin-dashboard/notifications' && isApprovalNotificationStatus(item.statusSnapshot)) {
+                            window.dispatchEvent(new CustomEvent('myvet:admin-notification-tab', { detail: item.statusSnapshot }))
+                          }
                           setOpen(null)
                         }}
                         className={`block px-4 py-3 hover:bg-slate-50 ${item.readAt ? '' : 'bg-teal-50/50'}`}
@@ -265,7 +265,7 @@ export function DashboardHeader({
   )
 }
 
-function notificationRoute(path: string) {
+function notificationRoute(path: string, status?: string | null, notificationsHref?: string) {
   const legacy: Record<string, string> = {
     '/vet/appointments': '/vet-dashboard',
     '/vet/reviews': '/vet-dashboard/reviews',
@@ -275,5 +275,14 @@ function notificationRoute(path: string) {
     '/dashboard/appointments': '/appointment-history',
     '/dashboard/reviews': '/my-reviews',
   }
-  return legacy[path] ?? (path.startsWith('/') ? path : '/')
+  if (notificationsHref === '/admin-dashboard/notifications' && isApprovalNotificationStatus(status)) {
+    return `${notificationsHref}?approvalStatus=${status}`
+  }
+  const normalizedPath = legacy[path] ?? path
+  if (!normalizedPath.startsWith('/')) return '/'
+  return normalizedPath
+}
+
+function isApprovalNotificationStatus(status?: string | null) {
+  return status === 'PENDING' || status === 'APPROVED' || status === 'REJECTED'
 }

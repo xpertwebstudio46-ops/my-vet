@@ -237,6 +237,24 @@ body {
   }
 }
 
+@media (min-width: 1661px) and (max-width: 1740px) {
+  .public-hero-banner {
+    width: 94rem;
+  }
+}
+
+@media (min-width: 1741px) and (max-width: 1830px) {
+  .public-hero-banner {
+    width: 100rem;
+  }
+}
+
+@media (min-width: 1831px) and (max-width: 1920px) {
+  .public-hero-banner {
+    width: 108rem;
+  }
+}
+
 .hero-image-slide {
   animation: heroImageFade4 12s ease-in-out infinite;
   opacity: 0;
