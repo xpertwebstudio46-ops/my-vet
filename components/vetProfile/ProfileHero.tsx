@@ -4,8 +4,9 @@ import { BookAppointmentButton } from "@/components/appointments/book-appointmen
 import { practiceMembershipLabel } from "@/lib/practice-cards";
 import type { PracticeMembershipType } from "@/lib/api/types";
 
-export default function VetProfile({ name, logoUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
+export default function VetProfile({ name, bannerUrl, logoUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
   name: string;
+  bannerUrl: string | null;
   logoUrl: string | null;
   rating: number;
   reviewCount: number;
@@ -16,16 +17,13 @@ export default function VetProfile({ name, logoUrl, rating, reviewCount, address
 }) {
   return (
     <section className="relative min-h-[560px] w-full overflow-hidden sm:h-[70vh]">
-      <Image src="/images/hero.png" alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
-      <div className="absolute inset-0 bg-[#064071]/55" />
-      <div className="absolute bottom-0 left-0 z-10 pointer-events-none">
-        <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
-      </div>
+      <Image src={bannerUrl ?? "/images/profile-banner.png"} alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
+      <div className="absolute inset-0 bg-black/45" />
       <div className="absolute inset-x-0 bottom-8 z-10 flex flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-end md:justify-between md:px-12">
         <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white p-3 shadow-lg sm:h-28 sm:w-28">
             <Image
-              src={logoUrl ?? "/placeholder.svg"}
+              src={logoUrl ?? "/images/header-logo.png"}
               alt={`${name} logo`}
               width={112}
               height={112}
