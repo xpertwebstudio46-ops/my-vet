@@ -34,7 +34,7 @@ const Header = () => {
                     <Link href="/" className="shrink-0">
                         <picture>
                             <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
-                            <img src="/images/change-logo.png" alt="MY VET" className="h-auto w-[132px] sm:w-[150px] lg:w-[166px]" />
+                            <img src="/images/change-logo.png" alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
                         </picture>
                     </Link>
 
@@ -44,7 +44,7 @@ const Header = () => {
                                 <Link
                                     key={link.label}
                                     href={link.href}
-                                    className="text-white/90 text-sm font-medium hover:text-[#13b8a8] transition-colors whitespace-nowrap"
+                                    className="site-header-nav-link text-white/90 text-sm font-medium hover:text-[#13b8a8] transition-colors whitespace-nowrap"
                                 >
                                     {link.label}
                                 </Link>
@@ -55,7 +55,7 @@ const Header = () => {
                             {user ? (
                                 <Link
                                     href={dashboardForRole(user.role)}
-                                    className="px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
+                                    className="site-header-action px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
                                 >
                                     My account
                                 </Link>
@@ -63,14 +63,14 @@ const Header = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsLoginOpen(true)}
-                                    className="px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
+                                    className="site-header-action px-6 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
                                 >
                                     Login
                                 </button>
                             )}
                             <Link
                                 href="/register?role=vet"
-                                className="px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"
+                                className="site-header-action px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"
                             >
                                 Register Your Practice
                                 <img src="/images/arrow.png" alt="" className="w-4 h-4 object-contain" aria-hidden="true" />

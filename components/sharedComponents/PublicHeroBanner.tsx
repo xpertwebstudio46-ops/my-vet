@@ -89,12 +89,12 @@ export function PublicHeroBanner({
                     <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
                 </div>
 
-                <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
-                    <div className={`relative w-full pt-32 sm:pt-40 ${textColumnClassName} lg:pt-52`}>
+                <div className="relative z-10 h-full main max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
+                    <div className={`relative w-full pt-32 content-length ${textColumnClassName} lg:pt-52`}>
                         <div className="absolute top-[128px] -left-3 z-20 pointer-events-none sm:top-50 sm:-left-6">
                             <img src="/images/mek.png" alt="" className="h-12 w-12 object-contain sm:h-18 sm:w-18" />
                         </div>
-                        <h1 className="max-w-[520px] text-[32px] font-extrabold leading-tight text-white sm:text-[36px] lg:text-[40px] mb-4 sm:mb-6">
+                        <h1 className="max-w-[520px] text-[55px] content-title font-extrabold leading-tight text-white  mb-4 sm:mb-6">
                             {title}
                         </h1>
 
@@ -141,7 +141,7 @@ export function PublicHeroBanner({
                 </div>
             </div>
 
-            <div className="absolute top-4 left-0 right-0 z-50 sm:top-6">
+            <div className="public-hero-header absolute top-4 left-0 right-0 z-50 sm:top-6">
                 <Header />
             </div>
 

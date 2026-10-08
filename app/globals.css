@@ -7,18 +7,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(
-    --font-plus-jakarta,
-    var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif)
-  );
-  --font-heading: var(
-    --font-montserrat,
-    var(--font-plus-jakarta, var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif))
-  );
-  --font-display: var(
-    --font-montserrat,
-    var(--font-plus-jakarta, var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif))
-  );
+  --font-sans: var(--font-plus-jakarta,
+      var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif));
+  --font-heading: var(--font-montserrat,
+      var(--font-plus-jakarta, var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif)));
+  --font-display: var(--font-montserrat,
+      var(--font-plus-jakarta, var(--font-dm-sans, ui-sans-serif, system-ui, sans-serif)));
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
@@ -70,10 +64,8 @@
 body {
   background: #ffffff;
   color: #171717;
-  font-family: var(
-    --font-dm-sans,
-    var(--font-plus-jakarta, ui-sans-serif, system-ui, sans-serif)
-  );
+  font-family: var(--font-dm-sans,
+      var(--font-plus-jakarta, ui-sans-serif, system-ui, sans-serif));
 }
 
 .font-manrope {
@@ -85,6 +77,7 @@ body {
     box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
+
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   a[href],
@@ -95,13 +88,16 @@ body {
   input[type="file"] {
     cursor: pointer;
   }
+
   button:disabled,
   [aria-disabled="true"] {
     cursor: not-allowed;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -199,59 +195,171 @@ body {
 }
 
 .dashboard-font {
-  font-family: var(
-    --font-dashboard-inter,
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    sans-serif
-  );
+  font-family: var(--font-dashboard-inter,
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      sans-serif);
 }
 
 .dashboard-heading {
-  font-family: var(
-    --font-dashboard-bebas,
-    "Bebas Neue",
-    Impact,
-    ui-sans-serif,
-    system-ui,
-    sans-serif
-  );
+  font-family: var(--font-dashboard-bebas,
+      "Bebas Neue",
+      Impact,
+      ui-sans-serif,
+      system-ui,
+      sans-serif);
   font-weight: 700;
   letter-spacing: 0;
 }
 
 .dashboard-outfit {
-  font-family: var(
-    --font-dashboard-outfit,
-    Outfit,
-    ui-sans-serif,
-    system-ui,
-    sans-serif
-  );
+  font-family: var(--font-dashboard-outfit,
+      Outfit,
+      ui-sans-serif,
+      system-ui,
+      sans-serif);
 }
 
 @media (min-width: 1540px) and (max-width: 1660px) {
-  .public-hero-banner {
-    width:90rem;
+
+  .large-scrren-image {
+    width: 220px;
+    object-fit: cover
+  }
+
+  .main {
+    width: 100%;
+    max-width: 1610px;
+  }
+
+  .content-length{
+   padding-top:20px;
+  
+  }
+
+  .content-title{
+    font-size: 65px;
+     max-width:90%;
+  }
+
+  .public-hero-header {
+    right: 70px;
+  }
+
+  .site-header-nav-link {
+    font-size: 20px;
+  }
+
+  .site-header-action {
+    padding: 0.85rem 1.65rem;
+    font-size: 15px;
   }
 }
 
 @media (min-width: 1661px) and (max-width: 1740px) {
-  .public-hero-banner {
-    width: 94rem;
+   .large-scrren-image {
+    width: 220px;
+    object-fit: cover
+  }
+
+  .main {
+    width: 100%;
+    max-width: 1610px;
+  }
+
+  .content-length{
+   padding-top:20px;
+  
+  }
+
+  .content-title{
+    font-size: 65px;
+     max-width:90%;
+  }
+
+  .public-hero-header {
+    right: 70px;
+  }
+
+  .site-header-nav-link {
+    font-size: 20px;
+  }
+
+  .site-header-action {
+    padding: 0.85rem 1.65rem;
+    font-size: 15px;
   }
 }
 
 @media (min-width: 1741px) and (max-width: 1830px) {
-  .public-hero-banner {
-    width: 100rem;
+
+ .large-scrren-image {
+    width: 220px;
+    object-fit: cover
+  }
+
+  
+  .content-length{
+   padding-top:20px;
+  }
+
+   .content-title{
+    font-size: 65px;
+     max-width:90%;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 1700px;
+  }
+
+  .public-hero-header {
+    right: 70px;
+  }
+
+  .site-header-nav-link {
+    font-size: 20px;
+  }
+
+  .site-header-action {
+    padding: 0.85rem 1.65rem;
+    font-size: 15px;
   }
 }
 
 @media (min-width: 1831px) and (max-width: 1920px) {
-  .public-hero-banner {
-    width: 108rem;
+  .large-scrren-image {
+    width: 220px;
+    object-fit: cover
+  }
+
+  .main {
+    width: 100%;
+    max-width: 1700px;
+
+  }
+
+   .content-title{
+    font-size: 65px;
+    max-width:90%;
+  }
+
+  .content-length{
+   padding-top:20px;
+  }
+
+  .public-hero-header {
+    right: 70px;
+  }
+
+  .site-header-nav-link {
+    font-size: 20px;
+  }
+
+  .site-header-action {
+    padding: 0.85rem 1.65rem;
+    font-size: 15px;
   }
 }
 
@@ -288,6 +396,7 @@ body {
 }
 
 @keyframes heroImageFade3 {
+
   0%,
   33% {
     opacity: 1;
@@ -302,6 +411,7 @@ body {
 }
 
 @keyframes heroImageFade4 {
+
   0%,
   25% {
     opacity: 1;
@@ -314,5 +424,3 @@ body {
     visibility: hidden;
   }
 }
-
-
