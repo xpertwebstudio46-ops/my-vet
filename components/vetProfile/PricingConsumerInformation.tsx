@@ -6,14 +6,15 @@ export function PricingConsumerInformation({ items, benchmarkLabel = "Average", 
   if (!items.length) return null;
 
   return (
-    <section aria-label="Pricing & Consumer Information" className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 dark:border-slate-700 dark:bg-slate-900">
+    <section id="pricing-consumer-information" aria-label="Pricing & Consumer Information" className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 dark:border-slate-700 dark:bg-slate-900">
       <h2 className="mb-5 text-xl font-bold text-[#0d2e5e] sm:text-2xl dark:text-slate-100">Pricing &amp; Consumer Information</h2>
       <div className="mb-6 flex items-start gap-3 rounded-xl border border-[#13b8a8]/20 bg-[#eafaf8] p-4 dark:bg-teal-950">
         <ShieldCheck aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-[#13b8a8]" />
         <div><h3 className="text-sm font-semibold text-[#0d2e5e] dark:text-teal-100">CMA Price Transparency</h3><p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">Prices are displayed in compliance with the Competition &amp; Markets Authority (CMA) Veterinary Market Investigation Order. All prices are indicative and include VAT where applicable.</p></div>
       </div>
       <PricingComparisonCharts items={items} benchmarkLabel={benchmarkLabel} />
-      <div tabIndex={0} role="region" aria-label="Service pricing comparison table, scroll horizontally on smaller screens" className="mt-6 overflow-x-auto rounded-xl border border-slate-200 focus-visible:outline-2 focus-visible:outline-[#13b8a8] dark:border-slate-700">
+      <h3 className="mt-6 mb-3 font-semibold text-[#0d2e5e] dark:text-slate-100">Published service prices</h3>
+      <div tabIndex={0} role="region" aria-label="Service pricing comparison table, scroll horizontally on smaller screens" className="overflow-x-auto rounded-xl border border-slate-200 focus-visible:outline-2 focus-visible:outline-[#13b8a8] dark:border-slate-700">
         <table aria-label="Practice service prices and benchmark comparisons" className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-slate-50 text-[#0d2e5e] dark:bg-slate-800 dark:text-slate-100"><tr>{["Service", "This Practice", benchmarkLabel, "Comparison"].map((label, index) => <th key={index} scope="col" className="px-4 py-3 font-semibold">{label}</th>)}</tr></thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { formatPricingPrice, priceDifference, type PricingComparisonItem } from "./pricing-comparison";
 
 export function PricingComparisonCharts({ items, benchmarkLabel }: { items: PricingComparisonItem[]; benchmarkLabel: string }) {
+  const chartId = useId();
   const [tooltip, setTooltip] = useState<string | null>(null);
   const comparable = items.filter((item): item is PricingComparisonItem & { benchmarkPrice: number } => item.benchmarkPrice !== null && Number.isFinite(item.benchmarkPrice) && item.benchmarkPrice >= 0);
   if (!comparable.length) return null;
@@ -23,14 +24,14 @@ export function PricingComparisonCharts({ items, benchmarkLabel }: { items: Pric
   return (
     <div className="grid gap-6">
       <div>
-        <h3 className="font-semibold text-[#0d2e5e] dark:text-slate-100">Service price comparison</h3>
+        <h3 id={`${chartId}-prices`} className="font-semibold text-[#0d2e5e] dark:text-slate-100">Service price comparison</h3>
         <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-600 dark:text-slate-300">
           <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#13b8a8]" />This Practice</span>
           <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#085A9E]" />{benchmarkLabel}</span>
         </div>
         <p aria-live="polite" className="mt-3 min-h-10 text-xs leading-5 text-slate-600 dark:text-slate-300">{tooltip ?? "Hover over or focus a bar to see the exact price."}</p>
         <div tabIndex={0} role="region" aria-label="Service price comparison chart, scroll horizontally to see all services" className="overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-[#13b8a8]">
-          <svg width={width} height={220 + labelHeight} role="group" aria-label={`Grouped bar chart comparing this practice with ${benchmarkLabel}`} className="text-slate-500 dark:text-slate-400">
+          <svg width={width} height={220 + labelHeight} role="group" aria-labelledby={`${chartId}-prices`} aria-label={`Grouped bar chart comparing this practice with ${benchmarkLabel}`} className="text-slate-500 dark:text-slate-400">
             {[0, 1, 2, 3, 4].map((tick) => {
               const y = 210 - tick * 45;
               return <g key={tick}><line x1={75} x2={width} y1={y} y2={y} stroke="currentColor" strokeOpacity={0.15} /><text x={68} y={y + 4} textAnchor="end" fontSize={11} fill="currentColor">£{new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2 }).format(scale * tick / 4)}</text></g>;
@@ -50,7 +51,7 @@ export function PricingComparisonCharts({ items, benchmarkLabel }: { items: Pric
         </div>
       </div>
       {differences.length > 0 && <div>
-        <h3 className="font-semibold text-[#0d2e5e] dark:text-slate-100">Difference from {benchmarkLabel}</h3>
+        <h3 id={`${chartId}-difference`} className="font-semibold text-[#0d2e5e] dark:text-slate-100">Difference from {benchmarkLabel}</h3>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Teal: cheaper · Orange: more expensive</p>
         <div className="mt-4 grid gap-4">
           {differences.map((item, index) => {

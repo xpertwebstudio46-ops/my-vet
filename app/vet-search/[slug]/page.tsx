@@ -24,7 +24,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
   }
   const reviews = await getPracticeReviews(practice.id);
   const publishedPricingItems = (practice.pricing ?? [])
-    .filter((item) => item.kind === "SERVICE" && item.currency === "GBP" && (item.billingPeriod === null || item.billingPeriod === "ONE_OFF") && item.price.trim() !== "" && Number.isFinite(Number(item.price)) && Number(item.price) >= 0)
+    .filter((item) => item.kind === "SERVICE" && item.currency === "GBP" && (!item.billingPeriod || item.billingPeriod === "ONE_OFF") && item.price.trim() !== "" && Number.isFinite(Number(item.price)) && Number(item.price) >= 0)
     .map((item) => ({ service: item.vatMode === "EX_VAT" ? `${item.name} (ex VAT)` : item.name, price: Number(item.price), benchmarkPrice: null }));
   const pricingItems = publishedPricingItems.length > 0 ? publishedPricingItems : (practice.services ?? [])
     .filter((item) => item.currency === "GBP" && item.price !== null && item.price.trim() !== "" && Number.isFinite(Number(item.price)) && Number(item.price) >= 0)
