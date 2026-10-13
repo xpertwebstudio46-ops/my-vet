@@ -51,26 +51,26 @@ export function PricingComparisonCharts({ items, benchmarkLabel, practiceLabel =
       <div className="flex justify-end">
         <button type="button" onClick={() => setAnimationKey((value) => value + 1)} aria-label="Replay price comparison chart animations" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-[#064071] transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-[#13b8a8] dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"><RotateCcw aria-hidden="true" className="size-3.5" />Replay animation</button>
       </div>
-      <div className="min-w-0 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+      <div className="min-w-0 max-w-full rounded-xl border border-slate-200 p-3 sm:p-4 dark:border-slate-700">
         <h3 id={`${chartId}-prices`} className="font-semibold text-[#0d2e5e] dark:text-slate-100">Service price comparison</h3>
-        <div tabIndex={0} role="region" aria-label="Price chart, scroll horizontally to see all services" className="mt-4 overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-[#13b8a8]">
+        <div tabIndex={0} role="region" aria-label="Price chart, scroll horizontally to see all services" className="mt-4 min-w-0 max-w-full overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-[#13b8a8]">
           <ChartContainer config={config} initialDimension={{ width: Math.max(640, chartItems.length * 120), height: 360 }} className="h-[360px] w-full min-w-[640px] aspect-auto" style={{ minWidth: Math.max(640, chartItems.length * 120) }} aria-labelledby={`${chartId}-prices`}>
             <BarChart key={`prices-${animationKey}`} accessibilityLayer data={chartItems} margin={{ top: 16, right: 16, bottom: 28, left: 4 }} barGap={6}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="service" tickLine={false} axisLine={false} interval={0} height={70} tick={<ServiceTick />} />
               <YAxis tickLine={false} axisLine={false} width={60} tickFormatter={(value: number) => `£${value}`} />
               <ChartTooltip cursor={{ fill: "var(--muted)", opacity: 0.35 }} content={<ChartTooltipContent formatter={(value, name) => <div className="flex min-w-44 justify-between gap-4"><span className="text-muted-foreground">{name === "price" ? priceLabel : averageLabel}</span><strong>{formatPricingPrice(Number(value))}</strong></div>} />} />
-              <ChartLegend content={<ChartLegendContent />} />
+              <ChartLegend content={<ChartLegendContent className="flex-wrap" />} />
               <Bar dataKey="price" name="price" fill="var(--color-price)" radius={[5, 5, 0, 0]} maxBarSize={32} isAnimationActive animationDuration={1000} />
               <Bar dataKey="benchmarkPrice" name="benchmarkPrice" fill="var(--color-benchmarkPrice)" radius={[5, 5, 0, 0]} maxBarSize={32} isAnimationActive animationBegin={150} animationDuration={1000} />
             </BarChart>
           </ChartContainer>
         </div>
       </div>
-      <div className="min-w-0 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+      <div className="min-w-0 max-w-full rounded-xl border border-slate-200 p-3 sm:p-4 dark:border-slate-700">
         <h3 id={`${chartId}-differences`} className="font-semibold text-[#0d2e5e] dark:text-slate-100">Difference from {averageLabel}</h3>
-        <div className="mt-3 flex gap-4 text-xs text-slate-600 dark:text-slate-300"><span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#13b8a8]" />Cheaper</span><span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-orange-500" />More expensive</span></div>
-        <div tabIndex={0} role="region" aria-label="Percentage comparison chart, scroll horizontally on smaller screens" className="mt-4 overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-[#13b8a8]">
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-600 dark:text-slate-300"><span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-[#13b8a8]" />Cheaper</span><span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-orange-500" />More expensive</span></div>
+        <div tabIndex={0} role="region" aria-label="Percentage comparison chart, scroll horizontally on smaller screens" className="mt-4 min-w-0 max-w-full overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-[#13b8a8]">
           <ChartContainer config={config} initialDimension={{ width: 640, height: Math.max(280, differences.length * 56) }} className="min-w-[640px] w-full aspect-auto" style={{ height: Math.max(280, differences.length * 56) }} aria-labelledby={`${chartId}-differences`}>
             <BarChart key={`differences-${animationKey}`} accessibilityLayer data={differences} layout="vertical" margin={{ top: 12, right: 40, bottom: 12, left: 4 }}>
               <CartesianGrid horizontal={false} />

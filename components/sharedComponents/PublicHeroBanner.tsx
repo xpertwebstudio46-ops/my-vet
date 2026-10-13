@@ -77,7 +77,7 @@ export function PublicHeroBanner({
                 </defs>
             </svg>
             <div aria-hidden="true" className="practice-logo-cutout pointer-events-none absolute left-0 top-0 z-20 bg-white" style={{ clipPath: `url(#${logoCutoutId})` }} />
-            <div className="absolute inset-0 overflow-hidden">
+            <div className="public-hero-body absolute inset-0 overflow-hidden">
 
                 <div className="absolute top-[92px] right-0 z-20 pointer-events-none sm:top-26">
                     <img src="/images/paw-2.png" alt="" className="h-20 w-full object-cover opacity-70 sm:h-32" />
@@ -90,7 +90,7 @@ export function PublicHeroBanner({
                     <img src="/images/shape.png" alt="" className="h-20 w-full object-contain opacity-70 sm:h-32" />
                 </div>
 
-                <div className="relative z-10 h-full main max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
+                <div className="public-hero-main relative z-10 h-full main max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-6">
                     <div className={`relative w-full pt-32 content-length ${textColumnClassName} lg:pt-52`}>
                         <div className="absolute top-[128px] -left-3 z-20 pointer-events-none sm:top-50 sm:-left-6">
                             <img src="/images/mek.png" alt="" className="h-12 w-12 object-contain sm:h-18 sm:w-18" />
@@ -115,7 +115,7 @@ export function PublicHeroBanner({
                         ) : null}
                     </div>
 
-                    <div className={imageGroupClassName}>
+                    <div className={`public-hero-images ${imageGroupClassName}`}>
                         <div className={halfRightShapeClassName}>
                             <img src="/images/half-right.png" alt="" className="w-6 h-6 object-contain " />
                         </div>
@@ -183,7 +183,7 @@ export function PublicHeroBanner({
             ) : null}
 
             {stats ? (
-                <div className="absolute bottom-4 left-0 right-0 z-30 px-3 sm:bottom-8 sm:px-4 flex justify-center">
+                <div className="public-hero-stats absolute bottom-4 left-0 right-0 z-30 px-3 sm:bottom-8 sm:px-4 flex justify-center">
                     <div className="relative w-full px-0 sm:px-10 sm:py-7">
                         <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-5 text-center">
                             {stats.map((stat) => (
