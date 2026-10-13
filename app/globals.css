@@ -202,27 +202,69 @@ body {
       sans-serif);
 }
 
-.practice-logo-cutout {
-  width: 230px;
-  height: 150px;
+.practice-profile-banner {
+  --practice-logo-width: 132px;
+  --practice-header-inset: 16px;
+}
+
+.practice-profile-banner .practice-logo-cutout {
+  width: calc(var(--practice-logo-width) + var(--practice-header-inset) + 88px);
+  height: calc(var(--practice-logo-width) * 0.37 + 80px);
   clip-path: url(#practice-logo-cutout);
 }
 
+.practice-profile-banner .public-hero-header {
+  top: 16px;
+  right: 0;
+}
+
 .practice-profile-banner .public-hero-header header > div {
+  margin-inline: var(--practice-header-inset);
   justify-content: space-between;
 }
 
+.practice-profile-banner .public-hero-header header > div > a img {
+  display: block;
+  width: var(--practice-logo-width);
+  height: auto;
+  object-fit: contain;
+}
+
+.practice-profile-banner .public-hero-header nav {
+  gap: clamp(12px, 1.25vw, 24px);
+}
+
+.practice-profile-banner .site-header-nav-link {
+  font-size: clamp(14px, 0.95vw, 18px);
+}
+
+.practice-profile-banner .site-header-action {
+  padding: 12px clamp(12px, 1vw, 20px);
+  font-size: clamp(12px, 0.85vw, 15px);
+}
+
 @media (min-width: 640px) {
-  .practice-logo-cutout {
-    width: 270px;
-    height: 170px;
+  .practice-profile-banner {
+    --practice-logo-width: 150px;
+    --practice-header-inset: 24px;
   }
 }
 
 @media (min-width: 1024px) {
-  .practice-logo-cutout {
-    width: 320px;
-    height: 190px;
+  .practice-profile-banner {
+    --practice-logo-width: 160px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .practice-profile-banner {
+    --practice-logo-width: 180px;
+  }
+}
+
+@media (min-width: 1540px) {
+  .practice-profile-banner {
+    --practice-logo-width: 220px;
   }
 }
 

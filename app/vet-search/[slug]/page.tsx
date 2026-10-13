@@ -47,7 +47,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
         <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
           <defs>
             <clipPath id="practice-logo-cutout" clipPathUnits="objectBoundingBox">
-              <path d="M0,0 H1 L0.88,0.58 Q0.78,1 0.51,0.84 L0,0.32 Z" />
+              <path d="M0,0 H1 L0.9,0.55 Q0.82,0.96 0.62,0.96 Q0.53,0.96 0.44,0.86 L0,0.65 Z" />
             </clipPath>
           </defs>
         </svg>
