@@ -16,7 +16,7 @@ const navLinks = [
     { label: 'Sponsorship', href: '/sponsorship' },
 ]
 
-const Header = () => {
+const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { user } = useAuth()
@@ -34,7 +34,7 @@ const Header = () => {
                     <Link href="/" className="shrink-0">
                         <picture>
                             <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
-                            <img src="/images/change-logo.png" alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
+                            <img src={logoOnWhite ? "/images/header-logo.png" : "/images/change-logo.png"} alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
                         </picture>
                     </Link>
 
