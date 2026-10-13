@@ -3,8 +3,6 @@ import { PricingComparisonCharts } from "./PricingComparisonCharts";
 import { COMPARISON_THRESHOLD_PERCENT, formatPricingPrice, priceDifference, type PricingComparisonItem } from "./pricing-comparison";
 
 export function PricingConsumerInformation({ items, benchmarkLabel = "Average", sourceText }: { items: PricingComparisonItem[]; benchmarkLabel?: string; sourceText?: string | null }) {
-  if (!items.length) return null;
-
   return (
     <section id="pricing-consumer-information" aria-label="Pricing & Consumer Information" className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 dark:border-slate-700 dark:bg-slate-900">
       <h2 className="mb-5 text-xl font-bold text-[#0d2e5e] sm:text-2xl dark:text-slate-100">Pricing &amp; Consumer Information</h2>
@@ -18,6 +16,7 @@ export function PricingConsumerInformation({ items, benchmarkLabel = "Average", 
         <table aria-label="Practice service prices and benchmark comparisons" className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-slate-50 text-[#0d2e5e] dark:bg-slate-800 dark:text-slate-100"><tr>{["Service", "This Practice", benchmarkLabel, "Comparison"].map((label, index) => <th key={index} scope="col" className="px-4 py-3 font-semibold">{label}</th>)}</tr></thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+            {items.length === 0 && <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-500 dark:text-slate-300">This practice has not published service prices yet.</td></tr>}
             {items.map((item, index) => {
               const difference = priceDifference(item);
               const below = difference !== null && difference <= -COMPARISON_THRESHOLD_PERCENT;
