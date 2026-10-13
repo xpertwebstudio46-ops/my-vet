@@ -8,8 +8,8 @@ export type PricingComparisonItem = {
 export const COMPARISON_THRESHOLD_PERCENT = 5;
 
 export const DEMO_PRICING_COMPARISON = {
-  practiceLabel: "Demo practice",
-  benchmarkLabel: "Demo average",
+  practiceLabel: "Practice price (demo)",
+  benchmarkLabel: "UK average (demo)",
   sourceText: "Illustrative sample prices and averages for demonstration only. These are not this practice's published fees or verified market averages.",
   items: [
     { service: "Initial consultation", price: 55, benchmarkPrice: 65 },
