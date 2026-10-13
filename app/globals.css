@@ -246,6 +246,10 @@ body {
 }
 
 @media (min-width: 1540px) and (max-width: 1660px) {
+    .practice-logo-cutout {
+    width: 320px;
+    height: 190px;
+  }
 
   .large-scrren-image {
     width: 220px;
@@ -282,6 +286,10 @@ body {
 }
 
 @media (min-width: 1661px) and (max-width: 1740px) {
+    .practice-logo-cutout {
+    width: 320px;
+    height: 190px;
+  }
    .large-scrren-image {
     width: 220px;
     object-fit: cover
@@ -317,6 +325,10 @@ body {
 }
 
 @media (min-width: 1741px) and (max-width: 1830px) {
+    .practice-logo-cutout {
+    width: 320px;
+    height: 190px;
+  }
 
  .large-scrren-image {
     width: 220px;
@@ -353,6 +365,10 @@ body {
 }
 
 @media (min-width: 1831px) and (max-width: 1920px) {
+    .practice-logo-cutout {
+    width: 320px;
+    height: 190px;
+  }
   .large-scrren-image {
     width: 220px;
     object-fit: cover
@@ -393,6 +409,11 @@ body {
   visibility: hidden;
 }
 
+.hero-image-slider--2 .hero-image-slide {
+  animation-duration: 6s;
+  animation-name: heroImageFade2;
+}
+
 .hero-image-slider--3 .hero-image-slide {
   animation-duration: 9s;
   animation-name: heroImageFade3;
@@ -417,6 +438,20 @@ body {
 
 .hero-image-slide-4 {
   animation-delay: 9s;
+}
+
+@keyframes heroImageFade2 {
+  0%,
+  50% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  55%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes heroImageFade3 {
