@@ -215,15 +215,17 @@ body {
 @media (max-width: 639px) {
   .public-hero-banner {
     height: auto;
-    min-height: 720px;
+    min-height: 0;
   }
   .public-hero-body {
     position: relative;
-    min-height: 720px;
+    min-height: 0;
   }
   .public-hero-main {
     height: auto;
-    min-height: 720px;
+    min-height: 0;
+    justify-content: flex-start;
+    gap: 8px;
   }
   .public-hero-banner .content-length {
     min-width: 0;
