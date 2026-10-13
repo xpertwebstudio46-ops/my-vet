@@ -23,9 +23,12 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
     throw error;
   }
   const reviews = await getPracticeReviews(practice.id);
-  const pricingItems = (practice.pricing ?? [])
+  const publishedPricingItems = (practice.pricing ?? [])
     .filter((item) => item.kind === "SERVICE" && item.currency === "GBP" && (item.billingPeriod === null || item.billingPeriod === "ONE_OFF") && item.price.trim() !== "" && Number.isFinite(Number(item.price)) && Number(item.price) >= 0)
     .map((item) => ({ service: item.vatMode === "EX_VAT" ? `${item.name} (ex VAT)` : item.name, price: Number(item.price), benchmarkPrice: null }));
+  const pricingItems = publishedPricingItems.length > 0 ? publishedPricingItems : (practice.services ?? [])
+    .filter((item) => item.currency === "GBP" && item.price !== null && item.price.trim() !== "" && Number.isFinite(Number(item.price)) && Number(item.price) >= 0)
+    .map((item) => ({ service: item.name, price: Number(item.price), benchmarkPrice: null }));
   const address = [practice.addressLine1, practice.addressLine2, practice.city, practice.county, practice.postcode, "United Kingdom"].filter(Boolean).join(", ");
   const [description, mission] = (practice.description ?? "Contact this practice to learn more about its veterinary care.").split(/\n\n/, 2);
   const mapEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
