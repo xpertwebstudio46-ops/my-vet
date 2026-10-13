@@ -224,7 +224,10 @@ body {
     width: 170px;
     object-fit: cover;
      position: relative;
-    left:35px;
+    left: 0;
+  }
+  .practice-profile-banner .large-scrren-image {
+    left: 35px;
   }
   .practice-logo-cutout {
     width: 280px;
@@ -261,7 +264,10 @@ body {
     width: 220px;
     object-fit: cover;
      position: relative;
-    left:20px;
+    left: 0;
+  }
+  .practice-profile-banner .large-scrren-image {
+    left: 20px;
   }
 
   .main {
@@ -302,7 +308,10 @@ body {
     width: 220px;
     object-fit: cover;
     position: relative;
-    left:20px;
+    left: 0;
+  }
+  .practice-profile-banner .large-scrren-image {
+    left: 20px;
   }
 
   .main {
@@ -344,7 +353,10 @@ body {
     width: 220px;
     object-fit: cover;
      position: relative;
-    left:20px;
+    left: 0;
+  }
+  .practice-profile-banner .large-scrren-image {
+    left: 20px;
 
   }
 
@@ -386,7 +398,10 @@ body {
     width: 220px;
     object-fit: cover;
      position: relative;
-    left:20px;
+    left: 0;
+  }
+  .practice-profile-banner .large-scrren-image {
+    left: 20px;
   }
 
   .main {
