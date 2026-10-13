@@ -221,10 +221,10 @@ body {
 
 @media (min-width: 1024px) {
   .large-scrren-image {
-    width: 220px;
+    width: 170px;
     object-fit: cover;
      position: relative;
-    left:20px;
+    left:35px;
   }
   .practice-logo-cutout {
     width: 280px;
