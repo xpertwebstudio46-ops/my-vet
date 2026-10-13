@@ -7,6 +7,20 @@ export type PricingComparisonItem = {
 
 export const COMPARISON_THRESHOLD_PERCENT = 5;
 
+export const DEMO_PRICING_COMPARISON = {
+  practiceLabel: "Demo practice",
+  benchmarkLabel: "Demo average",
+  sourceText: "Illustrative sample prices and averages for demonstration only. These are not this practice's published fees or verified market averages.",
+  items: [
+    { service: "Initial consultation", price: 55, benchmarkPrice: 65 },
+    { service: "Annual vaccination", price: 75, benchmarkPrice: 75 },
+    { service: "Dental scale and polish", price: 180, benchmarkPrice: 150 },
+    { service: "Cat neutering", price: 85, benchmarkPrice: 100, isFromPrice: true },
+    { service: "Microchipping", price: 25, benchmarkPrice: 30 },
+    { service: "Emergency consultation", price: 140, benchmarkPrice: 120 },
+  ] satisfies PricingComparisonItem[],
+};
+
 const priceFormatter = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
