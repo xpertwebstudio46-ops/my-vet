@@ -2,12 +2,22 @@
 
 import { useId, useState } from "react";
 import { RotateCcw } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, ReferenceLine, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, ReferenceLine, XAxis, YAxis, type LabelProps } from "recharts";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { DEMO_PRICING_COMPARISON, formatPricingPrice, priceDifference, type PricingComparisonItem } from "./pricing-comparison";
 
 function formatPercentage(value: number) {
   return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function PercentageLabel({ viewBox, value }: LabelProps) {
+  if (!viewBox || !("x" in viewBox) || !("y" in viewBox) || !("width" in viewBox) || !("height" in viewBox)) return <g />;
+  const percentage = Number(value);
+  const x = Number(viewBox.x);
+  const width = Number(viewBox.width);
+  const inside = Math.abs(width) >= 50;
+  const labelX = inside ? x + width / 2 : percentage < 0 ? x - 6 : x + width + 6;
+  return <text x={labelX} y={Number(viewBox.y) + Number(viewBox.height) / 2} dominantBaseline="middle" textAnchor={inside ? "middle" : percentage < 0 ? "end" : "start"} fontSize={11} fill={inside ? "#ffffff" : "currentColor"} className="text-slate-600 dark:text-slate-300">{formatPercentage(percentage)}</text>;
 }
 
 function ServiceTick({ x = 0, y = 0, payload, horizontal = false }: { x?: number | string; y?: number | string; payload?: { value: string | number }; horizontal?: boolean }) {
@@ -70,7 +80,7 @@ export function PricingComparisonCharts({ items, benchmarkLabel, practiceLabel =
               <ChartTooltip cursor={{ fill: "var(--muted)", opacity: 0.35 }} content={<ChartTooltipContent formatter={(value) => <div className="flex min-w-40 justify-between gap-4"><span className="text-muted-foreground">Difference</span><strong>{formatPercentage(Number(value))}</strong></div>} />} />
               <Bar dataKey="difference" radius={4} maxBarSize={26} isAnimationActive animationDuration={1200}>
                 {differences.map((item, index) => <Cell key={`${item.service}-${index}`} fill={item.difference < 0 ? "#13b8a8" : item.difference > 0 ? "#f97316" : "#94a3b8"} />)}
-                <LabelList dataKey="difference" position="inside" formatter={(value) => formatPercentage(Number(value))} fill="#ffffff" fontSize={11} />
+                <LabelList dataKey="difference" content={<PercentageLabel />} />
               </Bar>
             </BarChart>
           </ChartContainer>
