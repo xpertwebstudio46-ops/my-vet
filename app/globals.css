@@ -220,11 +220,6 @@ body {
 }
 
 @media (min-width: 1024px) {
-  .practice-profile-banner .public-hero-header header > div > a img {
-    position: relative;
-    left: 28px;
-  }
-
   .practice-logo-cutout {
     width: 280px;
     height: 150px;
@@ -251,11 +246,6 @@ body {
 }
 
 @media (min-width: 1540px) and (max-width: 1660px) {
-  .practice-profile-banner .public-hero-header header > div > a img {
-    position: relative;
-    left: 10px;
-  }
-
     .practice-logo-cutout {
         width: 310px;
         height: 200px;
@@ -263,7 +253,9 @@ body {
 
   .large-scrren-image {
     width: 220px;
-    object-fit: cover
+    object-fit: cover;
+     position: relative;
+    left:20px;
   }
 
   .main {
@@ -296,18 +288,15 @@ body {
 }
 
 @media (min-width: 1661px) and (max-width: 1740px) {
-  .practice-profile-banner .public-hero-header header > div > a img {
-    position: relative;
-    left: 10px;
-  }
-
     .practice-logo-cutout {
            width: 310px;
         height: 200px;
   }
    .large-scrren-image {
     width: 220px;
-    object-fit: cover
+    object-fit: cover;
+    position: relative;
+    left:20px;
   }
 
   .main {
@@ -340,11 +329,6 @@ body {
 }
 
 @media (min-width: 1741px) and (max-width: 1830px) {
-  .practice-profile-banner .public-hero-header header > div > a img {
-    position: relative;
-    left: 10px;
-  }
-
     .practice-logo-cutout {
            width: 310px;
         height: 200px;
@@ -352,7 +336,10 @@ body {
 
  .large-scrren-image {
     width: 220px;
-    object-fit: cover
+    object-fit: cover;
+     position: relative;
+    left:20px;
+
   }
 
   
@@ -385,18 +372,15 @@ body {
 }
 
 @media (min-width: 1831px) and (max-width: 1920px) {
-  .practice-profile-banner .public-hero-header header > div > a img {
-    position: relative;
-    left: 10px;
-  }
-
     .practice-logo-cutout {
           width: 310px;
-        height: 200px;
+        height: 200px
   }
   .large-scrren-image {
     width: 220px;
-    object-fit: cover
+    object-fit: cover;
+     position: relative;
+    left:20px;
   }
 
   .main {

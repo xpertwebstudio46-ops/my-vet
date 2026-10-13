@@ -5,10 +5,11 @@ const HeroBanner = () => {
         <PublicHeroBanner
             cta={{ href: '/register?role=vet', label: 'Register Your Practice' }}
             innerLayout={false}
-            rightImageSrc="/images/dac-1.png"
+            rightImageSrc="/images/den-1.png"
             rightImageSlides={[
-                { src: '/images/dac-1.png', alt: 'Veterinary care' },
-                { src: '/images/dac-2.png', alt: 'Veterinary care' },
+                { src: '/images/den-1.png', alt: 'Veterinarian holding an iguana' },
+                { src: '/images/den-2.png', alt: 'Veterinary care' },
+                { src: '/images/pet.png', alt: 'Pet' },
             ]}
             rightImageBottomClassName="bottom-6"
             showSearch
