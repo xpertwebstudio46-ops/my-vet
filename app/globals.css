@@ -221,8 +221,8 @@ body {
 
 @media (min-width: 1024px) {
   .practice-logo-cutout {
-    width: 320px;
-    height: 190px;
+    width: 280px;
+    height: 150px;
   }
 }
 
@@ -247,7 +247,7 @@ body {
 
 @media (min-width: 1540px) and (max-width: 1660px) {
     .practice-logo-cutout {
-    width: 320px;
+    width: 200px;
     height: 190px;
   }
 
@@ -287,8 +287,8 @@ body {
 
 @media (min-width: 1661px) and (max-width: 1740px) {
     .practice-logo-cutout {
-    width: 320px;
-    height: 190px;
+    width: 332px;
+    height: 195px;
   }
    .large-scrren-image {
     width: 220px;
