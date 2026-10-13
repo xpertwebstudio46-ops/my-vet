@@ -247,8 +247,8 @@ body {
 
 @media (min-width: 1540px) and (max-width: 1660px) {
     .practice-logo-cutout {
-    width: 200px;
-    height: 190px;
+  width: 280px;
+    height: 150px;
   }
 
   .large-scrren-image {
@@ -287,8 +287,8 @@ body {
 
 @media (min-width: 1661px) and (max-width: 1740px) {
     .practice-logo-cutout {
-    width: 332px;
-    height: 195px;
+     width: 280px;
+    height: 150px;
   }
    .large-scrren-image {
     width: 220px;
