@@ -34,6 +34,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", "font-sans", manrope.variable, dmSans.variable)}
     >
       <body className="min-h-full flex flex-col">
+        <span hidden aria-hidden="true">updated</span>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
