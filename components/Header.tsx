@@ -30,7 +30,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
     return (
         <>
             <header className="w-full bg-transparent">
-                <div className="mx-4 flex items-center justify-between gap-4 sm:mx-6 lg:justify-around lg:gap-8">
+                <div className="site-header-row mx-4 flex items-center justify-between gap-4 sm:mx-6">
                     <Link href="/" className="shrink-0">
                         <picture>
                             <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
@@ -38,7 +38,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                         </picture>
                     </Link>
 
-                    <div className="hidden items-center justify-center gap-2 lg:flex">
+                    <div className="site-header-desktop hidden items-center justify-center gap-2">
                         <nav className="flex items-center gap-12">
                             {navLinks.map((link) => (
                                 <Link
@@ -82,7 +82,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                         type="button"
                         onClick={() => setIsMenuOpen(true)}
                         aria-label="Open navigation menu"
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#064071] shadow-lg lg:hidden"
+                        className="site-header-menu-trigger inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#064071] shadow-lg"
                     >
                         <Menu className="h-6 w-6" />
                     </button>
@@ -90,7 +90,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
             </header>
 
             {isMenuOpen ? (
-                <div className="fixed inset-0 z-[100] lg:hidden">
+                <div className="site-header-mobile-overlay fixed inset-0 z-[100]">
                     <button
                         type="button"
                         aria-label="Close navigation overlay"

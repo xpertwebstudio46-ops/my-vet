@@ -214,8 +214,30 @@ body {
 
 @media (min-width: 640px) {
   .practice-logo-cutout {
-    width: 270px;
-    height: 170px;
+    width: 135px;
+    height: 100px;
+  }
+  .practice-profile-banner .large-scrren-image {
+    position: relative;
+    left: 15px;
+  }
+}
+
+.site-header-desktop {
+  display: none;
+}
+
+@media (min-width: 1282px) {
+  .site-header-desktop {
+    display: flex;
+  }
+  .site-header-menu-trigger,
+  .site-header-mobile-overlay {
+    display: none;
+  }
+  .site-header-row {
+    justify-content: space-around;
+    gap: 32px;
   }
 }
 
