@@ -4,7 +4,7 @@ export default function LocationMap({
   mapEmbedSrc?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-2 overflow-hidden">
+    <div className="min-w-0 max-w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-hidden">
       <div className="w-full h-[160px] sm:h-[180px] rounded-xl overflow-hidden">
         <iframe
           title="Practice location map"

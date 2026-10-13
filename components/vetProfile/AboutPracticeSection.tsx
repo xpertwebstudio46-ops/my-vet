@@ -24,8 +24,8 @@ export default function AboutPracticeSection({ name, description, mission, whatW
   const [activeTab, setActiveTab] = useState(tabs[0]?.key ?? "about");
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+    <div className="min-w-0 [overflow-wrap:anywhere] flex flex-col gap-6 sm:gap-8">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">
         <h2 className="text-xl font-bold text-[#0d2e5e] sm:text-2xl">About {name}</h2>
 
         <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
@@ -68,14 +68,14 @@ export default function AboutPracticeSection({ name, description, mission, whatW
         {services.length ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{services.map((service) => (
           <div key={service.id} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#eafaf8]"><Stethoscope className="h-4 w-4 text-[#13b8a8]" /></span>
-            <div><p className="text-sm font-semibold text-slate-900">{service.name}</p><p className="mt-0.5 text-xs text-slate-500">{service.description ?? (service.price ? `From ${service.currency} ${service.price}` : "Contact the practice for details")}</p></div>
+            <div className="min-w-0"><p className="text-sm font-semibold text-slate-900">{service.name}</p><p className="mt-0.5 text-xs text-slate-500">{service.description ?? (service.price ? `From ${service.currency} ${service.price}` : "Contact the practice for details")}</p></div>
           </div>
         ))}</div> : <p className="rounded-xl border bg-white p-4 text-sm text-slate-500">This practice has not published its service list yet.</p>}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">
         <h2 className="mb-4 text-xl font-bold text-[#0d2e5e] sm:text-2xl">Facilities</h2>
-        {facilities.length ? <div className="flex flex-wrap gap-3">{facilities.map((facility) => <span key={facility.id} className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs text-slate-600"><span className="h-1.5 w-1.5 rounded-full bg-[#13b8a8]" />{facility.name}</span>)}</div> : <p className="text-sm text-slate-500">No facilities have been published yet.</p>}
+        {facilities.length ? <div className="flex flex-wrap gap-3">{facilities.map((facility) => <span key={facility.id} className="flex min-w-0 max-w-full items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs text-slate-600"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#13b8a8]" />{facility.name}</span>)}</div> : <p className="text-sm text-slate-500">No facilities have been published yet.</p>}
       </div>
     </div>
   );

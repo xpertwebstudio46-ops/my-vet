@@ -16,9 +16,9 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
   const emergency = practice.emergencyHours
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="min-w-0 [overflow-wrap:anywhere] flex flex-col gap-6 sm:gap-8">
       {pricing.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">
           <div className="mb-5 flex flex-col gap-1">
             <h2 className="text-2xl font-bold text-[#0d2e5e]">Pricing</h2>
             <p className="text-sm text-slate-500">Typical fees and packages published by this practice.</p>
@@ -35,7 +35,7 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
           <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-[#0d2e5e]"><Images className="size-5 text-[#13b8a8]" />Gallery</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {gallery.map((media) => media.mediaType === 'VIDEO' ? (
-              <video key={media.id} controls className="aspect-video w-full rounded-xl border bg-black" src={media.url} />
+              <video key={media.id} controls className="aspect-video min-w-0 max-w-full w-full rounded-xl border bg-black" src={media.url} />
             ) : (
               <figure key={media.id} className="overflow-hidden rounded-xl border bg-white">
                 <img src={media.url} alt={media.altText ?? media.caption ?? `${practice.name} gallery image`} className="aspect-video w-full object-cover" />
@@ -92,9 +92,9 @@ function TeamMemberArticle({ member }: { member: NonNullable<Practice['teamMembe
   const qualifications = getQualifications(member.qualifications)
 
   return (
-    <article className="flex gap-4 rounded-xl border bg-white p-4">
+    <article className="flex min-w-0 flex-col gap-4 sm:flex-row rounded-xl border bg-white p-4">
       {member.imageUrl ? <img src={member.imageUrl} alt={member.name} className="size-20 shrink-0 rounded-xl object-cover" /> : <span className="flex size-20 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-2xl font-semibold text-teal-700">{member.name.slice(0, 1)}</span>}
-      <div>
+      <div className="min-w-0">
         <h3 className="font-semibold">{member.name}</h3>
         <p className="text-sm font-medium text-[#13b8a8]">{member.role}</p>
         {qualifications.length > 0 && (
@@ -126,7 +126,7 @@ function PricingGroup({ title, items }: { title: string; items: NonNullable<Prac
                 {item.description ? <PricingDescription text={item.description} /> : <p className="mt-2 text-sm text-slate-500">Contact the practice for details.</p>}
               </div>
               <div className="shrink-0 rounded-lg bg-white px-3 py-2 text-left shadow-sm sm:min-w-32 sm:text-right">
-                <strong className="block whitespace-nowrap text-lg text-[#064071]">{formatPrice(item.price, item.currency)}</strong>
+                <strong className="block sm:whitespace-nowrap text-lg text-[#064071]">{formatPrice(item.price, item.currency)}</strong>
                 <span className="mt-0.5 block text-xs font-semibold uppercase text-slate-500">{vatLabel(item.vatMode ?? 'INC_VAT')}</span>
                 {item.billingPeriod && item.billingPeriod !== 'ONE_OFF' && <span className="mt-0.5 block text-xs text-slate-500">{billingLabel(item.billingPeriod)}</span>}
               </div>

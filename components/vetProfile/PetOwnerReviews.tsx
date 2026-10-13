@@ -34,8 +34,8 @@ export default function PetOwnerReviews({
   totalReviews: number;
 }) {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
+    <div className="min-w-0 [overflow-wrap:anywhere]">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h2 className="text-xl sm:text-2xl font-bold text-[#0d2e5e]">
           Pet Owner Reviews
         </h2>
@@ -48,7 +48,7 @@ export default function PetOwnerReviews({
         {reviews.map((review) => (
           <div
             key={review.id}
-            className="rounded-2xl border border-slate-200 bg-white p-5"
+            className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
           >
             <div className="flex items-center gap-3">
               <span
@@ -57,7 +57,7 @@ export default function PetOwnerReviews({
               >
                 {review.avatarInitial}
               </span>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900">
                   {review.name}
                 </p>
@@ -75,7 +75,7 @@ export default function PetOwnerReviews({
           </div>
         ))}
         {!reviews.length && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm text-slate-500">
             This listing has a historical aggregate rating, but no individual approved reviews have been published on MY VET yet.
           </div>
         )}
