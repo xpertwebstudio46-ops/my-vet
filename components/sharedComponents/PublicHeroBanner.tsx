@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Header from '../Header'
@@ -52,6 +52,7 @@ export function PublicHeroBanner({
     rightImageBottomClassName = 'bottom-0',
     innerLayout = true,
 }: PublicHeroBannerProps) {
+    const logoCutoutId = useId()
     const imageSlides = rightImageSlides?.length ? rightImageSlides : [{ src: rightImageSrc, alt: rightImageAlt }]
     const isImageSlider = imageSlides.length > 1
     const imageSliderClassName = isImageSlider ? `hero-image-slider hero-image-slider--${imageSlides.length}` : ''
@@ -67,16 +68,16 @@ export function PublicHeroBanner({
         : 'absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20'
 
     return (
-        <section className={`public-hero-banner relative w-full h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
+        <section className={`public-hero-banner practice-profile-banner relative w-full bg-[#0c4170] h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
+            <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
+                <defs>
+                    <clipPath id={logoCutoutId} clipPathUnits="objectBoundingBox">
+                        <path d="M0,0 H1 L0.88,0.58 Q0.78,1 0.51,0.84 L0,0.32 Z" />
+                    </clipPath>
+                </defs>
+            </svg>
+            <div aria-hidden="true" className="practice-logo-cutout pointer-events-none absolute left-0 top-0 z-20 bg-white" style={{ clipPath: `url(#${logoCutoutId})` }} />
             <div className="absolute inset-0 overflow-hidden">
-                <Image
-                    src="/images/hero.png"
-                    alt="Hero Banner"
-                    fill
-                    sizes="100vw"
-                    className="object-cover"
-                    priority
-                />
 
                 <div className="absolute top-[92px] right-0 z-20 pointer-events-none sm:top-26">
                     <img src="/images/paw-2.png" alt="" className="h-20 w-full object-cover opacity-70 sm:h-32" />
@@ -141,8 +142,8 @@ export function PublicHeroBanner({
                 </div>
             </div>
 
-            <div className="public-hero-header absolute top-4 left-0 right-0 z-50 sm:top-6">
-                <Header />
+            <div className="public-hero-header absolute top-4 left-0 right-0 z-50">
+                <Header logoOnWhite />
             </div>
 
             {showSearch ? (

@@ -214,12 +214,12 @@ body {
 
 @media (max-width: 639px) {
   .practice-logo-cutout {
-    width: 200px;
-    height: 130px;
+    width: 220px;
+    height: 170px;
   }
   .practice-profile-banner .large-scrren-image {
     position: relative;
-    left: 25px;
+    left: 15px;
   }
   .mid{
     display: flex;
