@@ -81,7 +81,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
         </div>
         <div className="grid grid-cols-2 gap-3">
           <button type="button" onClick={() => setRole("PET_OWNER")} className={`rounded-lg border p-3 text-sm ${role === "PET_OWNER" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Pet owner</button>
-          <button type="button" onClick={() => setRole("VET")} className={`rounded-lg border p-3 text-sm ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</button>
+          <Link href="/#pricing" className={`rounded-lg border p-3 text-center text-sm ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</Link>
         </div>
         {role === 'VET' && selectedPlan && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-slate-700">

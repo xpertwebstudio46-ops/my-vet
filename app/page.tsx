@@ -4,6 +4,7 @@ import WhyChooseUs from '@/components/WhyChooseUs'
 import VetPracticeCallout from '@/components/VetPracticeCallout'
 import TopRatedPractices from '@/components/TopRatedPractices'
 import PricingPlans from '@/components/PricingPlans'
+import PriceComparisonSection from '@/components/PriceComparisonSection'
 import Testimonials from '@/components/Testimonials'
 import LogoMarquee from '@/components/LogoMarquee'
 import Footer from '@/components/Footer'
@@ -17,6 +18,7 @@ const Page = () => {
       <VetPracticeCallout />
       <TopRatedPractices />
       <PricingPlans />
+      <PriceComparisonSection />
       <Testimonials />
       <LogoMarquee />
       <Footer />

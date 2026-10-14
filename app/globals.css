@@ -541,6 +541,11 @@ body {
   animation-name: heroImageFade4;
 }
 
+.hero-image-slider--5 .hero-image-slide {
+  animation-duration: 15s;
+  animation-name: heroImageFade5;
+}
+
 .hero-image-slide-1 {
   animation-delay: 0s;
 }
@@ -555,6 +560,24 @@ body {
 
 .hero-image-slide-4 {
   animation-delay: 9s;
+}
+
+.hero-image-slide-5 {
+  animation-delay: 12s;
+}
+
+@keyframes heroImageFade5 {
+  0%,
+  20% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  24%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes heroImageFade2 {
