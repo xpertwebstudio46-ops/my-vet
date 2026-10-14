@@ -33,6 +33,7 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 | `COOKIE_SECURE` | Yes in production | No | Must be `true` for HTTPS production |
 | `COOKIE_SAME_SITE` | Yes | No | `lax`, `strict`, or `none`; `none` requires secure cookies |
 | `MAIL_FROM` | Yes | No | Sender address used by the mail boundary |
+| `RESEND_API_KEY` | Production email | No | Resend sending key for the verified sender domain |
 | `PASSWORD_RESET_URL` | Yes | No | Frontend reset-password URL |
 | `STRIPE_ENABLED` | Yes | No | Enables billing and signed webhook processing |
 | `STRIPE_SECRET_KEY` | When Stripe enabled | Yes | Stripe server API key |

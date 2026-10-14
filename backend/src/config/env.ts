@@ -36,6 +36,7 @@ const envSchema = z
     COOKIE_SECURE: envBoolean(false),
     COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
     MAIL_FROM: z.email().default('no-reply@example.com'),
+    RESEND_API_KEY: optionalString,
     PASSWORD_RESET_URL: z.url().default('http://localhost:3000/reset-password'),
     STRIPE_ENABLED: envBoolean(false),
     STRIPE_SECRET_KEY: optionalString,
