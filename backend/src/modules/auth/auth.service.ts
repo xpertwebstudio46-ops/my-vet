@@ -122,6 +122,8 @@ export async function resetPassword(input: ResetPasswordInput) {
   const tokenHash = hashOpaqueToken(input.token)
   const record = await prisma.passwordResetToken.findUnique({ where: { hashedToken: tokenHash } })
   if (!record || record.usedAt || record.expiresAt <= new Date()) {
+    const reason = !record ? 'not found' : record.usedAt ? 'used or superseded by a newer link' : 'expired'
+    console.warn(`[password-reset] Token rejected: ${reason}`)
     throw new ApiError(400, 'INVALID_RESET_TOKEN', 'Password reset token is invalid or expired')
   }
 
@@ -140,7 +142,10 @@ export async function resetPassword(input: ResetPasswordInput) {
     })
     return true
   })
-  if (!consumed) throw new ApiError(400, 'INVALID_RESET_TOKEN', 'Password reset token is invalid or expired')
+  if (!consumed) {
+    console.warn('[password-reset] Token rejected: consumed or expired during submission')
+    throw new ApiError(400, 'INVALID_RESET_TOKEN', 'Password reset token is invalid or expired')
+  }
   invalidateAuthUser(record.userId)
 }
 
