@@ -131,7 +131,11 @@ export const vetRouter = Router()
 vetRouter.use(authenticate, requireRole('VET'))
 
 vetRouter.get('/dashboard', async (request, response) => {
-  const practice = await getOwnedPractice(request.user!.userId)
+  const practice = await prisma.practice.findUnique({ where: { ownerId: request.user!.userId } })
+  if (!practice) {
+    sendSuccess(response, { practice: null, stats: null }, 'Add your practice to complete your dashboard')
+    return
+  }
   const [upcomingAppointments, pendingReviews, views, contacts, emergencyHours] = await Promise.all([
     prisma.appointment.count({ where: { practiceId: practice.id, date: { gte: new Date() }, status: { in: ['PENDING', 'CONFIRMED', 'RESCHEDULED'] } } }),
     prisma.review.count({ where: { practiceId: practice.id, status: 'PENDING' } }),

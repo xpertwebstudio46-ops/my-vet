@@ -32,7 +32,7 @@ export default function VetDashboardLayout({
       className={`${dashboardSans.variable} ${dashboardHeading.variable} ${dashboardOutfit.variable}`}
     >
       <RequireAuth roles={['VET']}>
-        <RequireVetPractice><VetDashboardShell>{children}</VetDashboardShell></RequireVetPractice>
+        <VetDashboardShell><RequireVetPractice>{children}</RequireVetPractice></VetDashboardShell>
       </RequireAuth>
     </div>
   )

@@ -10,7 +10,7 @@ const HeroBanner = () => {
             rightImageSrc="/images/den-1.png"
             rightImageSlides={[
                 { src: '/images/goats.png', alt: 'Veterinarian holding an iguana', className: '-translate-x-[14px] pr-6 sm:pr-12 lg:pr-16' },
-                { src: '/images/cow.png', alt: 'Veterinary care', className: '-translate-x-[40px] sm:-translate-x-[56px] lg:-translate-x-[82px] pr-6 sm:pr-12 lg:pr-16' },
+                { src: '/images/cow.png', alt: 'Veterinary care', className: '-translate-x-[40px] sm:-translate-x-[56px] lg:-translate-x-[42px] pr-6 sm:pr-12 lg:pr-16' },
                 { src: '/images/pet.png', alt: 'Pet' },
             ]}
             rightImageBottomClassName="bottom-6"
