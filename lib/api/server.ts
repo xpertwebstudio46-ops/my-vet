@@ -30,7 +30,7 @@ export function getPractices(options: {
   animalType?: string;
   service?: string;
   membershipType?: PracticeMembershipType;
-  sort?: "rating" | "newest" | "name";
+  sort?: "rating" | "newest" | "name" | "featured";
 } = {}) {
   const query = new URLSearchParams();
   query.set("page", String(options.page ?? 1));
@@ -42,6 +42,10 @@ export function getPractices(options: {
   if (options.membershipType) query.set("membershipType", options.membershipType);
   if (options.sort) query.set("sort", options.sort);
   return apiFetch<Paginated<Practice>>(`/api/practices?${query.toString()}`);
+}
+
+export function getPracticeAnimalTypes() {
+  return apiFetch<Array<{ name: string; slug: string }>>("/api/practices/animal-types");
 }
 
 export function getPractice(slug: string) {

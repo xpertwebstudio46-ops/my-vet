@@ -1,18 +1,19 @@
 import HeroDirectory from "@/components/directory/HeroDirectory";
 import Footer from "@/components/Footer";
 import DirectoryClient from "@/components/directory/DirectoryClient";
-import { getPractices } from "@/lib/api/server";
-import { toPracticeCard } from "@/lib/practice-cards";
+import { getPracticeAnimalTypes, getPractices } from "@/lib/api/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DirectoryPage() {
-  const result = await getPractices({ limit: 100, sort: "rating" });
-  const practices = result.items.map(toPracticeCard);
+  const [result, animalTypes] = await Promise.all([
+    getPractices({ limit: 10, sort: "featured" }),
+    getPracticeAnimalTypes(),
+  ]);
   return (
     <div>
       <HeroDirectory />
-      <DirectoryClient practices={practices} />
+      <DirectoryClient initialResult={result} initialAnimalTypes={animalTypes} />
       <Footer />
     </div>
   );

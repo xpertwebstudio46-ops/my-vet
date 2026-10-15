@@ -68,10 +68,13 @@ const contactActionSchema = z.object({ type: z.enum(ContactActionType), source: 
 const searchSchema = paginationSchema.extend({
   q: z.string().trim().max(100).optional(),
   city: z.string().trim().max(100).optional(),
-  animalType: z.string().trim().max(300).optional(),
+  animalType: z.string().trim().max(2000).optional(),
   service: z.string().trim().max(300).optional(),
   membershipType: z.enum(['INDEPENDENT', 'GROUP']).optional(),
-  sort: z.enum(['rating', 'newest', 'name']).default('rating'),
+  minRating: z.coerce.number().min(0).max(5).optional(),
+  facilities: z.string().trim().max(500).optional(),
+  openingHours: z.string().max(100).transform((value) => value.split(',').filter(Boolean)).pipe(z.array(z.enum(['Open Now', 'Open Weekends']))).optional(),
+  sort: z.enum(['rating', 'newest', 'name', 'featured']).default('rating'),
 })
 
 function publicInclude() {
@@ -103,6 +106,15 @@ function practiceDto<T extends { rating: Prisma.Decimal; services?: Array<{ pric
 
 export const practicesRouter = Router()
 
+practicesRouter.get('/animal-types', async (_request, response) => {
+  const types = await prisma.animalType.findMany({
+    where: { active: true, practices: { some: { practice: { status: 'APPROVED', owner: { deletedAt: null } } } } },
+    select: { name: true, slug: true },
+    orderBy: { name: 'asc' },
+  })
+  sendSuccess(response, types)
+})
+
 practicesRouter.get('/', validateQuery(searchSchema), async (request, response) => {
   const query = request.validatedQuery as z.infer<typeof searchSchema>
   const where: Prisma.PracticeWhereInput = {
@@ -122,6 +134,7 @@ practicesRouter.get('/', validateQuery(searchSchema), async (request, response) 
     ]
   }
   if (query.membershipType) where.membershipType = query.membershipType
+  if (query.minRating !== undefined) where.rating = { gte: query.minRating }
   if (query.city) where.city = { contains: query.city, mode: 'insensitive' }
   if (query.animalType) {
     const animalTypes = query.animalType.split(',').map((value) => value.trim()).filter(Boolean)
@@ -131,8 +144,27 @@ practicesRouter.get('/', validateQuery(searchSchema), async (request, response) 
     const services = query.service.split(',').map((value) => value.trim()).filter(Boolean)
     where.AND = services.map((service) => ({ services: { some: { active: true, OR: [{ name: { contains: service, mode: 'insensitive' } }, { category: { name: { contains: service, mode: 'insensitive' }, active: true } }] } } }))
   }
-  const orderBy: Prisma.PracticeOrderByWithRelationInput =
-    query.sort === 'newest' ? { createdAt: 'desc' } : query.sort === 'name' ? { name: 'asc' } : { rating: 'desc' }
+  const conditions: Prisma.PracticeWhereInput[] = Array.isArray(where.AND) ? where.AND : []
+  for (const name of query.facilities?.split(',').map((value) => value.trim()).filter(Boolean) ?? []) {
+    conditions.push({ facilities: { some: { active: true, name: { equals: name, mode: 'insensitive' } } } })
+  }
+  if (query.openingHours?.includes('Open Weekends')) {
+    conditions.push({ openingHours: { some: { dayOfWeek: { in: [0, 6] }, isClosed: false, opensAt: { not: null }, closesAt: { not: null } } } })
+  }
+  if (query.openingHours?.includes('Open Now')) {
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date())
+    const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? ''
+    const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(part('weekday'))
+    const time = `${part('hour')}:${part('minute')}`
+    const date = new Date(`${part('year')}-${part('month')}-${part('day')}T00:00:00.000Z`)
+    conditions.push({ OR: [
+      { holidayHours: { some: { date, isClosed: false, opensAt: { lte: time }, closesAt: { gt: time } } } },
+      { AND: [{ holidayHours: { none: { date } } }, { openingHours: { some: { dayOfWeek, isClosed: false, opensAt: { lte: time }, closesAt: { gt: time } } } }] },
+    ] })
+  }
+  if (conditions.length) where.AND = conditions
+  const orderBy: Prisma.PracticeOrderByWithRelationInput[] =
+    query.sort === 'featured' ? [{ isFeatured: 'desc' }, { rating: 'desc' }, { id: 'asc' }] : [query.sort === 'newest' ? { createdAt: 'desc' } : query.sort === 'name' ? { name: 'asc' } : { rating: 'desc' }, { id: 'asc' }]
 
   const [items, total] = await Promise.all([
     prisma.practice.findMany({

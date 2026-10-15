@@ -25,17 +25,25 @@ export interface FiltersState {
   membershipTypes: PracticeMembershipType[];
   facilities: string[];
   openingHours: string[];
+  animalTypes: string[];
 }
+
+export type AnimalTypeOption = { name: string; slug: string };
+const VISIBLE_ANIMAL_TYPES = 6;
 
 export default function FiltersSidebar({
   onChange,
+  animalTypes,
 }: {
   onChange?: (filters: FiltersState) => void;
+  animalTypes: AnimalTypeOption[];
 }) {
   const [minRating, setMinRating] = useState<number | null>(null);
   const [selectedMembershipTypes, setSelectedMembershipTypes] = useState<PracticeMembershipType[]>([]);
   const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
+  const [selectedAnimalTypes, setSelectedAnimalTypes] = useState<string[]>([]);
+  const [showAllAnimals, setShowAllAnimals] = useState(false);
 
   const emit = (next: Partial<FiltersState>) => {
     onChange?.({
@@ -43,6 +51,7 @@ export default function FiltersSidebar({
       membershipTypes: selectedMembershipTypes,
       facilities: selectedFacilities,
       openingHours: selectedHours,
+      animalTypes: selectedAnimalTypes,
       ...next,
     });
   };
@@ -82,7 +91,8 @@ export default function FiltersSidebar({
     setSelectedMembershipTypes([]);
     setSelectedFacilities([]);
     setSelectedHours([]);
-    onChange?.({ minRating: null, membershipTypes: [], facilities: [], openingHours: [] });
+    setSelectedAnimalTypes([]);
+    onChange?.({ minRating: null, membershipTypes: [], facilities: [], openingHours: [], animalTypes: [] });
   };
 
   return (
@@ -161,6 +171,24 @@ export default function FiltersSidebar({
           ))}
         </div>
       </div>
+
+      <fieldset className="mt-5 min-w-0">
+        <legend className="mb-2.5 text-xs font-semibold text-slate-900">Animal Type</legend>
+        <div className="flex flex-col gap-2" id="directory-animal-types">
+          {(showAllAnimals ? animalTypes : animalTypes.slice(0, VISIBLE_ANIMAL_TYPES)).map((animal) => (
+            <label key={animal.slug} className="flex min-w-0 cursor-pointer items-start gap-2">
+              <input type="checkbox" checked={selectedAnimalTypes.includes(animal.slug)} onChange={() => {
+                const next = selectedAnimalTypes.includes(animal.slug) ? selectedAnimalTypes.filter((value) => value !== animal.slug) : [...selectedAnimalTypes, animal.slug];
+                setSelectedAnimalTypes(next);
+                emit({ animalTypes: next });
+              }} className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 accent-[#13b8a8]" />
+              <span className="min-w-0 break-words text-xs text-slate-600">{animal.name}</span>
+            </label>
+          ))}
+          {!animalTypes.length && <p className="text-xs text-slate-500">No animal types published yet.</p>}
+        </div>
+        {animalTypes.length > VISIBLE_ANIMAL_TYPES && <button type="button" aria-expanded={showAllAnimals} aria-controls="directory-animal-types" onClick={() => setShowAllAnimals((value) => !value)} className="mt-3 text-xs font-semibold text-[#085A9E] hover:underline focus-visible:outline-2 focus-visible:outline-[#13b8a8]">{showAllAnimals ? 'Read less' : 'Read more'}</button>}
+      </fieldset>
 
       {/* Facilities */}
       <div className="mt-5">
