@@ -70,7 +70,7 @@ export default function AccountSettingsPage() {
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('')
       setMessage('Password updated. Please sign in again.')
       await logout().catch(() => undefined)
-      router.replace('/login')
+      router.replace('/?login=pet-owner')
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : 'Password could not be updated.')
     } finally { setSaving(false) }

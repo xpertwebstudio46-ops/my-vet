@@ -57,7 +57,7 @@ export function SavePracticeButton({
   async function toggleSaved() {
     if (loading || saving) return;
     if (!user) {
-      router.push(`/login?next=${encodeURIComponent(pathname)}`);
+      router.push(`/?login=pet-owner&next=${encodeURIComponent(pathname)}`);
       return;
     }
 

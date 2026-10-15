@@ -69,6 +69,9 @@ export async function login(input: LoginInput) {
   if (!user || !valid || user.deletedAt) {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect')
   }
+  if (input.role && user.role !== input.role) {
+    throw new ApiError(403, 'LOGIN_ROLE_MISMATCH', 'This account cannot sign in using the selected login. Please choose the correct login for your account.')
+  }
   if (user.role === 'PET_OWNER' && user.approvalStatus !== 'APPROVED') {
     throw new ApiError(403, 'ACCOUNT_AWAITING_APPROVAL', user.approvalStatus === 'REJECTED' ? 'Your account has not been approved.' : 'Your account is waiting for admin approval.')
   }

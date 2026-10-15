@@ -11,7 +11,7 @@ export function RequireAuth({ roles, children }: { roles: Role[]; children: Reac
 
   useEffect(() => {
     if (loading) return;
-    if (!user) router.replace("/login");
+    if (!user) router.replace(roles.length === 1 && roles[0] === "ADMIN" ? "/login" : roles.length === 1 && roles[0] === "VET" ? "/?login=vet" : "/?login=pet-owner");
     else if (!roles.includes(user.role)) router.replace(dashboardForRole(user.role));
   }, [loading, roles, router, user]);
 

@@ -17,7 +17,7 @@ type RegisterInput = {
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (email: string, password: string, role?: Role) => Promise<User>;
   register: (input: RegisterInput) => Promise<AuthResult>;
   logout: () => Promise<void>;
 };
@@ -87,10 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // A new authenticated user always owns a new socket connection.
   }, [user]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, role?: Role) => {
     const result = await apiClient<AuthResult>(
       "/api/auth/login",
-      { method: "POST", body: JSON.stringify({ email, password }) },
+      { method: "POST", body: JSON.stringify({ email, password, ...(role ? { role } : {}) }) },
       { authenticated: false },
     );
     if (!result.accessToken) throw new Error("Login did not return a session.");

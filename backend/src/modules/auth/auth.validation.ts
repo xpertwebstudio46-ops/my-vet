@@ -17,7 +17,7 @@ export const registerSchema = z.object({
   role: z.enum(['PET_OWNER', 'VET']).default('PET_OWNER'),
 })
 
-export const loginSchema = z.object({ email, password: z.string().min(1).max(128) })
+export const loginSchema = z.object({ email, password: z.string().min(1).max(128), role: z.enum(['ADMIN', 'VET', 'PET_OWNER']).optional() })
 export const forgotPasswordSchema = z.object({ email })
 export const resetPasswordSchema = z.object({ token: z.string().min(40).max(256), password })
 

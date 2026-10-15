@@ -1,6 +1,7 @@
 import { CalendarDays, Images, MapPin, PhoneCall, UsersRound } from 'lucide-react'
 import type { Practice } from '@/lib/api/types'
 import { PracticeGallery } from './PracticeGallery'
+import { ExpandableTeamBio } from './ExpandableTeamBio'
 
 function getQualifications(value: string | null | undefined) {
   return value?.split(/\r?\n/).map((item) => item.trim()).filter(Boolean) ?? []
@@ -98,7 +99,7 @@ function TeamMemberArticle({ member }: { member: NonNullable<Practice['teamMembe
             ))}
           </div>
         )}
-        {member.bio && <p className="mt-2 line-clamp-3 break-words text-sm text-slate-600">{member.bio}</p>}
+        {member.bio && <ExpandableTeamBio text={member.bio} />}
       </div>
     </article>
   )

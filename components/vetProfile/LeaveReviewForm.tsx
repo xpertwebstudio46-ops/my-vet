@@ -38,7 +38,7 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
   }
 
   if (loading) return null;
-  if (!user) return <div className="rounded-2xl min-w-0 [overflow-wrap:anywhere] bg-[#eef1f5] p-4 sm:p-6 text-sm text-slate-600"><Link href="/login" className="font-semibold text-[#064071]">Sign in</Link> with a pet-owner account to leave a verified review.</div>;
+  if (!user) return <div className="rounded-2xl min-w-0 [overflow-wrap:anywhere] bg-[#eef1f5] p-4 sm:p-6 text-sm text-slate-600"><Link href="/?login=pet-owner" className="font-semibold text-[#064071]">Sign in</Link> with a pet-owner account to leave a verified review.</div>;
   if (user.role !== "PET_OWNER") return null;
 
   return (

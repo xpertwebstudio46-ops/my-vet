@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import LoginModal from "@/components/sharedComponents/modal";
 import { dashboardForRole, useAuth } from '@/components/auth/AuthProvider'
@@ -15,6 +16,14 @@ const navLinks = [
     { label: 'Blog', href: '/blog' },
     { label: 'Sponsorship', href: '/sponsorship' },
 ]
+
+function HeaderLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+    const searchParams = useSearchParams()
+    const loginRequest = searchParams.get('login')
+    const [dismissedLoginRequest, setDismissedLoginRequest] = useState<string | null>(null)
+    const requestedLoginOpen = (loginRequest === 'vet' || loginRequest === 'pet-owner') && dismissedLoginRequest !== loginRequest
+    return <LoginModal key={loginRequest ?? 'header-login'} initialRole={loginRequest === 'vet' ? 'VET' : 'PET_OWNER'} isOpen={isOpen || requestedLoginOpen} onClose={() => { onClose(); setDismissedLoginRequest(loginRequest) }} />
+}
 
 const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -193,7 +202,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                 }
             `}</style>
 
-            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+            <Suspense fallback={null}><HeaderLoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} /></Suspense>
         </>
     )
 }
