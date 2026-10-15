@@ -1,0 +1,3 @@
+export default function DirectorySkeleton() {
+  return <div role="status" aria-label="Loading practices" className="grid gap-5 sm:grid-cols-2"><span className="sr-only">Loading practices...</span>{Array.from({ length: 10 }, (_, index) => <div key={index} aria-hidden="true" className="overflow-hidden rounded-2xl border border-slate-200 motion-safe:animate-pulse"><div className="h-40 bg-slate-200" /><div className="space-y-3 p-4"><div className="h-5 w-3/4 rounded bg-slate-200" /><div className="h-3 w-1/2 rounded bg-slate-100" /><div className="h-12 rounded bg-slate-100" /><div className="h-9 rounded bg-slate-200" /></div></div>)}</div>;
+}
