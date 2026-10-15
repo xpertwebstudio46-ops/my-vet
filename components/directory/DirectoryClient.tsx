@@ -18,7 +18,7 @@ export default function DirectoryClient({ initialResult, initialAnimalTypes }: {
   const [query, setQuery] = useState<DirectoryQuery | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const current = query ? { ...query, page: result.page } : { page: 1, sort: "Featured", filters: emptyFilters };
+  const current: DirectoryQuery = query ?? { page: 1, sort: "Featured", filters: emptyFilters };
 
   useEffect(() => {
     if (!query) return;
@@ -62,7 +62,8 @@ export default function DirectoryClient({ initialResult, initialAnimalTypes }: {
   }
 
   const pageCount = Math.max(1, result.totalPages);
-  const pages = [...new Set([1, current.page - 1, current.page, current.page + 1, pageCount])].filter((page) => page >= 1 && page <= pageCount).sort((a, b) => a - b);
+  const activePage = result.page;
+  const pages = [...new Set([1, activePage - 1, activePage, activePage + 1, pageCount])].filter((page) => page >= 1 && page <= pageCount).sort((a, b) => a - b);
 
   return (
     <div className="w-full bg-slate-50 py-8 px-4 sm:px-6 sm:py-10 lg:px-8">
@@ -79,9 +80,9 @@ export default function DirectoryClient({ initialResult, initialAnimalTypes }: {
           {!loading && !error && <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-5">
             <p className="text-sm text-slate-500" aria-live="polite">Showing {result.total ? (result.page - 1) * PAGE_SIZE + 1 : 0}–{Math.min(result.page * PAGE_SIZE, result.total)} of {result.total} entries</p>
             {result.totalPages > 1 && <nav aria-label="Directory pagination" className="flex max-w-full flex-wrap items-center gap-1.5">
-              <button type="button" disabled={current.page <= 1} onClick={() => update({ ...current, page: current.page - 1 })} className="rounded-lg border px-3 py-2 text-sm text-[#064071] disabled:opacity-40">Previous</button>
-              {pages.map((page, index) => <span key={page} className="flex items-center gap-1.5">{index > 0 && page - pages[index - 1] > 1 && <span aria-hidden="true" className="px-1 text-slate-400">…</span>}<button type="button" aria-label={`Page ${page}`} aria-current={page === current.page ? "page" : undefined} onClick={() => update({ ...current, page })} className={`min-w-9 rounded-lg border px-3 py-2 text-sm ${page === current.page ? "border-[#064071] bg-[#064071] text-white" : "text-[#064071]"}`}>{page}</button></span>)}
-              <button type="button" disabled={current.page >= result.totalPages} onClick={() => update({ ...current, page: current.page + 1 })} className="rounded-lg border px-3 py-2 text-sm text-[#064071] disabled:opacity-40">Next</button>
+              <button type="button" disabled={activePage <= 1} onClick={() => update({ ...current, page: activePage - 1 })} className="rounded-lg border px-3 py-2 text-sm text-[#064071] disabled:opacity-40">Previous</button>
+              {pages.map((page, index) => <span key={page} className="flex items-center gap-1.5">{index > 0 && page - pages[index - 1] > 1 && <span aria-hidden="true" className="px-1 text-slate-400">…</span>}<button type="button" aria-label={`Page ${page}`} aria-current={page === activePage ? "page" : undefined} onClick={() => update({ ...current, page })} className={`min-w-9 rounded-lg border px-3 py-2 text-sm ${page === activePage ? "border-[#064071] bg-[#064071] text-white" : "text-[#064071]"}`}>{page}</button></span>)}
+              <button type="button" disabled={activePage >= result.totalPages} onClick={() => update({ ...current, page: activePage + 1 })} className="rounded-lg border px-3 py-2 text-sm text-[#064071] disabled:opacity-40">Next</button>
             </nav>}
           </div>}
         </div>
