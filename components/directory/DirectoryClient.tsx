@@ -91,4 +91,3 @@ export default function DirectoryClient({ initialResult, initialAnimalTypes }: {
     </div>
   );
 }
-
