@@ -1,11 +1,7 @@
 import Hero from "@/components/find-a-vet/Hero";
-import FindVetFilters from "@/components/find-a-vet/FindVetFilters";
-import FindVetToolbar from "@/components/find-a-vet/FindVetToolbar";
-import VetGrid from "@/components/find-a-vet/VetGrid";
-import FindVetPagination from "@/components/find-a-vet/FindVetPagination";
-import { getPractices } from "@/lib/api/server";
+import FindVetClient from "@/components/find-a-vet/FindVetClient";
+import { getPractices, getPracticeAnimalTypes } from "@/lib/api/server";
 import type { PracticeMembershipType } from "@/lib/api/types";
-import { toPracticeCard } from "@/lib/practice-cards";
 
 export const dynamic = "force-dynamic";
 
@@ -24,25 +20,21 @@ export default async function Page({
   const membershipTypeValue = Array.isArray(params.membershipType) ? params.membershipType[0] : params.membershipType;
   const membershipType: PracticeMembershipType | undefined = membershipTypeValue === "INDEPENDENT" || membershipTypeValue === "GROUP" ? membershipTypeValue : undefined;
   const sort = sortValue === "newest" || sortValue === "name" ? sortValue : "rating";
-  const [result, serviceSource] = await Promise.all([
-    getPractices({ page, limit: 12, sort, q, city, animalType, service, membershipType }),
+  const [result, serviceSource, animalTypes] = await Promise.all([
+    getPractices({ page, limit: 10, sort, q, city, animalType, service, membershipType }),
     getPractices({ page: 1, limit: 100, sort: "name" }),
+    getPracticeAnimalTypes(),
   ]);
   const serviceOptions = [...new Set(serviceSource.items.flatMap((practice) => practice.services?.map((item) => item.name) ?? []))].sort((a, b) => a.localeCompare(b));
+  const initialQuery = new URLSearchParams({ page: String(page), sort });
+  for (const [key, value] of Object.entries({ q, city, animalType, service, membershipType })) if (value) initialQuery.set(key, value);
 
   return (
     <>
       <Hero />
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid min-w-0 gap-6 lg:grid-cols-[280px_1fr] lg:gap-8 items-start">
-            <FindVetFilters serviceOptions={serviceOptions} />
-            <div className="min-w-0 space-y-6 sm:space-y-8">
-              <FindVetToolbar total={result.total} />
-              <VetGrid practices={result.items.map(toPracticeCard)} />
-              <FindVetPagination page={result.page} totalPages={result.totalPages} sort={sort} filters={{ q, city, animalType, service, membershipType }} />
-            </div>
-          </div>
+          <FindVetClient key={initialQuery.toString()} initialResult={result} initialQuery={initialQuery.toString()} initialAnimalTypes={animalTypes} serviceOptions={serviceOptions} />
         </div>
       </section>
     </>

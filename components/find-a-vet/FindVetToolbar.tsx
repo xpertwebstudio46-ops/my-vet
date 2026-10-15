@@ -1,20 +1,10 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function FindVetToolbar({ total }: { total: number }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentSort = searchParams.get("sort") ?? "rating";
-
+export default function FindVetToolbar({ total, currentSort, onSortChange }: { total: number; currentSort: string; onSortChange: (sort: string) => void }) {
   function changeSort(value: string | null) {
-    if (!value) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sort", value);
-    params.delete("page");
-    router.push(`${pathname}?${params.toString()}`);
+    if (value) onSortChange(value);
   }
 
   return (
