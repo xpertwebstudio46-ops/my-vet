@@ -108,7 +108,7 @@ export const practicesRouter = Router()
 
 practicesRouter.get('/animal-types', async (_request, response) => {
   const types = await prisma.animalType.findMany({
-    where: { active: true, practices: { some: { practice: { status: 'APPROVED', owner: { deletedAt: null } } } } },
+    where: { active: true },
     select: { name: true, slug: true },
     orderBy: { name: 'asc' },
   })
