@@ -76,7 +76,7 @@ const VetCard = ({ vet }: VetCardProps) => {
         </div>
 
         {/* Description */}
-        <p className="mt-5 text-sm leading-6 text-gray-600">
+        <p className="mt-5 line-clamp-2 break-words [overflow-wrap:anywhere] text-sm leading-6 text-gray-600">
           {vet.description}
         </p>
 

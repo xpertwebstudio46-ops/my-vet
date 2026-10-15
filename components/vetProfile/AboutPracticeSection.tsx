@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { CheckCircle2, Stethoscope } from "lucide-react";
 
 type Service = { id: string; name: string; description: string | null; price: string | null; currency: string };
 type Facility = { id: string; name: string; description: string | null };
 
-export default function AboutPracticeSection({ name, description, mission, whatWeDo, careOptions, services, facilities, animalTypes }: {
+export default function AboutPracticeSection({ name, description, mission, whatWeDo, careOptions, services, facilities, animalTypes, vetComparison }: {
   name: string;
   description: string;
   mission?: string;
@@ -15,11 +15,13 @@ export default function AboutPracticeSection({ name, description, mission, whatW
   services: Service[];
   facilities: Facility[];
   animalTypes: string[];
+  vetComparison?: ReactNode;
 }) {
   const tabs = [
     { key: "about", label: "About" },
     ...(whatWeDo ? [{ key: "what-we-do", label: "What we do" }] : []),
     ...(careOptions.length ? [{ key: "care-offered", label: "Care offered" }] : []),
+    ...(vetComparison ? [{ key: "vet-comparison", label: "Vet comparison" }] : []),
   ];
   const [activeTab, setActiveTab] = useState(tabs[0]?.key ?? "about");
 
@@ -30,13 +32,14 @@ export default function AboutPracticeSection({ name, description, mission, whatW
 
         <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
           {tabs.map((tab) => (
-            <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)} className={`border-b-2 px-3 py-2 text-sm font-semibold transition ${activeTab === tab.key ? "border-[#13b8a8] text-[#0d2e5e]" : "border-transparent text-slate-500 hover:text-[#0d2e5e]"}`}>
+            <button key={tab.key} type="button" aria-pressed={activeTab === tab.key} onClick={() => setActiveTab(tab.key)} className={`border-b-2 px-3 py-2 text-sm font-semibold transition ${activeTab === tab.key ? "border-[#13b8a8] text-[#0d2e5e]" : "border-transparent text-slate-500 hover:text-[#0d2e5e]"}`}>
               {tab.label}
             </button>
           ))}
         </div>
 
-        <div className="mt-5 min-h-28">
+        <div className="mt-5 min-h-28 min-w-0">
+          {activeTab === "vet-comparison" && vetComparison}
           {activeTab === "about" && (
             <div>
               <p className="whitespace-pre-line text-sm leading-relaxed text-slate-500">{description}</p>

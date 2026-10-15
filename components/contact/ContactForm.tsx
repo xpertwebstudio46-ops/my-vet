@@ -187,10 +187,16 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
               Get <span style={{ color: "#064071" }}>Directions</span>:
             </h3>
 
+            <address className="mt-4 space-y-3 break-words text-sm leading-6 not-italic text-slate-600">
+              <p>Shawbriggs, Barrow Road, Goxhill, DN19 7LN</p>
+              <p><a href="mailto:hello@my-vet.co.uk" className="text-[#064071] hover:underline">hello@my-vet.co.uk</a></p>
+              <p><a href="tel:012345676789" className="text-[#064071] hover:underline">0 12345676789</a></p>
+            </address>
+
             <div className="mt-4 w-full h-[260px] sm:h-[300px] rounded-2xl overflow-hidden border border-slate-200">
               <iframe
                 title="Location map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.618!2d-0.1278!3d51.5074!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDMwJzI2LjYiTiAwwrAwNyc0MC4xIlc!5e0!3m2!1sen!2suk!4v1600000000000"
+                src="https://www.google.com/maps?q=Shawbriggs%2C%20Barrow%20Road%2C%20Goxhill%2C%20DN19%207LN&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

@@ -57,7 +57,7 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
           </span>
         </div>
 
-        <p className="mt-3 line-clamp-2 text-sm leading-5 text-slate-600">{vet.description}</p>
+        <p className="mt-3 line-clamp-2 break-words [overflow-wrap:anywhere] text-sm leading-5 text-slate-600">{vet.description}</p>
 
         <ul className="mt-3 flex flex-col gap-1.5 flex-1">
           {vet.tags.map((tag) => (

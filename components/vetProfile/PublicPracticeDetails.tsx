@@ -1,5 +1,6 @@
 import { CalendarDays, Images, MapPin, PhoneCall, UsersRound } from 'lucide-react'
 import type { Practice } from '@/lib/api/types'
+import { PracticeGallery } from './PracticeGallery'
 
 function getQualifications(value: string | null | undefined) {
   return value?.split(/\r?\n/).map((item) => item.trim()).filter(Boolean) ?? []
@@ -33,16 +34,7 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
       {gallery.length > 0 && (
         <section>
           <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold text-[#0d2e5e]"><Images className="size-5 text-[#13b8a8]" />Gallery</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {gallery.map((media) => media.mediaType === 'VIDEO' ? (
-              <video key={media.id} controls className="aspect-video min-w-0 max-w-full w-full rounded-xl border bg-black" src={media.url} />
-            ) : (
-              <figure key={media.id} className="overflow-hidden rounded-xl border bg-white">
-                <img src={media.url} alt={media.altText ?? media.caption ?? `${practice.name} gallery image`} className="aspect-video w-full object-cover" />
-                {media.caption && <figcaption className="p-3 text-sm text-slate-500">{media.caption}</figcaption>}
-              </figure>
-            ))}
-          </div>
+          <PracticeGallery media={gallery} practiceName={practice.name} />
         </section>
       )}
 
@@ -106,7 +98,7 @@ function TeamMemberArticle({ member }: { member: NonNullable<Practice['teamMembe
             ))}
           </div>
         )}
-        {member.bio && <p className="mt-2 text-sm text-slate-600">{member.bio}</p>}
+        {member.bio && <p className="mt-2 line-clamp-3 break-words text-sm text-slate-600">{member.bio}</p>}
       </div>
     </article>
   )

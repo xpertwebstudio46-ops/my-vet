@@ -132,9 +132,11 @@ const Footer = () => {
             <h4 className="mb-5 font-heading text-lg font-bold">Get in Touch</h4>
             <ul className="grid gap-4 text-sm">
               <li>
-                <a href="mailto:info@myvet.co.uk" className="break-words text-white hover:text-[#13b8a8]">info@myvet.co.uk</a>
+                <a href="mailto:hello@my-vet.co.uk" className="break-words text-white hover:text-[#13b8a8]">hello@my-vet.co.uk</a>
               </li>
-              <li className="leading-6 text-white/90">123 Street, London Ltd.</li>
+              <li className="leading-6 text-white/90">
+                <address className="not-italic">Shawbriggs<br />Barrow Road<br />Goxhill<br />DN19 7LN</address>
+              </li>
               <li>
                 <a href="tel:012345676789" className="text-white hover:text-[#13b8a8]">0 12345676789</a>
               </li>
