@@ -231,6 +231,9 @@ model Practice {
   website                String?
   logoUrl                String?
   bannerUrl              String?
+  bannerWidth            Int?
+  bannerHeight           Int?
+  bannerObjectFit        String             @default("cover")
   timezone               String             @default("Europe/London")
   latitude               Decimal?           @db.Decimal(10, 7)
   longitude              Decimal?           @db.Decimal(10, 7)
@@ -395,6 +398,8 @@ model HolidayHours {
 }
 
 model EmergencyHours {
+  inHoursPhone String?
+  outOfHoursPhone String?
   id          String   @id @default(cuid())
   practiceId  String   @unique
   enabled     Boolean  @default(false)

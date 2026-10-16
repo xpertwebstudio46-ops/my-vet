@@ -13,7 +13,7 @@ const HeroBanner = () => {
                 { src: '/images/cow.png', alt: 'Veterinary care', className: '-translate-x-[40px] sm:-translate-x-[56px] lg:-translate-x-[42px] pr-6 sm:pr-12 lg:pr-16' },
                 { src: '/images/pet.png', alt: 'Pet' },
                 { src: '/images/slide-2.png', alt: 'Veterinary care' },
-                { src: '/images/slide-3.png', alt: 'Veterinary practice' },
+                { src: '/images/slide-4.png', alt: 'Veterinary practice' },
             ]}
             rightImageBottomClassName="bottom-6"
             showSearch

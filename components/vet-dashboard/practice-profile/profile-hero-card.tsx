@@ -11,13 +11,19 @@ type Practice = {
   id: string;
   name: string;
   description: string | null;
+  timezone: string;
   logoUrl: string | null;
   bannerUrl: string | null;
+  bannerWidth?: number | null;
+  bannerHeight?: number | null;
+  bannerObjectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
 };
 
 export function ProfileHeroCard() {
   const [practice, setPractice] = useState<Practice | null>(null);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
 
   useEffect(() => {
@@ -40,6 +46,19 @@ export function ProfileHeroCard() {
     window.addEventListener("myvet:practice-updated", update);
     return () => window.removeEventListener("myvet:practice-updated", update);
   }, []);
+
+  async function saveCover() {
+    if (!practice || saving) return;
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      await apiClient('/api/practices/' + practice.id, { method: 'PUT', body: JSON.stringify({ timezone: practice.timezone, bannerWidth: practice.bannerWidth ?? null, bannerHeight: practice.bannerHeight ?? null, bannerObjectFit: practice.bannerObjectFit ?? 'cover' }) });
+      setMessage('Cover appearance saved to your public profile.');
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Cover appearance could not be saved.');
+    } finally { setSaving(false); }
+  }
 
   async function replaceImage(file: File, kind: "logo" | "banner") {
     setUploading(kind);
@@ -86,7 +105,7 @@ export function ProfileHeroCard() {
           alt="Practice cover"
           fill
           sizes="100vw"
-          className="object-cover object-center"
+          style={{ width: `${practice?.bannerWidth ?? 100}%`, height: `${practice?.bannerHeight ?? 100}%`, left: "50%", transform: "translateX(-50%)", objectFit: practice?.bannerObjectFit ?? "cover" }}
           priority
         />
         <div className="absolute inset-0 bg-black/10" />
@@ -131,6 +150,13 @@ export function ProfileHeroCard() {
         </span>
       </div>
       <div className="bg-white px-5 pb-5 pt-24">
+        {practice && <div className="mb-5 grid gap-4 rounded-lg border bg-slate-50 p-4 sm:grid-cols-3">
+          {(['bannerWidth', 'bannerHeight'] as const).map((key) => <label key={key} className="text-sm font-medium">{key === 'bannerWidth' ? 'Cover width (%)' : 'Cover height (%)'}<input type="number" min={1} max={100} step={1} value={practice[key] ?? ''} placeholder="100 (default)" onChange={(event) => setPractice({ ...practice, [key]: event.target.value === '' ? null : Number(event.target.value) })} className="mt-2 h-10 w-full rounded-md border bg-white px-3" /></label>)}
+          <label className="text-sm font-medium">Image fit<select value={practice.bannerObjectFit ?? 'cover'} onChange={(event) => setPractice({ ...practice, bannerObjectFit: event.target.value as NonNullable<Practice['bannerObjectFit']> })} className="mt-2 h-10 w-full rounded-md border bg-white px-3">{(['cover', 'contain', 'fill', 'none', 'scale-down'] as const).map((fit) => <option key={fit} value={fit}>{fit}</option>)}</select></label>
+          <p className="text-xs text-slate-500 sm:col-span-3">Dimensions are percentages of the cover area. Contain shows the whole image; cover fills the area and may crop it.</p>
+          <button type="button" disabled={saving || [practice.bannerWidth, practice.bannerHeight].some((value) => value != null && (!Number.isInteger(value) || value < 1 || value > 100))} onClick={() => void saveCover()} className="rounded-md bg-[#01AEAD] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save cover settings'}</button>
+          {message && <p role="status" className="text-sm text-emerald-700 sm:col-span-2">{message}</p>}
+        </div>}
         <div className="max-w-3xl">
           <h2 className="dashboard-outfit text-[22px] font-semibold text-[#01AEAD]">
             {practice?.name || "Loading practice..."}

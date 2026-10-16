@@ -77,6 +77,8 @@ const holidaySchema = z.object({
   note: z.string().trim().max(300).nullable().optional(),
 })
 const emergencySchema = z.object({
+  inHoursPhone: z.string().trim().max(30).nullable().optional(),
+  outOfHoursPhone: z.string().trim().max(30).nullable().optional(),
   enabled: z.boolean().optional(),
   phone: z.string().trim().max(30).nullable().optional(),
   calloutAddress: z.string().trim().max(500).nullable().optional(),
@@ -141,13 +143,15 @@ vetRouter.get('/dashboard', async (request, response) => {
     prisma.review.count({ where: { practiceId: practice.id, status: 'PENDING' } }),
     prisma.profileView.count({ where: { practiceId: practice.id } }),
     prisma.contactAction.count({ where: { practiceId: practice.id } }),
-    prisma.emergencyHours.findUnique({ where: { practiceId: practice.id }, select: { phone: true, calloutAddress: true } }),
+    prisma.emergencyHours.findUnique({ where: { practiceId: practice.id }, select: { phone: true, inHoursPhone: true, outOfHoursPhone: true, calloutAddress: true } }),
   ])
   sendSuccess(response, {
     practice: {
       ...practice,
       rating: practice.rating.toString(),
       emergencyNumber: emergencyHours?.phone ?? null,
+      emergencyInHoursNumber: emergencyHours?.inHoursPhone ?? null,
+      emergencyOutOfHoursNumber: emergencyHours?.outOfHoursPhone ?? null,
       emergencyCalloutAddress: emergencyHours?.calloutAddress ?? null,
     },
     stats: { upcomingAppointments, pendingReviews, views, contacts },

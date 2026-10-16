@@ -28,6 +28,9 @@ const practiceFields = z.object({
   website: z.url().nullable().optional(),
   logoUrl: z.url().nullable().optional(),
   bannerUrl: z.url().nullable().optional(),
+  bannerWidth: z.number().int().min(1).max(100).nullable().optional(),
+  bannerHeight: z.number().int().min(1).max(100).nullable().optional(),
+  bannerObjectFit: z.enum(['cover', 'contain', 'fill', 'none', 'scale-down']).optional(),
   timezone: z.string().trim().min(3).max(80).default('Europe/London'),
 })
 const groupMembershipSelection = z.object({

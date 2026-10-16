@@ -4,9 +4,12 @@ import { BookAppointmentButton } from "@/components/appointments/book-appointmen
 import { practiceMembershipLabel } from "@/lib/practice-cards";
 import type { PracticeMembershipType } from "@/lib/api/types";
 
-export default function VetProfile({ name, bannerUrl, logoUrl, rating, reviewCount, address, phone, practiceId, membershipType }: {
+export default function VetProfile({ name, bannerUrl, logoUrl, rating, reviewCount, address, phone, practiceId, membershipType, bannerWidth, bannerHeight, bannerObjectFit }: {
   name: string;
   bannerUrl: string | null;
+  bannerWidth?: number | null;
+  bannerHeight?: number | null;
+  bannerObjectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
   logoUrl: string | null;
   rating: number;
   reviewCount: number;
@@ -17,7 +20,7 @@ export default function VetProfile({ name, bannerUrl, logoUrl, rating, reviewCou
 }) {
   return (
     <section className="practice-detail-hero relative min-h-[560px] w-full overflow-hidden sm:h-[70vh]">
-      <Image src={bannerUrl ?? "/images/profile-banner.png"} alt={`${name} profile banner`} fill priority sizes="100vw" className="object-cover" />
+      <Image src={bannerUrl ?? "/images/profile-banner.png"} alt={`${name} profile banner`} fill priority sizes="100vw" style={{ width: `${bannerWidth ?? 100}%`, height: `${bannerHeight ?? 100}%`, left: "50%", transform: "translateX(-50%)", objectFit: bannerObjectFit ?? "cover" }} />
       <div className="absolute inset-0 bg-black/45" />
       <div className="practice-detail-content absolute inset-x-0 mid bottom-8 z-10 flex flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-end md:justify-between md:px-12">
         <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">

@@ -55,6 +55,7 @@ export function PublicPracticeDetails({ practice }: { practice: Practice }) {
           {emergency?.enabled && (
             <article className="rounded-xl border bg-white p-5">
               <h2 className="flex items-center gap-2 font-semibold text-[#0d2e5e]"><PhoneCall className="size-5 text-[#13b8a8]" />Emergency contact</h2>
+              {([['inHoursPhone', 'In hours'], ['outOfHoursPhone', 'Out of hours']] as const).map(([key, label]) => emergency[key] && <div key={key} className="mt-3"><p className="text-sm text-slate-500">{label}</p><a href={'tel:' + emergency[key]!.replace(/[^+\d]/g, '')} className="font-semibold text-[#064071]">{emergency[key]}</a></div>)}
               {emergency.phone && <a href={`tel:${emergency.phone.replace(/[^+\d]/g, '')}`} className="mt-3 block font-semibold text-[#064071]">{emergency.phone}</a>}
               {emergency.calloutAddress && <p className="mt-2 flex items-start gap-2 text-sm text-slate-600"><MapPin className="mt-0.5 size-4 shrink-0 text-[#13b8a8]" />{emergency.calloutAddress}</p>}
               {emergency.instructions && <p className="mt-2 whitespace-pre-line text-sm text-slate-500">{emergency.instructions}</p>}

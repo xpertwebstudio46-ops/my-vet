@@ -21,6 +21,8 @@ type Practice = {
   website: string | null
   timezone: string
   emergencyNumber: string | null
+  emergencyInHoursNumber: string | null
+  emergencyOutOfHoursNumber: string | null
   emergencyCalloutAddress: string | null
 }
 
@@ -85,6 +87,8 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
           method: 'PUT',
           body: JSON.stringify({
             phone: practice.emergencyNumber || null,
+            inHoursPhone: practice.emergencyInHoursNumber || null,
+            outOfHoursPhone: practice.emergencyOutOfHoursNumber || null,
             calloutAddress: practice.emergencyCalloutAddress || null,
           }),
         })
@@ -159,6 +163,8 @@ export function PracticeEditor({ heading = 'Practice information', showEmergency
         <Field label="Timezone" value={practice.timezone} onChange={(value) => set('timezone', value)} />
         {showEmergencyFields && (
           <>
+            <Field label="Emergency number (in hours)" value={practice.emergencyInHoursNumber ?? ''} onChange={(value) => set('emergencyInHoursNumber', value || null)} />
+            <Field label="Emergency number (out of hours)" value={practice.emergencyOutOfHoursNumber ?? ''} onChange={(value) => set('emergencyOutOfHoursNumber', value || null)} />
             <Field label="Emergency number" value={practice.emergencyNumber ?? ''} onChange={(value) => set('emergencyNumber', value || null)} />
             <Field label="Emergency callout address" value={practice.emergencyCalloutAddress ?? ''} onChange={(value) => set('emergencyCalloutAddress', value || null)} />
           </>

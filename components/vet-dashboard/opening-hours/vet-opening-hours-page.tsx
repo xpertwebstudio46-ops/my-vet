@@ -21,6 +21,8 @@ type Holiday = {
   note: string | null;
 };
 type Emergency = {
+  inHoursPhone?: string | null;
+  outOfHoursPhone?: string | null;
   enabled: boolean;
   phone: string | null;
   calloutAddress: string | null;
@@ -259,6 +261,7 @@ export function VetOpeningHoursPage() {
             />
             Enable emergency information
           </label>
+          {([['inHoursPhone', 'Emergency number (in hours)'], ['outOfHoursPhone', 'Emergency number (out of hours)']] as const).map(([key, label]) => <label key={key} className="text-sm font-medium">{label}<input type="tel" maxLength={30} value={emergency[key] ?? ""} onChange={(event) => setEmergency({ ...emergency, [key]: event.target.value || null })} className="mt-2 h-10 w-full rounded-md border px-3 text-sm" /></label>)}
           <input
             value={emergency.phone ?? ""}
             onChange={(e) =>
