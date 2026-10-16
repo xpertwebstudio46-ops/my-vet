@@ -73,9 +73,8 @@ export default function FindVetClient({ initialResult, initialQuery, initialAnim
     <FindVetFilters serviceOptions={serviceOptions} animalTypes={animalTypes} query={query} onChange={update} />
     <div className="min-w-0 space-y-6 sm:space-y-8" aria-busy={loading}>
       <FindVetToolbar total={result.total} currentSort={params.get("sort") ?? "rating"} onSortChange={(sort) => { const next = new URLSearchParams(query); next.set("sort", sort); next.delete("page"); update(next.toString()); }} />
-      <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-slate-500">{PAGE_SIZE} entries per page</p><FindVetPagination page={result.page} totalPages={result.totalPages} loading={loading} onPageChange={changePage} /></div>
       {loading ? <DirectorySkeleton /> : error ? <div role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-700"><p>{error}</p><button type="button" onClick={() => update(query)} className="mt-2 font-semibold underline">Try again</button></div> : result.items.length ? <VetGrid practices={result.items.map(toPracticeCard)} /> : <p className="py-12 text-center text-slate-500">No practices match these filters.</p>}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5"><p aria-live="polite" className="text-sm text-slate-500">{loading ? "Loading practices..." : `Showing ${result.total ? (result.page - 1) * PAGE_SIZE + 1 : 0}–${Math.min(result.page * PAGE_SIZE, result.total)} of ${result.total} entries`}</p><FindVetPagination page={result.page} totalPages={result.totalPages} loading={loading} onPageChange={changePage} /></div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5"><p aria-live="polite" className="text-sm text-slate-500">{loading ? "Loading practices..." : `Showing ${result.total ? (result.page - 1) * PAGE_SIZE + 1 : 0}–${Math.min(result.page * PAGE_SIZE, result.total)} / ${result.total} total entries`}</p><FindVetPagination page={result.page} totalPages={result.totalPages} loading={loading} onPageChange={changePage} /></div>
     </div>
   </div>;
 }
