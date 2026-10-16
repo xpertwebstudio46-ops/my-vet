@@ -42,7 +42,7 @@ export const vetSupportContacts: VetSupportContact[] = [
   },
   {
     icon: Phone,
-    value: '0800 118 2200',
+    value: '01482 688508',
     hint: 'Mon-Fri, 9am-6pm',
   },
   {

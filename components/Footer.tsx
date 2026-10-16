@@ -138,7 +138,7 @@ const Footer = () => {
                 <address className="not-italic">Shawbriggs Barrow Road Goxhill DN19 7LN</address>
               </li>
               <li>
-                <a href="tel:012345676789" className="text-white hover:text-[#13b8a8]">0 12345676789</a>
+                <a href="tel:01482688508" className="text-white hover:text-[#13b8a8]">01482 688508</a>
               </li>
             </ul>
           </div>

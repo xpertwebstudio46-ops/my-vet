@@ -21,7 +21,7 @@ export function CredentialsCard() {
         <InfoField
           label="Emergency contact"
           type="tel"
-          defaultValue="+44 1865 555 019"
+          defaultValue="01482 688508"
         />
       </div>
 

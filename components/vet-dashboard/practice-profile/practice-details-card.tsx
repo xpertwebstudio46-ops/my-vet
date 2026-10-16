@@ -24,7 +24,7 @@ export function PracticeDetailsCard() {
         <ProfileField
           label="Phone number"
           type="tel"
-          defaultValue="+44 1865 555 014"
+          defaultValue="01482 688508"
         />
         <ProfileField
           label="Website URL"

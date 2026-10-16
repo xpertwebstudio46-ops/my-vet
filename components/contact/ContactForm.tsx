@@ -190,7 +190,7 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
             <address className="mt-4 space-y-3 break-words text-sm leading-6 not-italic text-slate-600">
               <p>Shawbriggs, Barrow Road, Goxhill, DN19 7LN</p>
               <p><a href="mailto:hello@my-vet.co.uk" className="text-[#064071] hover:underline">hello@my-vet.co.uk</a></p>
-              <p><a href="tel:012345676789" className="text-[#064071] hover:underline">0 12345676789</a></p>
+              <p><a href="tel:01482688508" className="text-[#064071] hover:underline">01482 688508</a></p>
             </address>
 
             <div className="mt-4 w-full h-[260px] sm:h-[300px] rounded-2xl overflow-hidden border border-slate-200">
