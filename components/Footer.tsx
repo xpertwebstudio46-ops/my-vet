@@ -135,7 +135,7 @@ const Footer = () => {
                 <a href="mailto:hello@my-vet.co.uk" className="break-words text-white hover:text-[#13b8a8]">hello@my-vet.co.uk</a>
               </li>
               <li className="leading-6 text-white/90">
-                <address className="not-italic">Shawbriggs<br />Barrow Road<br />Goxhill<br />DN19 7LN</address>
+                <address className="not-italic">Shawbriggs Barrow Road Goxhill DN19 7LN</address>
               </li>
               <li>
                 <a href="tel:012345676789" className="text-white hover:text-[#13b8a8]">0 12345676789</a>
