@@ -42,7 +42,7 @@ const Header = () => {
                 <div className="site-header-row mx-4 flex items-center justify-between gap-4 sm:mx-6">
                     <Link href="/" className="shrink-0">
                         <picture>
-                            <img src="/images/log.jpeg" alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
+                            <img src="/images/long.jpeg" alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
                         </picture>
                     </Link>
 
@@ -108,7 +108,7 @@ const Header = () => {
                     <aside className="mobile-menu-sheet absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-white p-5 shadow-2xl">
                         <div className="flex items-center justify-between gap-4">
                             <Link href="/" onClick={closeMenu} className="shrink-0">
-                                <img src="/images/log.jpeg" alt="MY VET" className="h-auto w-[132px]" />
+                                <img src="/images/long.jpeg" alt="MY VET" className="h-auto w-[132px]" />
                             </Link>
                             <button
                                 type="button"
