@@ -7,6 +7,7 @@ import { PracticeCard, type PracticeCardItem } from '@/components/dashboard/prac
 import { Card, PageHeader } from '@/components/dashboard/ui'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 import type { Paginated, Practice, PracticeMembershipType } from '@/lib/api/types'
+import { InviteYourVet } from '@/components/practices/invite-your-vet'
 
 const animalTypes = ['Small Animals', 'Cats', 'Dogs', 'Equine', 'Farm Animals', 'Exotics']
 const services = ['Emergency Care', 'Surgery', 'Dental Care', 'Vaccinations', 'Diagnostics', 'Holistic Care']
@@ -83,6 +84,7 @@ export default function FindAVetPage() {
   const cards = result?.items.map(toCard) ?? []
   return <div>
     <PageHeader title="Find a Vet" description="Search live approved practices by name, animal type and service." />
+    <InviteYourVet />
     <Card className="mb-6 p-3"><form className="flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); setPage(1); setSubmittedQuery(query.trim()) }}><div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Practice name or treatment" className="h-11 w-full rounded-lg border bg-white pl-9 pr-4 text-sm outline-none focus:border-[#01AEAD]" /></div><button className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#064071] px-6 text-sm font-semibold text-white"><Search className="size-4" />Search</button></form></Card>
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
       <aside className="hidden lg:block"><Card className="sticky top-20 p-5"><div className="mb-4 flex items-center gap-2"><SlidersHorizontal className="size-4 text-[#064071]" /><h2 className="font-semibold">Filters</h2></div>{filterContent}</Card></aside>

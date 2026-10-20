@@ -2,6 +2,7 @@ import Hero from "@/components/find-a-vet/Hero";
 import FindVetClient from "@/components/find-a-vet/FindVetClient";
 import { getPractices, getPracticeAnimalTypes } from "@/lib/api/server";
 import type { PracticeMembershipType } from "@/lib/api/types";
+import { InviteYourVet } from "@/components/practices/invite-your-vet";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function Page({
       <Hero />
       <section className="py-10 sm:py-16">
         <div className="container mx-auto max-w-7xl px-4">
+          <InviteYourVet />
           <FindVetClient key={initialQuery.toString()} initialResult={result} initialQuery={initialQuery.toString()} initialAnimalTypes={animalTypes} serviceOptions={serviceOptions} />
         </div>
       </section>
