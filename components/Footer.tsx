@@ -99,7 +99,7 @@ const Footer = () => {
 
         <div className="grid gap-10 py-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.2fr] lg:gap-12 lg:py-14">
           <div>
-            <Image src="/images/footer-logo.png" alt="My Vet Logo" width={90} height={70} className="h-auto w-[90px] object-contain" />
+            <Image src="/images/log.jpeg" alt="My Vet Logo" width={1567} height={1004} className="h-auto w-[150px] object-contain" />
             <p className="mt-4 max-w-md text-sm leading-7 text-white/90 sm:text-base">
               My Vet is a trusted UK veterinary directory helping animal owners find the right care through transparent reviews and verified practices.
             </p>

@@ -52,7 +52,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
           </defs>
         </svg>
         <div aria-hidden="true" className="practice-logo-cutout pointer-events-none absolute left-0 top-0 z-20 bg-white" />
-        <div className="public-hero-header absolute top-4 left-0 right-0 z-50"><Header logoOnWhite /></div>
+        <div className="public-hero-header absolute top-4 left-0 right-0 z-50"><Header /></div>
         <VetProfile name={practice.name} bannerUrl={practice.bannerUrl} bannerWidth={practice.bannerWidth} bannerHeight={practice.bannerHeight} bannerObjectFit={practice.bannerObjectFit} logoUrl={practice.logoUrl} rating={Number(practice.rating)} reviewCount={practice.reviewCount} address={address} phone={practice.phone} practiceId={practice.id} membershipType={practice.membershipType} />
       </div>
       <div className="w-full bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">

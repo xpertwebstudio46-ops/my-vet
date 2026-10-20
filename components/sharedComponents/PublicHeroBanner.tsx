@@ -159,7 +159,7 @@ export function PublicHeroBanner({
             </div>
 
             <div className="public-hero-header absolute top-4 left-0 right-0 z-50">
-                <Header logoOnWhite />
+                <Header />
             </div>
 
             {showSearch ? (

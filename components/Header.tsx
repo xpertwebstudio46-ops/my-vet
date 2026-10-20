@@ -25,7 +25,7 @@ function HeaderLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
     return <LoginModal key={loginRequest ?? 'header-login'} initialRole={loginRequest === 'vet' ? 'VET' : 'PET_OWNER'} isOpen={isOpen || requestedLoginOpen} onClose={() => { onClose(); setDismissedLoginRequest(loginRequest) }} />
 }
 
-const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
+const Header = () => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { user } = useAuth()
@@ -42,8 +42,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                 <div className="site-header-row mx-4 flex items-center justify-between gap-4 sm:mx-6">
                     <Link href="/" className="shrink-0">
                         <picture>
-                            <source media="(min-width: 1024px)" srcSet="/images/header-logo.png" />
-                            <img src={logoOnWhite ? "/images/header-logo.png" : "/images/change-logo.png"} alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
+                            <img src="/images/log.jpeg" alt="MY VET" className="h-auto large-scrren-image w-[132px] sm:w-[150px] " />
                         </picture>
                     </Link>
 
@@ -109,7 +108,7 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                     <aside className="mobile-menu-sheet absolute left-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-white p-5 shadow-2xl">
                         <div className="flex items-center justify-between gap-4">
                             <Link href="/" onClick={closeMenu} className="shrink-0">
-                                <img src="/images/header-logo.png" alt="MY VET" className="h-auto w-[132px]" />
+                                <img src="/images/log.jpeg" alt="MY VET" className="h-auto w-[132px]" />
                             </Link>
                             <button
                                 type="button"
