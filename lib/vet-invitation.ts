@@ -10,3 +10,5 @@ export const vetInvitationBody = [
 ].join('\r\n\r\n')
 
 export const vetInvitationMailto = `mailto:?subject=${encodeURIComponent(vetInvitationSubject)}&body=${encodeURIComponent(vetInvitationBody)}`
+
+export const vetInvitationGmail = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(vetInvitationSubject)}&body=${encodeURIComponent(vetInvitationBody)}`
