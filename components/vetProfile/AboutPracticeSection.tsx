@@ -33,13 +33,13 @@ export default function AboutPracticeSection({ name, membershipType, description
     <div className="min-w-0 [overflow-wrap:anywhere] flex flex-col gap-6 sm:gap-8">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">
         <div className="flex items-center gap-3">
-          <h2 className="min-w-0 text-xl font-bold text-[#0d2e5e] sm:text-2xl">About {name}</h2>
+          <h2 className="min-w-0 flex-1 text-xl font-bold text-[#0d2e5e] sm:text-2xl">About {name}</h2>
           <Image
             src={practiceMembershipBadgeImage(membershipType)}
             alt={practiceMembershipLabel(membershipType)}
-            width={118}
-            height={36}
-            className="h-8 w-auto max-w-[40%] shrink-0 object-contain"
+            width={142}
+            height={44}
+            className="h-11 w-[142px] max-w-[45%] shrink-0 object-contain"
           />
         </div>
 

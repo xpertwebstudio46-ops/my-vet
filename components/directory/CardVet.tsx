@@ -35,13 +35,13 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
         <div className="flex items-center gap-2">
-          <h3 className="min-w-0 break-words text-base font-bold text-slate-900">{vet.name}</h3>
+          <h3 className="min-w-0 flex-1 break-words text-base font-bold text-slate-900">{vet.name}</h3>
           <Image
             src={practiceMembershipBadgeImage(vet.membershipType)}
             alt={practiceMembershipLabel(vet.membershipType)}
-            width={118}
-            height={36}
-            className="h-8 w-auto max-w-[40%] shrink-0 object-contain"
+            width={142}
+            height={44}
+            className="h-11 w-[142px] max-w-[45%] shrink-0 object-contain"
           />
         </div>
 

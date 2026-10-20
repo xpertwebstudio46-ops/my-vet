@@ -19,13 +19,6 @@ const VetCard = ({ vet }: VetCardProps) => {
           fill
           className="object-cover"
         />
-        <Image
-          src={practiceMembershipBadgeImage(vet.membershipType)}
-          alt={practiceMembershipLabel(vet.membershipType)}
-          width={118}
-          height={36}
-          className="absolute left-2 top-2 h-8 w-auto max-w-[calc(100%-4.5rem)] object-contain drop-shadow-sm"
-        />
         <div className="absolute right-2 top-2 flex flex-col items-end gap-2">
           <div className="bg-white rounded-md  p-1 flex items-center gap-2">
             <Star
@@ -43,9 +36,18 @@ const VetCard = ({ vet }: VetCardProps) => {
       </div>
 
       <div className="p-5 sm:p-6">
-        <h3 className="break-words text-[20px] font-bold text-black">
-          {vet.name}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="min-w-0 flex-1 break-words text-[20px] font-bold text-black">
+            {vet.name}
+          </h3>
+          <Image
+            src={practiceMembershipBadgeImage(vet.membershipType)}
+            alt={practiceMembershipLabel(vet.membershipType)}
+            width={142}
+            height={44}
+            className="h-11 w-[142px] max-w-[45%] shrink-0 object-contain"
+          />
+        </div>
 
 
         {/* Rating */}
