@@ -2,12 +2,16 @@
 
 import { useState, type ReactNode } from "react";
 import { CheckCircle2, Stethoscope } from "lucide-react";
+import Image from "next/image";
+import type { PracticeMembershipType } from "@/lib/api/types";
+import { practiceMembershipBadgeImage, practiceMembershipLabel } from "@/lib/practice-cards";
 
 type Service = { id: string; name: string; description: string | null; price: string | null; currency: string };
 type Facility = { id: string; name: string; description: string | null };
 
-export default function AboutPracticeSection({ name, description, mission, whatWeDo, careOptions, services, facilities, animalTypes, vetComparison }: {
+export default function AboutPracticeSection({ name, membershipType, description, mission, whatWeDo, careOptions, services, facilities, animalTypes, vetComparison }: {
   name: string;
+  membershipType: PracticeMembershipType;
   description: string;
   mission?: string;
   whatWeDo?: string | null;
@@ -28,7 +32,16 @@ export default function AboutPracticeSection({ name, description, mission, whatW
   return (
     <div className="min-w-0 [overflow-wrap:anywhere] flex flex-col gap-6 sm:gap-8">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">
-        <h2 className="text-xl font-bold text-[#0d2e5e] sm:text-2xl">About {name}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="min-w-0 text-xl font-bold text-[#0d2e5e] sm:text-2xl">About {name}</h2>
+          <Image
+            src={practiceMembershipBadgeImage(membershipType)}
+            alt={practiceMembershipLabel(membershipType)}
+            width={118}
+            height={36}
+            className="h-8 w-auto max-w-[40%] shrink-0 object-contain"
+          />
+        </div>
 
         <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
           {tabs.map((tab) => (
