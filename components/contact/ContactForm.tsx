@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { apiClient, ApiClientError } from "@/lib/api/client";
+import { FACEBOOK_URL } from "@/lib/social-links";
 const socialLinks = [
-  { icon: "images/grp-1.png", href: "#", label: "Facebook" },
+  { icon: "images/grp-1.png", href: FACEBOOK_URL, label: "Facebook" },
   { icon: "images/grp-2.png", href: "#", label: "Twitter" },
   { icon: "images/grp-3.png", href: "#", label: "LinkedIn" },
   { icon: "images/grp-4.png", href: "#", label: "Instagram" },

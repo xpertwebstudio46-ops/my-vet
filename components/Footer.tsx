@@ -5,6 +5,7 @@ import type { FormEvent, ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { apiClient, ApiClientError } from '@/lib/api/client'
+import { FACEBOOK_URL } from '@/lib/social-links'
 
 const quickLinks = [
   { label: 'Home', href: '/' },
@@ -105,7 +106,7 @@ const Footer = () => {
 
             <div className="mt-6 flex gap-2.5">
               {socialLinks.map((social) => (
-                <a key={social.label} href="#" aria-label={social.label} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:border-[#13b8a8] hover:text-[#13b8a8]">
+                <a key={social.label} href={social.label === 'Facebook' ? FACEBOOK_URL : '#'} aria-label={social.label} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:border-[#13b8a8] hover:text-[#13b8a8]">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     {social.icon}
                   </svg>
