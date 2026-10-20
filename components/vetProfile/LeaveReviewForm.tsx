@@ -16,7 +16,8 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (rating === 0) return;
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     setError("");
     setSuccess("");
     try {
@@ -30,7 +31,7 @@ export default function LeaveReviewForm({ practiceId }: { practiceId: string }) 
         }),
       });
       setSuccess("Your review was submitted and is awaiting moderation.");
-      event.currentTarget.reset();
+      formElement.reset();
       setRating(0);
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : "The review could not be submitted.");

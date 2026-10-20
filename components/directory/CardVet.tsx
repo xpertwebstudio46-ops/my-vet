@@ -17,13 +17,6 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
           className="object-cover"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-4rem)] flex-col items-start gap-2">
-          <Image
-            src={practiceMembershipBadgeImage(vet.membershipType)}
-            alt={practiceMembershipLabel(vet.membershipType)}
-            width={118}
-            height={36}
-            className="h-8 w-auto max-w-full object-contain drop-shadow-sm"
-          />
           {vet.featured && (
             <span
               className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm"
@@ -41,7 +34,16 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
-        <h3 className="text-base font-bold text-slate-900">{vet.name}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="min-w-0 break-words text-base font-bold text-slate-900">{vet.name}</h3>
+          <Image
+            src={practiceMembershipBadgeImage(vet.membershipType)}
+            alt={practiceMembershipLabel(vet.membershipType)}
+            width={118}
+            height={36}
+            className="h-8 w-auto max-w-[40%] shrink-0 object-contain"
+          />
+        </div>
 
         <div className="mt-1.5 flex flex-col gap-1.5 text-xs text-slate-500 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
           <span className="flex min-w-0 items-center gap-1">
