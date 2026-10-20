@@ -39,7 +39,7 @@ export default function AboutPracticeSection({ name, membershipType, description
             alt={practiceMembershipLabel(membershipType)}
             width={142}
             height={44}
-            className="h-11 w-[142px] max-w-[45%] shrink-0 object-contain"
+            className="ml-auto h-11 w-[142px] max-w-[45%] shrink-0 object-contain object-right"
           />
         </div>
 
