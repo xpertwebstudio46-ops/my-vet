@@ -35,6 +35,7 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 | `MAIL_FROM` | Yes | No | Sender address used by the mail boundary |
 | `RESEND_API_KEY` | Production email | No | Resend sending key for the verified sender domain |
 | `PASSWORD_RESET_URL` | Yes | No | Frontend reset-password URL |
+| `SIGNUP_NOTIFICATION_EMAIL` | Optional | No | New-account alerts; defaults to `production.xpertwebstudio@gmail.com` |
 | `STRIPE_ENABLED` | Yes | No | Enables billing and signed webhook processing |
 | `STRIPE_SECRET_KEY` | When Stripe enabled | Yes | Stripe server API key |
 | `STRIPE_WEBHOOK_SECRET` | When Stripe enabled | Yes | Stripe endpoint signing secret |
@@ -47,6 +48,8 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 | `CLOUDFLARE_CDN_URL` | When R2 enabled | No | Public asset base URL |
 
 Production cookie guidance: use `COOKIE_SECURE=true`. Use `COOKIE_SAME_SITE=none` only when the frontend and API are truly cross-site; configure the exact frontend origin and cookie domain together.
+
+Successful pet-owner and vet signups send a welcome email with the matching login link, plus an account alert to `SIGNUP_NOTIFICATION_EMAIL`. Pending pet owners are told that admin approval is required. Signup links use the first origin in `FRONTEND_URL`; put the public website first. Production delivery requires `RESEND_API_KEY` and a verified `MAIL_FROM` sender. Development/test emails are logged locally. Failed signup emails are logged without failing the saved account; automatic retry is not currently provided. These are welcome links, not email-verification links.
 
 ## Commands
 

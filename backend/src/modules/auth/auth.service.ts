@@ -4,6 +4,7 @@ import { prisma } from '../../config/database.js'
 import { env } from '../../config/env.js'
 import { ApiError } from '../../shared/utils/api-error.js'
 import { mailService } from '../../shared/services/mail.service.js'
+import { sendSignupEmails } from '../../shared/services/signup-mail.service.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import type { LoginInput, RegisterInput, ResetPasswordInput } from './auth.validation.js'
 import { invalidateAuthUser } from './user-auth-cache.js'
@@ -56,6 +57,7 @@ export async function register(input: RegisterInput) {
   })
   emitNotifications(result.notifications)
   const { user } = result
+  if (user.role === 'PET_OWNER' || user.role === 'VET') await sendSignupEmails({ ...user, role: user.role })
   if (user.role === 'PET_OWNER' && user.approvalStatus !== 'APPROVED') {
     return { user, requiresApproval: true }
   }
