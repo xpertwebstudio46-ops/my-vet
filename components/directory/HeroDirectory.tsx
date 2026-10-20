@@ -3,6 +3,7 @@ import { PublicHeroBanner } from '../sharedComponents/PublicHeroBanner'
 const HeroDirectory = () => {
     return (
         <PublicHeroBanner
+            cta={{ href: '/register?role=vet', label: 'Register today' }}
             title={
                 <>
                     Partner With <span style={{ color: '#13b8a8' }}>MY VET</span> & Grow Your

@@ -47,8 +47,8 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                         </picture>
                     </Link>
 
-                    <div className="site-header-desktop hidden items-center justify-center gap-2">
-                        <nav className="flex items-center gap-12">
+                    <div className="site-header-desktop hidden flex-wrap items-center justify-end gap-3">
+                        <nav className="flex items-center gap-4">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.label}
@@ -77,11 +77,17 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                                     Login
                                 </button>
                             )}
+                            {!user && <Link
+                                href="/register?role=pet-owner"
+                                className="site-header-action whitespace-nowrap px-5 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
+                            >
+                                Register pet owner
+                            </Link>}
                             <Link
                                 href="/register?role=vet"
                                 className="site-header-action px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"
                             >
-                                Register Your Practice
+                                Register today
                                 <img src="/images/arrow.png" alt="" className="w-4 h-4 object-contain" aria-hidden="true" />
                             </Link>
                         </div>
@@ -155,13 +161,21 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                                     Login
                                 </button>
                             )}
+                            {!user && <Link
+                                href="/register?role=pet-owner"
+                                onClick={closeMenu}
+                                className="mobile-menu-item inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
+                                style={{ animationDelay: `${145 + navLinks.length * 45}ms` }}
+                            >
+                                Register pet owner
+                            </Link>}
                             <Link
                                 href="/register?role=vet"
                                 onClick={closeMenu}
                                 className="mobile-menu-item inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#085A9E] px-5 text-sm font-semibold text-white"
                                 style={{ animationDelay: `${165 + navLinks.length * 45}ms` }}
                             >
-                                Register Your Practice
+                                Register today
                                 <img src="/images/arrow.png" alt="" className="h-4 w-4 object-contain" aria-hidden="true" />
                             </Link>
                         </div>
