@@ -47,8 +47,8 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                         </picture>
                     </Link>
 
-                    <div className="site-header-desktop hidden flex-wrap items-center justify-end gap-3">
-                        <nav className="flex items-center gap-4">
+                    <div className="site-header-desktop hidden items-center justify-center gap-2">
+                        <nav className="flex items-center gap-12">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.label}
@@ -77,12 +77,6 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                                     Login
                                 </button>
                             )}
-                            {!user && <Link
-                                href="/register?role=pet-owner"
-                                className="site-header-action whitespace-nowrap px-5 py-3 text-sm font-semibold text-white bg-[#13b8a8] rounded-full hover:bg-[#0fa598] transition-colors"
-                            >
-                                Register pet owner
-                            </Link>}
                             <Link
                                 href="/register?role=vet"
                                 className="site-header-action px-5 py-3 text-sm font-semibold text-white bg-[#085A9E] rounded-full flex items-center gap-1.5 hover:bg-[#0a2550] transition-colors whitespace-nowrap"
@@ -161,14 +155,6 @@ const Header = ({ logoOnWhite = false }: { logoOnWhite?: boolean }) => {
                                     Login
                                 </button>
                             )}
-                            {!user && <Link
-                                href="/register?role=pet-owner"
-                                onClick={closeMenu}
-                                className="mobile-menu-item inline-flex h-12 items-center justify-center rounded-full bg-[#13b8a8] px-5 text-sm font-semibold text-white"
-                                style={{ animationDelay: `${145 + navLinks.length * 45}ms` }}
-                            >
-                                Register pet owner
-                            </Link>}
                             <Link
                                 href="/register?role=vet"
                                 onClick={closeMenu}

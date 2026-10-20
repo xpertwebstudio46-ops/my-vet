@@ -6,6 +6,7 @@ const HeroBanner = () => {
             title="Find, compare and review veterinary practices near you"
             description="We help pet owners discover, compare, and review trusted veterinary practices so they can make informed decisions about their pets' healthcare."
             cta={{ href: '/register?role=vet', label: 'Register today' }}
+            secondaryCta={{ href: '/register?role=pet-owner', label: 'Register pet owner' }}
             innerLayout={false}
             rightImageSrc="/images/den-1.png"
             rightImageSlides={[

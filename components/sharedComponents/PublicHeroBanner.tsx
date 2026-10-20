@@ -15,6 +15,10 @@ type PublicHeroBannerProps = {
         href: string
         label: string
     }
+    secondaryCta?: {
+        href: string
+        label: string
+    }
     showSearch?: boolean
     stats?: HeroStat[]
     rightImageSrc?: string
@@ -45,6 +49,7 @@ export function PublicHeroBanner({
     title = defaultTitle,
     description = defaultDescription,
     cta,
+    secondaryCta,
     showSearch = false,
     stats,
     rightImageSrc = '/images/about-hero.png',
@@ -104,6 +109,7 @@ export function PublicHeroBanner({
                             {description}
                         </p>
 
+                        <div className="relative z-20 flex flex-wrap items-center gap-3">
                         {cta ? (
                             <Link
                                 href={cta.href}
@@ -114,6 +120,15 @@ export function PublicHeroBanner({
                                 <img src="/images/arrow.png" alt="" className="w-4 h-4 object-contain" aria-hidden="true" />
                             </Link>
                         ) : null}
+                        {secondaryCta ? (
+                            <Link
+                                href={secondaryCta.href}
+                                className="inline-flex items-center justify-center rounded-full border-2 border-white px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#0c4170] sm:py-4"
+                            >
+                                {secondaryCta.label}
+                            </Link>
+                        ) : null}
+                        </div>
                     </div>
 
                     <div className={`public-hero-images ${imageGroupClassName}`}>

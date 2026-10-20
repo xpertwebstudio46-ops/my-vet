@@ -4,6 +4,7 @@ const HeroDirectory = () => {
     return (
         <PublicHeroBanner
             cta={{ href: '/register?role=vet', label: 'Register today' }}
+            secondaryCta={{ href: '/register?role=pet-owner', label: 'Register pet owner' }}
             title={
                 <>
                     Partner With <span style={{ color: '#13b8a8' }}>MY VET</span> & Grow Your
