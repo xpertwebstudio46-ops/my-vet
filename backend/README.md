@@ -35,7 +35,7 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 | `MAIL_FROM` | Yes | No | Sender address used by the mail boundary |
 | `RESEND_API_KEY` | Production email | No | Resend sending key for the verified sender domain |
 | `PASSWORD_RESET_URL` | Yes | No | Frontend reset-password URL |
-| `SIGNUP_NOTIFICATION_EMAIL` | Optional | No | New-account alerts; defaults to `production.xpertwebstudio@gmail.com` |
+| `SIGNUP_NOTIFICATION_EMAIL` | Optional | No | New-account alerts; defaults to `hello@my-vet.co.uk` |
 | `STRIPE_ENABLED` | Yes | No | Enables billing and signed webhook processing |
 | `STRIPE_SECRET_KEY` | When Stripe enabled | Yes | Stripe server API key |
 | `STRIPE_WEBHOOK_SECRET` | When Stripe enabled | Yes | Stripe endpoint signing secret |

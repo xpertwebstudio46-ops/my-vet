@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({ send: vi.fn() }))
 vi.mock('../../config/env.js', () => ({
-  env: { SIGNUP_NOTIFICATION_EMAIL: 'production.xpertwebstudio@gmail.com' },
+  env: { SIGNUP_NOTIFICATION_EMAIL: 'hello@my-vet.co.uk' },
   frontendOrigins: ['https://my-vet.co.uk', 'https://test.my-vet.co.uk'],
 }))
 vi.mock('./mail.service.js', () => ({ mailService: { send: mocks.send } }))
@@ -26,7 +26,7 @@ describe('signup emails', () => {
     }))
     expect(mocks.send.mock.calls[0]?.[0].text).toContain('awaiting admin approval')
     expect(mocks.send).toHaveBeenNthCalledWith(2, expect.objectContaining({
-      to: 'production.xpertwebstudio@gmail.com',
+      to: 'hello@my-vet.co.uk',
       text: expect.stringContaining('Email: new@example.com'),
     }))
     expect(mocks.send.mock.calls[1]?.[0].text).toContain('/admin-dashboard/pet-owner')
@@ -43,7 +43,7 @@ describe('signup emails', () => {
   it.each([0, 1])('still attempts both deliveries and preserves signup when email %i fails', async (failedIndex) => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
     mocks.send.mockImplementation(async (message) => {
-      if (message.to === (failedIndex === 0 ? user.email : 'production.xpertwebstudio@gmail.com')) throw new Error('Provider unavailable')
+      if (message.to === (failedIndex === 0 ? user.email : 'hello@my-vet.co.uk')) throw new Error('Provider unavailable')
     })
     await expect(sendSignupEmails(user)).resolves.toBeUndefined()
     expect(mocks.send).toHaveBeenCalledTimes(2)
