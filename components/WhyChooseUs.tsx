@@ -21,10 +21,17 @@ const WhyChooseUs = () => {
             <span style={{ color: '#01AEAD' }}>Choose</span> My Vet?
           </h2>
 
-          <p className="text-[16px] sm:text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
-            A trusted veterinary directory designed to help animal owners
-            make informed, confident decisions.
+          <p className="text-[16px] sm:text-[18px] font-sans font-semibold leading-relaxed mb-8 max-w-xl">
+            My Vet is the UK’s leading online directory connecting pet owners with trusted veterinary practices.
           </p>
+
+          <p className="text-[16px] sm:text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
+            We make it simple for vets to manage their reviews, services and pricing in one easytouse platform, no design skills or technical experience required.
+          </p>
+
+           <p className="text-[16px] sm:text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
+              We make it simple for vets to manage their reviews, services and pricing in one easytouse platform, no design skills or technical experience required.
+            </p>
 
           {/* Features — 2 column grid */}
           <div className="grid grid-cols-1 gap-y-4 gap-x-10 sm:grid-cols-2">

@@ -85,7 +85,7 @@ export default function OurStorySection() {
                     </div>
 
                     <h2 className="mt-3 font-bold leading-tight text-[#0d2e5e] text-[32px] sm:text-[40px]">
-                        We are fully committed to better veterinary care
+                        Committed to Building a Better More Transparent Platform for Veterinary Practices and Pet Owners alike
                     </h2>
 
                     <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-500">

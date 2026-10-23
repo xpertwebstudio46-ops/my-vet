@@ -2,7 +2,36 @@
 
 Express 5, strict TypeScript, Prisma 7/PostgreSQL, Socket.IO, Stripe, and Cloudflare R2.
 
-## Railway
+## Local development (independent of Railway)
+
+Use a separate PostgreSQL database locally. Railway continues using its service's
+`DATABASE_URL`; your computer uses `backend/.env`. The two databases do not sync.
+Local users and deletions do not affect Railway users.
+
+1. Keep PostgreSQL running locally.
+2. Copy `backend/.env.example` to `backend/.env` if it does not exist. Set
+   `NODE_ENV=development`, unique JWT secrets of at least 32 characters, and
+   `DATABASE_URL=postgresql://myvet_local:YOUR_LOCAL_APP_PASSWORD@localhost:5432/myvet_local`.
+3. Add `LOCAL_POSTGRES_ADMIN_URL=postgresql://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/postgres`
+   to that file. URL-encode special characters in passwords. This is used only
+   during setup to create the dedicated login and database; it can be removed afterward.
+4. From `backend`, run `npm run local:setup`. This creates the local database if
+   missing, generates Prisma, applies committed migrations, and seeds demo data.
+   Re-running the seed restores demo accounts and data.
+5. From `backend`, run `npm run dev` (API at `http://localhost:5000`).
+6. Copy the root `.env.example` to `.env.local` if missing. Both `API_URL` and
+   `NEXT_PUBLIC_API_URL` should be `http://localhost:5000`. Run `npm run dev`
+   from the root (website at `http://localhost:3000`). Restart Next.js after URL changes.
+
+Check `http://localhost:5000/api/readiness` to verify database connectivity.
+Run `npm run db:studio` from `backend` to inspect local records.
+
+Demo logins: `admin@myvet.local`, `owner@myvet.local`, and `vet@myvet.local`.
+Each uses password `MyVetDev123!`. Email is logged locally; Stripe and R2 are
+disabled by default, so billing and uploads require their own test configuration.
+Existing Railway records are not included in the local seed.
+
+## Railway deployment
 
 Set the Railway service root directory to `/backend`. The checked-in `railway.json` performs:
 

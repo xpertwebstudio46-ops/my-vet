@@ -101,7 +101,8 @@ const Footer = () => {
           <div>
             <Image src="/images/long.jpeg" alt="My Vet Logo" width={1567} height={1004} className="h-auto w-[150px] object-contain" />
             <p className="mt-4 max-w-md text-sm leading-7 text-white/90 sm:text-base">
-              My Vet is a trusted UK veterinary directory helping animal owners find the right care through transparent reviews and verified practices.
+           My Vet is the UK’s trusted veterinary directory helping practices take control of their online profile and giving pet owners the clarity they need to choose the best care for their pets
+Veterinary teams can easily update their services, pricing, reviews and practice information, while pet owners can compare verified practices and make confident, informed decisions about their animal’s wellbeing.
             </p>
 
             <div className="mt-6 flex gap-2.5">
@@ -148,6 +149,7 @@ const Footer = () => {
         <div className="flex flex-col gap-3 border-t border-white/50 py-5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p>
             &copy; 2026 <Link href="/" className="text-[#13b8a8]">My Vet</Link>. All Rights Reserved.
+            {' '}Website by <a href="https://jump-media-website-production.up.railway.app/" target="_blank" rel="noopener noreferrer" className="text-[#13b8a8] hover:underline">jumpmedia</a>.
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/privacy-policy" className="hover:text-[#13b8a8]">Privacy Policy</Link>

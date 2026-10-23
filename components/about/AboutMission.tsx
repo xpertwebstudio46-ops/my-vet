@@ -17,9 +17,9 @@ export default function AboutMissionSection() {
 
         {/* Heading */}
         <h2 className="mt-5 max-w-3xl text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
-          Providing Loving Care for
+         Providing the perfect platform for vet practices and  
           <br />
-          <span className="text-[#01AEAD]">Your Pets</span>, Always.
+          <span className="text-[#01AEAD]">pet owners</span> to discover each other
         </h2>
 
         {/* Content */}
@@ -42,16 +42,23 @@ export default function AboutMissionSection() {
             </h3>
 
             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-              Lorem Ipsum is simply dummy text of the printing and
-              typesetting industry. Lorem Ipsum has been the industry&apos;s
-              standard dummy text ever since the 1500s, when an unknown
-              printer took a galley of type and scrambled it to make a type
-              specimen book. It has survived not only five centuries, but
-              also the leap into electronic typesetting, remaining
-              essentially unchanged.
+             Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
+            </p>
+             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+            <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+             Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
+            </p>
+            </p>
+             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+            For pet owners, My Vet makes it simple to create your very own unique online pet profile for your pets and search and create a shortlist of your most favoured vets specific for the pets you have such as exotic pets, equine or household pets, search locally. Store your favourite vet, by location, specialism and compare prices and options, it also provides you with the ability to access and write real reviews and experiences from other owners helping every family make confident, informed decisions about their animal’s wellbeing.
             </p>
 
-            <div className="mt-8 space-y-6">
+             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+          Together, our aim is to build a transparent, modern, and communitydriven space that connects pet owners with the right veterinary care, every time
+            </p>
+
+
+            {/* <div className="mt-8 space-y-6">
               {missionPoints.map((point) => (
                 <div key={point} className="flex items-start gap-4">
                   <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E7FAF8]">
@@ -66,7 +73,7 @@ export default function AboutMissionSection() {
                   </p>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

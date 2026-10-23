@@ -13,16 +13,16 @@ const members = [
         thumb: "/images/person-1.png",
         image: "/images/center-big.png",
         name: "Alina Maisner",
-        role: "Pet Sitter",
+        role: "Veterinary nurse",
         description:
-            "Emma leads our team with a passion for animal welfare and years of experience. Although expert groomers themselves, lots of cats like being brushed and it's a great way of bonding with your cat. As well as fewer hairballs and less shedding, grooming your cats will imitate how they groom each other naturally and increase affection for you as a result.",
+            "As a vet nurse, I see every day how important regular checkups are for an animal’s longterm health. ",
     },
     {
         id: 2,
         thumb: "/images/person-2.png",
         image: "/images/center-big.png",
         name: "David Smith",
-        role: "Pet Coordinator",
+        role: "Practice Director",
         description:
             "David ensures every pet receives the best care possible. He coordinates appointments and works closely with the veterinary staff to provide a smooth experience for every pet owner.",
     },
@@ -31,18 +31,18 @@ const members = [
         thumb: "/images/person-3.png",
         image: "/images/center-big.png",
         name: "Emma Brown",
-        role: "Veterinarian",
+        role: "Equine Vet",
         description:
-            "Emma is an experienced veterinarian specializing in surgery, diagnostics, and preventive healthcare. She believes every pet deserves compassionate treatment.",
+            "Many animals respond really well to these visits they can be reassuring, help build trust, and strengthen the bond between you and your pet. Regular checkups allow us to spot early signs of illness, support healthy development, and maintain overall wellbeing. ",
     },
     {
         id: 4,
         thumb: "/images/person-3.png",
         image: "/images/center-big.png",
         name: "Mary Douglas",
-        role: "Groomer",
+        role: "Small Animal Vet",
         description:
-            "Mary specializes in professional grooming services. She ensures every pet looks and feels their best while providing a stress-free grooming experience.",
+            "When you bring your pet in for routine care, you’re not just protecting their health; you’re reinforcing a relationship built on comfort, confidence and proactive support”.",
     },
 ];
 
@@ -127,10 +127,10 @@ export default function TeamMembers() {
                     </div>
                 </div>
 
-                <h2 className="text-[32px] font-bold leading-tight text-[#064071] font-heading sm:text-[40px]">
+                <h2 className="text-[32px] font-bold max-w-xl leading-tight text-[#064071] font-heading sm:text-[40px]">
                     Loyal,
-                    <span className="text-[#01AEAD]"> Passionate, </span>
-                    and Driven
+                    <span className="text-[#01AEAD]"> Passionate,</span>
+                    and Driven change to Find, Manage and Review
                 </h2>
 
                 <p className="mt-5 text-gray-500 max-w-xl font-sans font-normal text-[16px]">
@@ -204,10 +204,10 @@ export default function TeamMembers() {
                     </button>
 
                     <div className="flex items-center gap-4 mt-10">
-                        <img src="images/ico-1.png" className="w-10 h-10 object-contain"  alt="" />
-                        <img src="images/ico-2.png" className="w-10 h-10 object-contain"  alt="" />
-                        <img src="images/ico-3.png" className="w-10 h-10 object-contain"  alt="" />
-                        <img src="images/ico-4.png" className="w-10 h-10 object-contain"  alt="" />
+                        <img src="images/ico-1.png" className="w-10 h-10 object-contain" alt="" />
+                        <img src="images/ico-2.png" className="w-10 h-10 object-contain" alt="" />
+                        <img src="images/ico-3.png" className="w-10 h-10 object-contain" alt="" />
+                        <img src="images/ico-4.png" className="w-10 h-10 object-contain" alt="" />
                     </div>
                 </div>
             </div>

@@ -308,13 +308,14 @@ body {
 
 @media (min-width: 1024px) {
   .large-scrren-image {
-    width: 170px;
+    width: 150px;
     object-fit: cover;
      position: relative;
-    left: 0;
+    left: 30px;
   }
   .practice-profile-banner .large-scrren-image {
-    left: 35px;
+    left: 70px;
+    bottom:40px;
   }
   .practice-logo-cutout {
     width: 280px;

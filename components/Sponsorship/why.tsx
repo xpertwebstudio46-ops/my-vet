@@ -37,8 +37,7 @@ export default function WhySponsorUs() {
             Why <span className="text-teal-500">Sponsor</span> Us?
           </h2>
           <p className="mt-3 font-sans text-slate-500 text-sm sm:text-base max-w-2xl mx-auto">
-            Align your brand with the UK&apos;s most trusted veterinary
-            directory and connect directly with your target audience.
+            Align your brand with the UK’s most trusted veterinary directory and place your products and services directly in front of pet owners and veterinary professionals. 
           </p>
         </div>
 

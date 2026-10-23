@@ -7,6 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "local:setup": "tsx scripts/setup-local.ts",
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc -p tsconfig.build.json",
     "start": "prisma migrate deploy && node dist/server.js",

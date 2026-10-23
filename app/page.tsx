@@ -8,6 +8,7 @@ import PriceComparisonSection from '@/components/PriceComparisonSection'
 import Testimonials from '@/components/Testimonials'
 import LogoMarquee from '@/components/LogoMarquee'
 import Footer from '@/components/Footer'
+import { InviteYourVet } from '@/components/practices/invite-your-vet'
 
 const Page = () => {
   return (
@@ -17,6 +18,9 @@ const Page = () => {
       <WhyChooseUs />
       <VetPracticeCallout />
       <TopRatedPractices />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <InviteYourVet />
+      </div>
       <PricingPlans />
       <PriceComparisonSection />
       <Testimonials />
