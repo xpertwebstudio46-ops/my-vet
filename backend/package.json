@@ -24,6 +24,7 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "bootstrap:production": "tsx scripts/bootstrap-production.ts",
+    "admin:change-password": "tsx scripts/change-admin-password.ts",
     "db:studio": "prisma studio",
     "smoke": "tsx scripts/smoke-test.ts"
   },

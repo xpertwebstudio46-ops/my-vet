@@ -99,6 +99,17 @@ npm run db:migrate         # development schema work only
 npm run db:seed            # non-production development data only
 ```
 
+## Change an existing admin password
+
+Set `ADMIN_EMAIL` to the existing administrator's email and `ADMIN_PASSWORD` to
+the desired password (at least 10 characters) in the backend service variables.
+Deploy those variables, then run `npm run admin:change-password` from the backend
+service shell. The command updates the database password and revokes old refresh
+sessions and password-reset links. It refuses missing, non-admin, or deactivated
+accounts. Remove both temporary variables after success, then sign in at `/login`
+with the same email and the new password. Changing variables alone does not run
+this command or update the stored password.
+
 ## One-time production bootstrap
 
 After the first successful Railway migration, create the initial administrator and import the eight listings previously displayed as frontend-only cards. Run this once from a shell attached to the **backend** service:
