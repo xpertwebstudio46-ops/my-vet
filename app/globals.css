@@ -315,7 +315,7 @@ body {
   }
   .practice-profile-banner .large-scrren-image {
     left: 70px;
-    bottom:40px;
+    bottom:0px;
   }
   .practice-logo-cutout {
     width: 280px;
