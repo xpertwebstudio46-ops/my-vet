@@ -263,7 +263,8 @@ body {
   }
   .practice-profile-banner .large-scrren-image {
     position: relative;
-    left: 25px;
+    left: 55px;
+    width: 110px;
   }
   .mid{
     display: flex;
@@ -279,7 +280,9 @@ body {
   }
   .practice-profile-banner .large-scrren-image {
     position: relative;
-    left: 15px;
+    left: 50px;
+    bottom: 0px;
+    width: 130px;
   }
   .mid{
     display: flex;
@@ -316,6 +319,7 @@ body {
   .practice-profile-banner .large-scrren-image {
     left: 70px;
     bottom:0px;
+    width:140px;
   }
   .practice-logo-cutout {
     width: 280px;

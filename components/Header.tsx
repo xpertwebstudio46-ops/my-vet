@@ -42,7 +42,7 @@ const Header = () => {
                 <div className="site-header-row mx-4  flex items-center justify-between gap-4 sm:mx-6">
                     <Link href="/" className="shrink-0 ">
                         <picture>
-                            <img src="/images/maker.png" alt="MY VET" className="h-auto overflow-hidden large-scrren-image w-[132px] sm:w-[180px] " />
+                            <img src="/images/maker.png" alt="MY VET" className="h-auto overflow-hidden large-scrren-image w-[132px]  " />
                         </picture>
                     </Link>
 

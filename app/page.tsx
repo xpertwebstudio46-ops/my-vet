@@ -9,8 +9,10 @@ import Testimonials from '@/components/Testimonials'
 import LogoMarquee from '@/components/LogoMarquee'
 import Footer from '@/components/Footer'
 import { InviteYourVet } from '@/components/practices/invite-your-vet'
+import { getSponsorships } from '@/lib/api/server'
 
-const Page = () => {
+const Page = async () => {
+  const sponsors = await getSponsorships().catch(() => [])
   return (
     <>
       <HeroBanner />
@@ -24,7 +26,7 @@ const Page = () => {
       <PricingPlans />
       <PriceComparisonSection />
       <Testimonials />
-      <LogoMarquee />
+      <LogoMarquee initialSponsors={sponsors} />
       <Footer />
     </>
   )

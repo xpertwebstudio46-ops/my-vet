@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api/client";
 import type { Sponsorship } from "@/lib/api/types";
 
-export default function LogoMarquee() {
-  const [sponsors, setSponsors] = useState<Sponsorship[]>([]);
+export default function LogoMarquee({ initialSponsors = [] }: { initialSponsors?: Sponsorship[] }) {
+  const [sponsors, setSponsors] = useState<Sponsorship[]>(initialSponsors);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -42,22 +42,21 @@ export default function LogoMarquee() {
   const items = Array.from({ length: repetitions }, () => sponsors).flat();
 
   return (
-    <section aria-label="Our sponsors" className="sponsor-marquee overflow-hidden bg-white py-10">
-      <div className="sponsor-marquee-track flex w-max items-center">
+    <section aria-label="Our sponsors" className="sponsor-marquee">
+      <div className="sponsor-marquee-track" style={{ animationDuration: `${Math.max(25, items.length * 4)}s` }}>
         {[0, 1].map((copy) => (
-          <div key={copy} aria-hidden={copy === 1 ? true : undefined} className="flex min-w-screen shrink-0 items-center justify-around">
+          <div key={copy} aria-hidden={copy === 1 ? true : undefined} className="sponsor-marquee-group">
             {items.map((sponsor, index) => {
               const duplicate = copy === 1 || index >= sponsors.length;
               const content = (
                 <>
                   {sponsor.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={sponsor.imageUrl} alt="" className="h-16 w-40 object-contain" />
                   )}
                   <span className="text-center text-sm font-semibold text-[#064071]">{sponsor.name}</span>
                 </>
               );
-              const className = "mx-8 flex w-44 shrink-0 flex-col items-center justify-center gap-2 rounded-xl p-2";
+              const className = "sponsor-marquee-item";
               return sponsor.websiteUrl ? (
                 <a key={`${sponsor.id}-${index}`} href={sponsor.websiteUrl} target="_blank" rel="noopener noreferrer" className={className} tabIndex={duplicate ? -1 : undefined} aria-hidden={duplicate ? true : undefined}>
                   {content}
@@ -70,7 +69,10 @@ export default function LogoMarquee() {
         ))}
       </div>
       <style>{`
-        .sponsor-marquee-track { animation: sponsor-marquee 30s linear infinite; }
+        .sponsor-marquee { width: 100%; overflow: hidden; background: white; padding: 40px 0; }
+        .sponsor-marquee-track { display: flex; width: max-content; align-items: center; animation: sponsor-marquee 30s linear infinite; }
+        .sponsor-marquee-group { display: flex; flex: 0 0 auto; align-items: center; min-width: 100vw; justify-content: space-around; }
+        .sponsor-marquee-item { display: flex; flex: 0 0 176px; width: 176px; margin: 0 32px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
         .sponsor-marquee:hover .sponsor-marquee-track,
         .sponsor-marquee:focus-within .sponsor-marquee-track { animation-play-state: paused; }
         @keyframes sponsor-marquee {

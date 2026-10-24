@@ -22,7 +22,7 @@ const WhyChooseUs = () => {
           </h2>
 
           <p className="text-[16px] sm:text-[18px] font-sans font-semibold leading-relaxed mb-8 max-w-xl">
-            My Vet is the UK’s leading online directory connecting pet owners with trusted veterinary practices.
+            Our aim is to create the UK's leading online directory connecting pet owners with trusted veterinary practices.
           </p>
 
           <p className="text-[16px] sm:text-[18px] font-sans font-normal leading-relaxed mb-8 max-w-xl">
