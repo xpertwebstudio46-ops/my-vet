@@ -62,7 +62,7 @@ export function PublicHeroBanner({
     const imageSlides = rightImageSlides?.length ? rightImageSlides : [{ src: rightImageSrc, alt: rightImageAlt }]
     const isImageSlider = imageSlides.length > 1
     const imageSliderClassName = isImageSlider ? `hero-image-slider hero-image-slider--${imageSlides.length}` : ''
-    const textColumnClassName = 'lg:w-[45%]'
+    const textColumnClassName = 'lg:w-[55%]'
     const imageGroupClassName = innerLayout
         ? 'absolute bottom-0 right-0 z-10 h-[300px] w-full sm:h-[410px] lg:right-0 lg:h-[620px] lg:w-[54%]'
         : 'absolute bottom-0 right-[-42px] z-10 h-[320px] w-[115%] sm:right-[-50px] sm:h-[430px] lg:right-0 lg:h-[620px] lg:w-[54%]'
@@ -74,7 +74,7 @@ export function PublicHeroBanner({
         : 'absolute top-16 left-[28%] z-20 pointer-events-none sm:top-24 sm:left-20'
 
     return (
-        <section className={`public-hero-banner practice-profile-banner relative w-full bg-[#0c4170] h-[720px] sm:h-[760px] lg:h-auto lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
+        <section className={`public-hero-banner practice-profile-banner relative w-full bg-[#0c4170] h-[720px] sm:h-[760px]  lg:aspect-[1920/1080] ${showSearch ? 'mb-24 sm:mb-16' : ''}`}>
             <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
                 <defs>
                     <clipPath id={logoCutoutId} clipPathUnits="objectBoundingBox">
@@ -164,7 +164,7 @@ export function PublicHeroBanner({
 
             {showSearch ? (
                 <div className="absolute bottom-[-76px] left-0 right-0 z-30 px-4 sm:bottom-[-41px] sm:px-4 flex justify-center">
-                    <form action="/vet-search" className="w-full max-w-[94%] flex flex-col sm:max-w-[76%] sm:flex-row items-stretch sm:items-center bg-white p-1 sm:p-2 rounded-2xl sm:rounded-full border border-gray-300 gap-2 sm:gap-0">
+                    <form action="/vet-search" className="w-full max-w-[94%] flex flex-col sm:max-w-[80%] sm:flex-row items-stretch sm:items-center bg-white p-1 sm:p-2 rounded-2xl sm:rounded-full border border-gray-300 gap-2 sm:gap-0">
                         <div className="flex min-h-[54px] flex-1 items-center gap-3 rounded-xl bg-gray-200 px-4 sm:min-h-[72px] sm:rounded-tl-full sm:rounded-bl-full sm:rounded-r-none sm:px-7">
                             <svg
                                 className="w-5 h-5 shrink-0"

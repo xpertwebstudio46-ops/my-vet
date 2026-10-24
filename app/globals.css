@@ -348,8 +348,8 @@ body {
 
 @media (min-width: 1540px) and (max-width: 1660px) {
     .practice-logo-cutout {
-        width: 310px;
-        height: 200px;
+       width: 280px;
+        height: 145px;
   }
 
   .large-scrren-image {
@@ -359,7 +359,7 @@ body {
     left: 0;
   }
   .practice-profile-banner .large-scrren-image {
-    left: 20px;
+    left: 80px;
   }
 
   .main {
@@ -368,7 +368,8 @@ body {
   }
 
   .content-length{
-   padding-top:20px;
+   padding-top:80px;
+   padding-left: 80px;
   
   }
 
@@ -393,8 +394,8 @@ body {
 
 @media (min-width: 1661px) and (max-width: 1740px) {
     .practice-logo-cutout {
-           width: 310px;
-        height: 200px;
+       width: 280px;
+        height: 145px;
   }
    .large-scrren-image {
     width: 220px;
@@ -403,7 +404,7 @@ body {
     left: 0;
   }
   .practice-profile-banner .large-scrren-image {
-    left: 20px;
+    left: 80px;
   }
 
   .main {
@@ -412,7 +413,7 @@ body {
   }
 
   .content-length{
-   padding-top:20px;
+   padding-top:80px;
   
   }
 
@@ -437,8 +438,8 @@ body {
 
 @media (min-width: 1741px) and (max-width: 1830px) {
     .practice-logo-cutout {
-           width: 310px;
-        height: 200px;
+       width: 280px;
+        height: 145px;
   }
 
  .large-scrren-image {
@@ -448,13 +449,14 @@ body {
     left: 0;
   }
   .practice-profile-banner .large-scrren-image {
-    left: 20px;
+    left: 80px;
 
   }
 
   
   .content-length{
-   padding-top:20px;
+   padding-top:80px;
+   padding-left:40px;
   }
 
    .content-title{
@@ -482,10 +484,11 @@ body {
 }
 
 @media (min-width: 1831px) and (max-width: 1920px) {
-    .practice-logo-cutout {
-          width: 310px;
-        height: 200px
+     .practice-logo-cutout {
+       width: 280px;
+        height: 145px;
   }
+
   .large-scrren-image {
     width: 220px;
     object-fit: cover;
@@ -493,7 +496,7 @@ body {
     left: 0;
   }
   .practice-profile-banner .large-scrren-image {
-    left: 20px;
+    left: 80px;
   }
 
   .main {
@@ -508,7 +511,8 @@ body {
   }
 
   .content-length{
-   padding-top:20px;
+   padding-top:80px;
+   padding-left:30px;
   }
 
   .public-hero-header {
