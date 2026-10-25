@@ -32,7 +32,7 @@ export default function TopRatedPractices() {
               <h3 className="font-heading font-bold text-[20px] text-black mb-1">{practice.name}</h3>
               <div className="flex items-center gap-1 mb-3"><img src="/images/location.png" alt="" className="w-3.5 h-3.5 object-contain shrink-0" aria-hidden="true" /><span className="text-[12px] text-black">{practice.location}</span></div>
               <div className="flex flex-wrap gap-1.5 mb-3">{practice.tags.map((tag) => <span key={tag} className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-[#01AEAD]/10 text-[#01AEAD]">{tag}</span>)}</div>
-              <p className="text-black font-sans text-[16px] leading-relaxed mb-5 flex-1">{practice.description}</p>
+              <p className="text-black line-clamp-2 break-words [overflow-wrap:anywhere] font-sans text-[16px] leading-relaxed mb-5 flex-1">{practice.description}</p>
               <Link href={`/vet-search/${practice.slug}`} className="inline-flex items-center gap-2 self-start px-6 py-2.5 rounded-full text-[14.64px] font-normal text-white bg-[#064071]">View Profile<img src="/images/arrow.png" alt="" className="w-4 h-4 object-contain" aria-hidden="true" /></Link>
             </div>
           </div>
