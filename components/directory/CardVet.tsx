@@ -41,7 +41,7 @@ export default function VetCard({ vet }: { vet: PracticeCardData }) {
             alt={practiceMembershipLabel(vet.membershipType)}
             width={142}
             height={44}
-            className="ml-auto  w-[100px] max-w-[45%] shrink-0 object-contain object-right"
+            className="ml-auto  w-[68px] max-w-[45%] shrink-0 object-contain object-right"
           />
         </div>
 
