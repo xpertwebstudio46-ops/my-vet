@@ -22,7 +22,7 @@ export function practiceMembershipLabel(membershipType?: PracticeMembershipType 
 }
 
 export function practiceMembershipBadgeImage(membershipType?: PracticeMembershipType | null) {
-  return membershipType === "GROUP" ? "/images/group-vet.png" : "/images/independent-vet.png";
+  return membershipType === "GROUP" ? "/images/group-vets.png" : "/images/independent-vets.png";
 }
 
 export function toPracticeCard(practice: Practice): PracticeCardData {
