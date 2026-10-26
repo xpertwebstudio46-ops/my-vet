@@ -40,8 +40,8 @@ export function IncompleteVetAccounts({ searchTerm }: { searchTerm: string }) {
 
   return <section aria-labelledby="incomplete-vet-accounts" className="space-y-3">
     <div>
-      <h2 id="incomplete-vet-accounts" className="font-semibold text-black">Practice registration incomplete{!loading && !error ? ` (${total})` : ''}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">These veterinary accounts have been created but have not submitted practice details. A practice can be reviewed after submission.</p>
+      <h2 id="incomplete-vet-accounts" className="font-semibold text-black">Not submitted{!loading && !error ? ` (${total})` : ''}</h2>
+      <p className="mt-1 text-sm text-muted-foreground">These veterinary accounts have no linked practice submission. A practice can be reviewed after its details are submitted.</p>
     </div>
     {error ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p> : <Card className="overflow-hidden p-0">
       <div className="overflow-x-auto">
@@ -53,7 +53,7 @@ export function IncompleteVetAccounts({ searchTerm }: { searchTerm: string }) {
               <td className="p-4">{item.email}</td>
               <td className="p-4">{new Date(item.createdAt).toLocaleDateString('en-GB')}</td>
               <td className="p-4">{item.deletedAt ? 'Deactivated' : 'Active'}</td>
-              <td className="p-4"><span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">Practice registration incomplete</span></td>
+              <td className="p-4"><span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">Not submitted</span></td>
             </tr>)}
           </tbody>
         </table>

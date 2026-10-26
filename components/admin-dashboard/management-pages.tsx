@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type KeyboardEvent } from 'react'
 import { Check, Pencil, Search, ShieldBan, X } from 'lucide-react'
 import { Card } from '@/components/dashboard/ui'
 import { Modal } from '@/components/dashboard/modal'
@@ -57,6 +57,7 @@ function ErrorBox({ message }: { message: string }) {
 }
 
 export function ManageVeterinaryPracticePage() {
+  const [activeTab, setActiveTab] = useState<'submitted' | 'not-submitted'>('submitted')
   const [items, setItems] = useState<Practice[]>([])
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
@@ -99,12 +100,29 @@ export function ManageVeterinaryPracticePage() {
     if (!downloadCsv('veterinary-practices.csv', items.map((item) => ({ Practice: item.name, Owner: `${item.owner.firstName} ${item.owner.lastName}`, 'Owner email': item.owner.email, Location: item.city, Rating: item.rating, Reviews: item.reviewCount, Status: item.status, Submitted: new Date(item.createdAt).toLocaleDateString('en-GB') })))) setError('There are no practices to export.')
   }
 
+  function navigateTabs(event: KeyboardEvent<HTMLDivElement>) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+    event.preventDefault()
+    const nextTab = event.key === 'Home' ? 'submitted' : event.key === 'End' ? 'not-submitted' : activeTab === 'submitted' ? 'not-submitted' : 'submitted'
+    setActiveTab(nextTab)
+    document.getElementById(`vet-${nextTab}-tab`)?.focus()
+  }
+
   return <div className="min-w-0 space-y-6">
-    <AdminPageBanner title="Manage Veterinary Practices" description="Veterinary accounts, practice registrations and moderation status." action={{ label: 'Export practices CSV', icon: 'download', tone: 'outline', onClick: exportItems }} />
-    <form onSubmit={(event) => { event.preventDefault(); void load(query) }} className="flex flex-col gap-2 sm:flex-row"><div className="relative min-w-0 flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search practices" className="h-10 w-full rounded-lg border bg-white pl-9 pr-3 text-sm" /></div><button className="h-10 rounded-lg bg-[#064071] px-4 text-sm font-semibold text-white">Search</button></form>
+    <AdminPageBanner title="Manage Veterinary Practices" description="Veterinary accounts, practice registrations and moderation status." action={activeTab === 'submitted' ? { label: 'Export practices CSV', icon: 'download', tone: 'outline', onClick: exportItems } : undefined} />
+    <div role="tablist" aria-label="Practice submission" onKeyDown={navigateTabs} className="flex gap-1 rounded-xl border bg-slate-50 p-1">
+      {([{ value: 'submitted', label: 'Submitted practices' }, { value: 'not-submitted', label: 'Not submitted' }] as const).map((tab) => <button key={tab.value} type="button" role="tab" id={`vet-${tab.value}-tab`} aria-controls={`vet-${tab.value}-panel`} aria-selected={activeTab === tab.value} tabIndex={activeTab === tab.value ? 0 : -1} onClick={() => setActiveTab(tab.value)} className={`flex-1 rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${activeTab === tab.value ? 'bg-[#064071] text-white shadow-sm' : 'text-slate-600 hover:bg-white'}`}>{tab.label}</button>)}
+    </div>
+    <form onSubmit={(event) => { event.preventDefault(); void load(query) }} className="flex flex-col gap-2 sm:flex-row"><div className="relative min-w-0 flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={activeTab === 'submitted' ? 'Search practices' : 'Search veterinary accounts'} placeholder={activeTab === 'submitted' ? 'Search practices' : 'Search by name or email'} className="h-10 w-full rounded-lg border bg-white pl-9 pr-3 text-sm" /></div><button className="h-10 rounded-lg bg-[#064071] px-4 text-sm font-semibold text-white">Search</button></form>
     <ErrorBox message={error} />
-    <IncompleteVetAccounts key={submittedQuery} searchTerm={submittedQuery} />
+    <div id="vet-not-submitted-panel" role="tabpanel" aria-labelledby="vet-not-submitted-tab" hidden={activeTab !== 'not-submitted'} tabIndex={0}>
+      {activeTab === 'not-submitted' && <IncompleteVetAccounts key={submittedQuery} searchTerm={submittedQuery} />}
+    </div>
+    <div id="vet-submitted-panel" role="tabpanel" aria-labelledby="vet-submitted-tab" hidden={activeTab !== 'submitted'} tabIndex={0}>
+    {activeTab === 'submitted' &&
     <PracticeTable items={items} loading={loading} actions={(item) => <div className="flex flex-wrap justify-end gap-2"><button type="button" onClick={() => setEditing(item)} className="inline-flex items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold text-[#064071]"><Pencil className="size-3.5" />Edit</button>{item.status !== 'APPROVED' && <button type="button" onClick={() => setAction({ item, status: 'APPROVED' })} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Approve</button>}{item.status !== 'SUSPENDED' && <button type="button" onClick={() => setAction({ item, status: 'SUSPENDED' })} className="rounded-md border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-700">Suspend</button>}{item.status !== 'ARCHIVED' && <button type="button" onClick={() => setAction({ item, status: 'ARCHIVED' })} className="rounded-md border border-red-300 px-3 py-2 text-xs font-semibold text-red-700">Archive</button>}</div>} />
+    }
+    </div>
     {action && <ModerationModal action={action} onClose={() => setAction(null)} onConfirm={setStatus} />}
     {editing && <PracticeEditModal practice={editing} onClose={() => setEditing(null)} onSave={(saved) => { setItems((current) => current.map((value) => value.id === saved.id ? saved : value)); setEditing(null) }} />}
   </div>
