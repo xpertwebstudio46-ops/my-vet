@@ -14,14 +14,10 @@ import { mailService } from '../../shared/services/mail.service.js'
 import { recalculatePracticeRating } from '../reviews/review-rating.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { installAndSyncSubscriptionCatalog, syncSubscriptionPlan } from '../subscriptions/stripe-catalog.service.js'
+import { userQuery, userWhere } from './admin-user-query.js'
 
 const idParams = z.object({ id: z.string().min(1) })
 const statusQuery = paginationSchema.extend({ status: z.string().trim().max(40).optional(), q: z.string().trim().max(100).optional() })
-const userQuery = paginationSchema.extend({
-  q: z.string().trim().max(100).optional(),
-  role: z.enum(['PET_OWNER', 'VET', 'ADMIN']).optional(),
-  approvalStatus: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
-})
 const notificationQuery = paginationSchema.extend({
   approvalStatus: z.enum(['ALL', 'PENDING', 'REVIEWED', 'REJECTED', 'APPROVED']).default('ALL'),
 })
@@ -530,11 +526,7 @@ adminRouter.post('/enquiries/:id/reply', validateParams(idParams), validateBody(
 
 adminRouter.get('/users', validateQuery(userQuery), async (request, response) => {
   const query = request.validatedQuery as z.infer<typeof userQuery>
-  const where: Prisma.UserWhereInput = {
-    ...(query.role ? { role: query.role } : {}),
-    ...(query.approvalStatus ? { approvalStatus: query.approvalStatus } : {}),
-    ...(query.q ? { OR: [{ email: { contains: query.q, mode: 'insensitive' } }, { firstName: { contains: query.q, mode: 'insensitive' } }, { lastName: { contains: query.q, mode: 'insensitive' } }] } : {}),
-  }
+  const where = userWhere(query)
   const [items, total] = await Promise.all([
     prisma.user.findMany({ where, select: { id: true, email: true, role: true, approvalStatus: true, firstName: true, lastName: true, deletedAt: true, createdAt: true }, orderBy: { createdAt: 'desc' }, ...paginationToPrisma(query.page, query.limit) }),
     prisma.user.count({ where }),

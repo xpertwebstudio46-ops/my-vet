@@ -8,6 +8,7 @@ import { apiClient, ApiClientError } from '@/lib/api/client'
 import type { Paginated } from '@/lib/api/types'
 import { downloadCsv } from '@/lib/csv'
 import { AdminPageBanner } from './shared/admin-page-banner'
+import { IncompleteVetAccounts } from './incomplete-vet-accounts'
 
 type PracticeStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'ARCHIVED'
 type PracticeMembershipType = 'INDEPENDENT' | 'GROUP'
@@ -58,6 +59,7 @@ function ErrorBox({ message }: { message: string }) {
 export function ManageVeterinaryPracticePage() {
   const [items, setItems] = useState<Practice[]>([])
   const [query, setQuery] = useState('')
+  const [submittedQuery, setSubmittedQuery] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [action, setAction] = useState<PracticeAction | null>(null)
@@ -69,6 +71,7 @@ export function ManageVeterinaryPracticePage() {
   }, [])
 
   async function load(term = '') {
+    setSubmittedQuery(term)
     setLoading(true)
     setError('')
     try {
@@ -97,9 +100,10 @@ export function ManageVeterinaryPracticePage() {
   }
 
   return <div className="min-w-0 space-y-6">
-    <AdminPageBanner title="Manage Veterinary Practices" description="Live practice directory records and moderation status." action={{ label: 'Export CSV', icon: 'download', tone: 'outline', onClick: exportItems }} />
+    <AdminPageBanner title="Manage Veterinary Practices" description="Veterinary accounts, practice registrations and moderation status." action={{ label: 'Export practices CSV', icon: 'download', tone: 'outline', onClick: exportItems }} />
     <form onSubmit={(event) => { event.preventDefault(); void load(query) }} className="flex flex-col gap-2 sm:flex-row"><div className="relative min-w-0 flex-1"><Search className="absolute left-3 top-3 size-4 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search practices" className="h-10 w-full rounded-lg border bg-white pl-9 pr-3 text-sm" /></div><button className="h-10 rounded-lg bg-[#064071] px-4 text-sm font-semibold text-white">Search</button></form>
     <ErrorBox message={error} />
+    <IncompleteVetAccounts key={submittedQuery} searchTerm={submittedQuery} />
     <PracticeTable items={items} loading={loading} actions={(item) => <div className="flex flex-wrap justify-end gap-2"><button type="button" onClick={() => setEditing(item)} className="inline-flex items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold text-[#064071]"><Pencil className="size-3.5" />Edit</button>{item.status !== 'APPROVED' && <button type="button" onClick={() => setAction({ item, status: 'APPROVED' })} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white">Approve</button>}{item.status !== 'SUSPENDED' && <button type="button" onClick={() => setAction({ item, status: 'SUSPENDED' })} className="rounded-md border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-700">Suspend</button>}{item.status !== 'ARCHIVED' && <button type="button" onClick={() => setAction({ item, status: 'ARCHIVED' })} className="rounded-md border border-red-300 px-3 py-2 text-xs font-semibold text-red-700">Archive</button>}</div>} />
     {action && <ModerationModal action={action} onClose={() => setAction(null)} onConfirm={setStatus} />}
     {editing && <PracticeEditModal practice={editing} onClose={() => setEditing(null)} onSave={(saved) => { setItems((current) => current.map((value) => value.id === saved.id ? saved : value)); setEditing(null) }} />}

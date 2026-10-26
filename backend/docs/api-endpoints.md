@@ -40,3 +40,9 @@ All JSON endpoints use the shared `{ success, data, message, error }` envelope. 
 | Admin settings/reports | `GET/PUT /api/admin/settings`, `GET /api/admin/reports/overview`, `GET /api/admin/reports/export.csv` | ADMIN |
 
 Socket.IO clients authenticate with an access token in `handshake.auth.token`. The server joins only the authenticated `user:{id}` room and emits `notification:new` after persisted domain transactions commit.
+
+Admins can list veterinary accounts that have not submitted a practice using
+`GET /api/admin/users?role=VET&practiceRegistration=INCOMPLETE`. This supports the
+existing `q`, `page`, and `limit` parameters and excludes accounts that already
+have a practice. Account access (active/deactivated) remains separate from
+practice registration status.
