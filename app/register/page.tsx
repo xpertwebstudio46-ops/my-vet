@@ -56,13 +56,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
       }
       const user = result.user;
       if (user.role === 'VET') {
-        const selection = new URLSearchParams()
-        if (selectedPlan) {
-          selection.set('membership', selectedPlan.membership)
-          selection.set('plan', selectedPlan.slug)
-          selection.set('billing', billing)
-        }
-        router.push(`/register-practice${selection.size ? `?${selection.toString()}` : ''}`)
+        router.push('/#pricing');
       } else {
         router.push(dashboardForRole(user.role));
       }
@@ -110,7 +104,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
         <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         {message && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">{message}</p>}
-        <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & add practice" : "Create account"}</button>
+        <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & choose plan" : "Create account"}</button>
       </form>
     </main>
   );

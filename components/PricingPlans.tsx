@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useAuth } from '@/components/auth/AuthProvider'
 import { ArrowRight, Check, ChevronDown, ShieldCheck, X } from 'lucide-react'
 import {
   formatPlanPrice,
@@ -214,11 +215,12 @@ function BillingButton({ active, onClick, children }: { active: boolean; onClick
 }
 
 function PlanCard({ plan, billing }: { plan: MembershipPlan; billing: BillingCycle }) {
+  const { user, loading } = useAuth()
   const enterprise = plan.membership === 'group' && plan.slug === 'enterprise'
   const price = formatPlanPrice(plan, billing)
   const href = enterprise
     ? `/enquire?membership=group&plan=enterprise&billing=${billing}`
-    : `/register?role=vet&membership=${plan.membership}&plan=${plan.slug}&billing=${billing}`
+    : `${user?.role === 'VET' ? '/register-practice' : '/register'}?role=vet&membership=${plan.membership}&plan=${plan.slug}&billing=${billing}`
 
   return (
     <article className={`relative flex h-full flex-col rounded-3xl border p-6 shadow-xl shadow-black/10 ${plan.popular ? 'border-[#4de0d3] bg-white ring-2 ring-[#4de0d3]/30' : 'border-white/15 bg-white/[0.08]'}`}>
@@ -251,6 +253,10 @@ function PlanCard({ plan, billing }: { plan: MembershipPlan; billing: BillingCyc
 
       <Link
         href={href}
+        aria-disabled={!enterprise && loading}
+        onClick={(event) => {
+          if (!enterprise && loading) event.preventDefault()
+        }}
         className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${plan.popular ? 'bg-[#13b8a8] text-white' : 'bg-white text-[#052f55]'}`}
       >
         {enterprise ? 'Request enterprise plan' : 'Start 6 months free'}
