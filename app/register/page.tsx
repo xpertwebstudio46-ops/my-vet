@@ -26,6 +26,13 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
 
+  function selectRole(nextRole: Exclude<Role, "ADMIN">) {
+    setRole(nextRole);
+    setError("");
+    setMessage("");
+    setFieldErrors({});
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formElement = event.currentTarget;
@@ -80,8 +87,8 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
           <p className="mt-2 text-sm text-slate-600">Create your account to start your listing. No payment card is needed today.</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <button type="button" onClick={() => setRole("PET_OWNER")} className={`rounded-lg border p-3 text-sm ${role === "PET_OWNER" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Pet owner</button>
-          <Link href="/#pricing" className={`rounded-lg border p-3 text-center text-sm ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</Link>
+          <button type="button" disabled={submitting} aria-pressed={role === "PET_OWNER"} onClick={() => selectRole("PET_OWNER")} className={`rounded-lg border p-3 text-sm disabled:opacity-60 ${role === "PET_OWNER" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Pet owner</button>
+          <button type="button" disabled={submitting} aria-pressed={role === "VET"} onClick={() => selectRole("VET")} className={`rounded-lg border p-3 text-center text-sm disabled:opacity-60 ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</button>
         </div>
         {role === 'VET' && selectedPlan && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-slate-700">
