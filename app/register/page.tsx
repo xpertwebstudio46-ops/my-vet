@@ -35,6 +35,10 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (role === 'VET' && !selectedPlan) {
+      setError('Choose a membership plan before creating your veterinary account.');
+      return;
+    }
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     setError("");
@@ -56,7 +60,13 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
       }
       const user = result.user;
       if (user.role === 'VET') {
-        router.push('/#pricing');
+        const selection = new URLSearchParams();
+        if (selectedPlan) {
+          selection.set('membership', selectedPlan.membership);
+          selection.set('plan', selectedPlan.slug);
+          selection.set('billing', billing);
+        }
+        router.push(`/register-practice${selection.size ? `?${selection}` : ''}`);
       } else {
         router.push(dashboardForRole(user.role));
       }
@@ -78,12 +88,19 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
         <div>
           <Link href={selectedPlan ? '/#pricing' : '/'} className="text-sm text-[#01AEAD]">← Back to MY VET</Link>
           <h1 className="mt-4 text-3xl font-bold text-[#064071]">Create your account</h1>
-          <p className="mt-2 text-sm text-slate-600">Create your account to start your listing. No payment card is needed today.</p>
+          <p className="mt-2 text-sm text-slate-600">{role === 'PET_OWNER' ? 'Create your pet-owner account to get started.' : selectedPlan ? 'Create your account to start your listing. No payment card is needed today.' : 'Choose a membership plan to register your veterinary practice.'}</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <button type="button" disabled={submitting} aria-pressed={role === "PET_OWNER"} onClick={() => selectRole("PET_OWNER")} className={`rounded-lg border p-3 text-sm disabled:opacity-60 ${role === "PET_OWNER" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Pet owner</button>
           <button type="button" disabled={submitting} aria-pressed={role === "VET"} onClick={() => selectRole("VET")} className={`rounded-lg border p-3 text-center text-sm disabled:opacity-60 ${role === "VET" ? "border-[#01AEAD] bg-teal-50 text-[#064071]" : "border-slate-200"}`}>Veterinary practice</button>
         </div>
+        {role === 'VET' && !selectedPlan && (
+          <div className="rounded-xl border border-teal-200 bg-teal-50 p-5">
+            <h2 className="font-semibold text-[#064071]">Choose a membership plan to register</h2>
+            <p className="mt-2 text-sm text-slate-600">Compare our plans, then complete your account and practice details. Your first 6 months are free and no card is required to start.</p>
+            <Link href="/#pricing" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#064071] px-5 py-3 font-semibold text-white">View pricing plans</Link>
+          </div>
+        )}
         {role === 'VET' && selectedPlan && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-slate-700">
             <div className="flex items-start justify-between gap-4">
@@ -96,15 +113,18 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
             <p className="mt-3 border-t border-teal-200 pt-3 text-xs text-[#087b75]">First 6 months free · No card required</p>
           </div>
         )}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="First name" name="firstName" autoComplete="given-name" errors={fieldErrors.firstName} />
-          <Field label="Last name" name="lastName" autoComplete="family-name" errors={fieldErrors.lastName} />
-        </div>
-        <Field label="Email" name="email" type="email" autoComplete="email" errors={fieldErrors.email} />
-        <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
-        {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-        {message && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">{message}</p>}
-        <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & choose plan" : "Create account"}</button>
+        <fieldset hidden={role === 'VET' && !selectedPlan} disabled={submitting || (role === 'VET' && !selectedPlan)} className="space-y-5">
+          <legend className="sr-only">Account details</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="First name" name="firstName" autoComplete="given-name" errors={fieldErrors.firstName} />
+            <Field label="Last name" name="lastName" autoComplete="family-name" errors={fieldErrors.lastName} />
+          </div>
+          <Field label="Email" name="email" type="email" autoComplete="email" errors={fieldErrors.email} />
+          <Field label="Password" name="password" type="password" minLength={10} autoComplete="new-password" errors={fieldErrors.password} hint="10+ characters with upper/lowercase letters and a number." />
+          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+          {message && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">{message}</p>}
+          <button disabled={submitting} className="w-full rounded-full bg-[#064071] py-3 font-semibold text-white disabled:opacity-60">{submitting ? "Creating account…" : role === 'VET' ? "Create account & add practice" : "Create account"}</button>
+        </fieldset>
       </form>
     </main>
   );
