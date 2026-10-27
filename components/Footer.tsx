@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { apiClient, ApiClientError } from '@/lib/api/client'
 import { FACEBOOK_URL } from '@/lib/social-links'
+import { CONTACT_ADDRESS } from '@/lib/contact-location'
 
 const quickLinks = [
   { label: 'Home', href: '/' },
@@ -137,7 +138,7 @@ Veterinary teams can easily update their services, pricing, reviews and practice
                 <a href="mailto:hello@my-vet.co.uk" className="break-words text-white hover:text-[#13b8a8]">hello@my-vet.co.uk</a>
               </li>
               <li className="leading-6 text-white/90">
-                <address className="not-italic">Shawbriggs Barrow Road Goxhill DN19 7LN</address>
+                <address className="not-italic">{CONTACT_ADDRESS}</address>
               </li>
               <li>
                 <a href="tel:01482688508" className="text-white hover:text-[#13b8a8]">01482 688508</a>

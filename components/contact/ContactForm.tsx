@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { apiClient, ApiClientError } from "@/lib/api/client";
 import { FACEBOOK_URL } from "@/lib/social-links";
+import { CONTACT_ADDRESS, CONTACT_MAP_EMBED_URL, CONTACT_MAP_URL } from "@/lib/contact-location";
 const socialLinks = [
   { icon: "images/grp-1.png", href: FACEBOOK_URL, label: "Facebook" },
   { icon: "images/grp-2.png", href: "#", label: "Twitter" },
@@ -189,22 +190,27 @@ export default function StayConnectedSection({ initialSubject = '' }: { initialS
             </h3>
 
             <address className="mt-4 space-y-3 break-words text-sm leading-6 not-italic text-slate-600">
-              <p>Shawbriggs, Barrow Road, Goxhill, DN19 7LN</p>
+              <p>{CONTACT_ADDRESS}</p>
               <p><a href="mailto:hello@my-vet.co.uk" className="text-[#064071] hover:underline">hello@my-vet.co.uk</a></p>
               <p><a href="tel:01482688508" className="text-[#064071] hover:underline">01482 688508</a></p>
             </address>
 
             <div className="mt-4 w-full h-[260px] sm:h-[300px] rounded-2xl overflow-hidden border border-slate-200">
               <iframe
-                title="Location map"
-                src="https://www.google.com/maps?q=Shawbriggs%2C%20Barrow%20Road%2C%20Goxhill%2C%20DN19%207LN&output=embed"
+                title={`MY VET location: ${CONTACT_ADDRESS}`}
+                src={CONTACT_MAP_EMBED_URL}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 loading="lazy"
+                allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
+            <a href={CONTACT_MAP_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#064071] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0d2e5e]">
+              Open in Google Maps
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
 
             <h3 className="mt-8 text-[30px] font-bold font-heading leading-tight sm:text-[40px]">
               Follow <span style={{ color: "#064071" }}>Us</span>:
