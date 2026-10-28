@@ -12,6 +12,7 @@ const navLinks = [
     { label: 'About Us', href: '/about' },
     { label: 'Find a Vet', href: '/vet-search' },
     { label: 'Directory', href: '/directory' },
+    { label: 'Price & Comparison', href: '/price-comparison' },
     { label: 'Reviews', href: '/review' },
     { label: 'Blog', href: '/blog' },
     { label: 'Sponsorship', href: '/sponsorship' },
@@ -47,7 +48,7 @@ const Header = () => {
                     </Link>
 
                     <div className="site-header-desktop hidden items-center justify-center gap-2">
-                        <nav className="flex items-center gap-12">
+                        <nav className="flex items-center gap-4 2xl:gap-6">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.label}

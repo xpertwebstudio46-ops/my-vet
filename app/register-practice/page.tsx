@@ -80,7 +80,7 @@ export default function RegisterPracticePage({ searchParams }: { searchParams: P
             {selectedPlan ? (
               <div className="mt-2 text-sm text-slate-600">
                 <p>You selected <strong className="text-[#064071]">{selectedPlan.name}</strong> at {formatPlanPrice(selectedPlan, billing)} {billing === 'annual' ? 'per year' : 'per month'}{selectedPlan.membership === 'group' ? ', per branch' : ''}.</p>
-                <p className="mt-1 font-medium text-[#087b75]">Your first 6 months are free and no card is required to start.</p>
+                <p className="mt-1 font-medium text-[#087b75]">Your first 3 months are free and no card is required to start.</p>
               </div>
             ) : (
               <p className="mt-1 text-sm text-slate-600">After submission, you can complete your dashboard while an administrator reviews the listing.</p>

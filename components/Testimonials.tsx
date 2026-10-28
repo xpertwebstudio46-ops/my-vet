@@ -1,53 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Star } from 'lucide-react'
+import type { PublicReview } from '@/lib/api/types'
 
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      '"I found an emergency vet within minutes  absolutely life saving platform."',
-    name: 'Amina K.',
-    initial: 'A',
-  },
-  {
-    id: 2,
-    quote:
-      '"Finally a transparent way to compare veterinary services and read honest reviews."',
-    name: 'Lydia S.',
-    initial: 'L',
-  },
-  {
-    id: 3,
-    quote:
-      '"The reviews helped me choose the right equine specialist for my horse."',
-    name: 'Sarah T.',
-    initial: 'S',
-  },
-  {
-    id: 4,
-    quote:
-      '"My Vet made it so easy to find a trusted farm vet in our rural area. Highly recommend!"',
-    name: 'James R.',
-    initial: 'J',
-  },
-  {
-    id: 5,
-    quote:
-      '"Great platform — I love being able to read real reviews before booking an appointment."',
-    name: 'Claire M.',
-    initial: 'C',
-  },
-  {
-    id: 6,
-    quote:
-      '"Found the perfect exotic animal specialist for my rabbit. Couldn\'t be happier."',
-    name: 'David P.',
-    initial: 'D',
-  },
-]
-
-const Testimonials = () => {
+const Testimonials = ({ reviews, unavailable = false }: { reviews: PublicReview[]; unavailable?: boolean }) => {
+  const testimonials = reviews.map((review) => ({
+    id: review.id,
+    quote: review.comment,
+    name: `${review.user.firstName} ${review.user.lastName ? `${review.user.lastName[0]}.` : ''}`.trim(),
+    initial: review.user.firstName.charAt(0).toUpperCase(),
+    rating: review.rating,
+    practice: review.practice,
+  }))
   const [start, setStart] = useState(0)
   const [visible, setVisible] = useState(1)
 
@@ -93,7 +59,11 @@ const Testimonials = () => {
         </p>
 
         {/* Slider with side arrows */}
-        <div className="relative flex items-center sm:gap-3">
+        {testimonials.length === 0 ? (
+          <p role="status" className="rounded-xl bg-slate-50 p-8 text-center text-slate-600">
+            {unavailable ? 'Reviews are temporarily unavailable. Please try again later.' : 'No published reviews yet.'}
+          </p>
+        ) : <div className="relative flex items-center sm:gap-3">
 
           {/* Left arrow */}
           <button
@@ -137,15 +107,19 @@ const Testimonials = () => {
                     border: '1px solid #e5e7eb',
                   }}
                 >
+                  <div className="mb-4 flex gap-1" role="img" aria-label={`${t.rating} out of 5 stars`}>
+                    {Array.from({ length: 5 }, (_, index) => <Star key={index} aria-hidden="true" className={`size-4 ${index < t.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} />)}
+                  </div>
                   {/* Quote */}
                   <p
-                    className="text-gray-700 leading-relaxed mb-6 font-sans text-[16px]"
+                    className="line-clamp-6 text-gray-700 leading-relaxed mb-6 font-sans text-[16px]"
                     
                   >
                     {t.quote}
                   </p>
 
                   {/* Author */}
+                  <div>
                   <div className="flex items-center gap-3">
                     <div
                       className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
@@ -164,6 +138,8 @@ const Testimonials = () => {
                     >
                       {t.name}
                     </span>
+                  </div>
+                  <Link href={`/vet-search/${encodeURIComponent(t.practice.slug)}`} className="mt-3 inline-block text-sm font-medium text-[#064071] hover:underline">{t.practice.name}</Link>
                   </div>
                 </div>
               </div>
@@ -188,7 +164,7 @@ const Testimonials = () => {
             </svg>
           </button>
 
-        </div>
+        </div>}
 
       </div>
     </section>

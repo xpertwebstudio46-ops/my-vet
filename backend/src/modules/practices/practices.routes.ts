@@ -223,7 +223,7 @@ practicesRouter.post('/', authenticate, requireRole('VET'), validateBody(createP
               email: practice.email,
               phone: practice.phone,
               subject: `Membership signup: ${membershipSelection.membership} / ${membershipSelection.plan}`,
-              message: `Billing: ${membershipSelection.billing}\nUK branches: ${membershipSelection.branchCount}\nLaunch offer: first 6 months free`,
+              message: `Billing: ${membershipSelection.billing}\nUK branches: ${membershipSelection.branchCount}\nLaunch offer: first 3 months free`,
             },
           })
         }

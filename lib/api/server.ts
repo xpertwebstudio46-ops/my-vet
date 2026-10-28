@@ -1,5 +1,5 @@
 import "server-only";
-import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeMembershipType, PracticeReview, Sponsorship, SubscriptionPlan } from "./types";
+import type { ApiEnvelope, BlogPost, BlogPostSummary, Paginated, Practice, PracticeMembershipType, PracticeReview, PublicReview, Sponsorship, SubscriptionPlan } from "./types";
 
 const API_URL = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/$/, "");
 
@@ -54,6 +54,10 @@ export function getPractice(slug: string) {
 
 export function getPracticeReviews(practiceId: string, limit = 10) {
   return apiFetch<Paginated<PracticeReview>>(`/api/reviews/practice/${encodeURIComponent(practiceId)}?page=1&limit=${limit}`);
+}
+
+export function getPublicReviews() {
+  return apiFetch<Paginated<PublicReview>>('/api/reviews?page=1&limit=24');
 }
 
 export function getBlogPosts(page = 1, limit = 24) {

@@ -1,6 +1,6 @@
 import AboutHero from '@/components/about/AboutHero'
 import React from 'react'
-import WhyChooseUs from '@/components/WhyChooseUs'
+import AboutWhyChooseUs from '@/components/about/AboutWhyChooseUs'
 import HowWe from '@/components/about/HowWe'
 import OurStorySection from '@/components/about/OurStory'
 import AboutMissionSection from '@/components/about/AboutMission'
@@ -16,7 +16,7 @@ const page = () => {
        <HowWe/>
        <div className='mt-4 sm:mt-8'>
 
-       <WhyChooseUs/>
+       <AboutWhyChooseUs/>
        <TeamSection/>
        </div>
        <Footer/>

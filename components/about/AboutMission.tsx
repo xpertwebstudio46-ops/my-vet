@@ -12,11 +12,11 @@ export default function AboutMissionSection() {
       <div className="max-w-[90%] mx-auto">
         {/* Badge */}
         <span className="inline-flex items-center rounded-full border border-[#10B7A6] px-5 py-2 text-[12px] font-medium text-[#01AEAD]">
-          About Our Company
+       About My Vet
         </span>
 
         {/* Heading */}
-        <h2 className="mt-5 max-w-3xl text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
+        <h2 className="mt-5 max-w-5xl text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
          Providing the perfect platform for vet practices and  
           <br />
           <span className="text-[#01AEAD]">pet owners</span> to discover each other
@@ -42,15 +42,15 @@ export default function AboutMissionSection() {
             </h3>
 
             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-             Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
+            Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
             </p>
              <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
             <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-             Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
+            For pet owners, My Vet makes it simple to create your very own unique online pet profile for your pets and search and create a shortlist of your most favoured vets specific for the pets you have such as exotic pets, equine or household pets, search locally. Store your favourite vet, by location, specialism and compare prices and options, it also provides you with the ability to access and write real reviews and experiences from other owners helping every family make confident, informed decisions about their animal’s well being.
             </p>
             </p>
              <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-            For pet owners, My Vet makes it simple to create your very own unique online pet profile for your pets and search and create a shortlist of your most favoured vets specific for the pets you have such as exotic pets, equine or household pets, search locally. Store your favourite vet, by location, specialism and compare prices and options, it also provides you with the ability to access and write real reviews and experiences from other owners helping every family make confident, informed decisions about their animal’s wellbeing.
+           Together, our aim is to build a transparent, modern, and community driven space that connects pet owners with the right veterinary care, every time
             </p>
 
              <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">

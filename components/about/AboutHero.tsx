@@ -3,13 +3,12 @@ import { PublicHeroBanner } from '../sharedComponents/PublicHeroBanner'
 const AboutHero = () => {
     return (
         <PublicHeroBanner
-            cta={{ href: '/register?role=vet', label: 'Register today' }}
-            secondaryCta={{ href: '/register?role=pet-owner', label: 'Register pet owner' }}
+            cta={{ href: '/register?role=vet', label: 'Vet register today' }}
+            secondaryCta={{ href: '/register?role=pet-owner', label: 'Pet owner register' }}
             title={
-                <>
-                    Partner With <span style={{ color: '#13b8a8' }}>MY VET</span> & Grow Your
-                    Reach
-                </>
+                <span className="block text-[28px] leading-snug sm:text-[34px] lg:text-[38px]">
+                    Vet Owners Join a Growing Community of Trusted Veterinary Practices Today and claim your <span style={{ color: '#13b8a8' }}>first 3 months free</span>
+                </span>
             }
         />
     )

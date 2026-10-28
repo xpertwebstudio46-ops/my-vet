@@ -17,6 +17,7 @@ All JSON endpoints use the shared `{ success, data, message, error }` envelope. 
 | Appointments | `GET/POST /api/appointments`, `PUT /api/appointments/:id`, `PATCH /api/appointments/:id/cancel` | PET_OWNER/owner; cancellation also owning VET |
 | Appointments | `GET /api/appointments/vet`, `PATCH /api/appointments/:id/confirm`, `PATCH /api/appointments/:id/complete` | VET/own practice |
 | Reviews | `GET /api/reviews/practice/:practiceId` | Public approved reviews |
+| Homepage reviews | `GET /api/reviews?page=1&limit=24` | Public approved reviews for published practices and active accounts |
 | Reviews | `GET /api/reviews/me`, `POST /api/reviews`, `PUT/DELETE /api/reviews/:id` | PET_OWNER/author |
 | Reviews | `POST /api/reviews/:id/reply` | VET/own practice |
 | Reviews | `POST/DELETE /api/reviews/:id/helpful` | User |

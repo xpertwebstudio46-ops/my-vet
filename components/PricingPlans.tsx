@@ -155,7 +155,7 @@ export default function PricingPlans() {
 
         <div className="mx-auto mt-8 flex max-w-3xl items-start gap-3 rounded-2xl border border-[#4de0d3]/30 bg-[#4de0d3]/10 p-4 text-left text-white sm:items-center sm:px-5">
           <ShieldCheck className="mt-0.5 size-6 shrink-0 text-[#4de0d3] sm:mt-0" aria-hidden="true" />
-          <p className="text-sm leading-6"><strong>Launch offer: your first 6 months are free</strong> on every plan. No card is required to start.</p>
+          <p className="text-sm leading-6"><strong>Launch offer: your first 3 months are free</strong> on every plan. No card is required to start.</p>
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-5 lg:flex-row">
@@ -238,7 +238,7 @@ function PlanCard({ plan, billing }: { plan: MembershipPlan; billing: BillingCyc
           {billing === 'monthly' ? 'per month, VAT included' : price === 'Custom' ? 'Bespoke annual agreement' : 'per year, VAT included'}
         </p>
         <p className={`mt-2 min-h-5 text-xs font-semibold ${plan.popular ? 'text-[#078a83]' : 'text-[#4de0d3]'}`}>
-          {billing === 'annual' ? (plan.membership === 'independent' ? 'Two months included free' : price === 'Custom' ? 'Tailored to your group' : 'Extra 10% annual discount') : 'First 6 months free'}
+          {billing === 'annual' ? (plan.membership === 'independent' ? 'Two months included free' : price === 'Custom' ? 'Tailored to your group' : 'Extra 10% annual discount') : 'First 3 months free'}
         </p>
       </div>
 
@@ -259,7 +259,7 @@ function PlanCard({ plan, billing }: { plan: MembershipPlan; billing: BillingCyc
         }}
         className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${plan.popular ? 'bg-[#13b8a8] text-white' : 'bg-white text-[#052f55]'}`}
       >
-        {enterprise ? 'Request enterprise plan' : 'Start 6 months free'}
+        {enterprise ? 'Request enterprise plan' : 'Start 3 months free'}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
       {!enterprise && <p className={`mt-3 text-center text-[11px] ${plan.popular ? 'text-slate-500' : 'text-blue-200'}`}>No card required</p>}

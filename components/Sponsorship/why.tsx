@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Eye, TrendingUp, ShieldCheck, Map } from "lucide-react";
 
 const features = [
@@ -34,11 +35,13 @@ export default function WhySponsorUs() {
         {/* Heading */}
         <div className="text-center mb-12">
           <h2 className="text-[32px] font-bold font-heading leading-tight text-[#064071] sm:text-[40px]">
-            Why <span className="text-teal-500">Sponsor</span> Us?
+            Why <span className="text-teal-500">Sponsor</span> My Vet?
           </h2>
-          <p className="mt-3 font-sans text-slate-500 text-sm sm:text-base max-w-2xl mx-auto">
-            Align your brand with the UK’s most trusted veterinary directory and place your products and services directly in front of pet owners and veterinary professionals. 
-          </p>
+          <div className="mx-auto mt-5 max-w-4xl space-y-4 text-base leading-relaxed text-slate-600 sm:text-lg">
+            <p>My Vet connects veterinary practices with pet owners across the UK, creating a trusted community focused on animal care and wellbeing. Sponsoring My Vet is an opportunity for brands in pet medication, pharmaceuticals, nutrition, pet clothing, insurance, animal feeds, and related services to showcase their products and services directly to an engaged audience of pet owners and veterinary professionals.</p>
+            <p>With sponsorship packages starting from just &pound;30 per month, your business can increase brand visibility, build trust within the veterinary community, and reach pet owners at the point they are actively seeking advice, products, and services for their pets.</p>
+          </div>
+          <Link href="#sponsorship-enquiry" className="mt-6 inline-flex rounded-full bg-[#064071] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#0d2e5e]">Enquire about sponsorship</Link>
         </div>
 
         {/* Feature cards */}
@@ -60,6 +63,9 @@ export default function WhySponsorUs() {
             </div>
           ))}
         </div>
+        <p className="mt-8 text-center text-base font-bold leading-relaxed text-[#064071] sm:text-lg">
+          Support the UK&apos;s growing veterinary community while promoting your brand to the people who matter most.
+        </p>
       </div>
     </section>
   );

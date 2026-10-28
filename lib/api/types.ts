@@ -107,6 +107,10 @@ export interface PracticeReview {
   user: { firstName: string; lastName: string; avatar: string | null };
 }
 
+export type PublicReview = Pick<PracticeReview, 'id' | 'rating' | 'comment' | 'createdAt' | 'user'> & {
+  practice: { name: string; slug: string };
+};
+
 export interface AuthResult {
   user: User;
   accessToken: string | null;

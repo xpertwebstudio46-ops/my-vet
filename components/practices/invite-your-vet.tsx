@@ -40,7 +40,7 @@ export function InviteYourVet() {
       <details className="mt-4 text-sm text-slate-600">
         <summary className="cursor-pointer font-semibold text-[#064071]">Preview invitation</summary>
         <div className="mt-3 rounded-xl border border-teal-100 bg-white p-4">
-          <p className="font-semibold">Subject: {vetInvitationSubject}</p>
+          {/* <p className="font-semibold">Subject: {vetInvitationSubject}</p> */}
           <p className="mt-3 whitespace-pre-line break-words leading-relaxed">{vetInvitationBody}</p>
         </div>
       </details>

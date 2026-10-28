@@ -10,6 +10,7 @@ import { sendSuccess } from '../../shared/utils/api-response.js'
 import { paginated, paginationSchema, paginationToPrisma } from '../../shared/utils/pagination.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import { recalculatePracticeRating } from './review-rating.service.js'
+import { publicReviewsRouter } from './public-reviews.routes.js'
 
 const createSchema = z.object({
   practiceId: z.string().min(1),
@@ -29,6 +30,7 @@ const idParams = z.object({ id: z.string().min(1) })
 const practiceParams = z.object({ practiceId: z.string().min(1) })
 
 export const reviewsRouter = Router()
+reviewsRouter.use(publicReviewsRouter)
 
 reviewsRouter.get('/practice/:practiceId', validateParams(practiceParams), validateQuery(paginationSchema), async (request, response) => {
   const { practiceId } = request.validatedParams as z.infer<typeof practiceParams>

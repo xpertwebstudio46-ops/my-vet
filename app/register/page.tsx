@@ -97,7 +97,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
         {role === 'VET' && !selectedPlan && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-5">
             <h2 className="font-semibold text-[#064071]">Choose a membership plan to register</h2>
-            <p className="mt-2 text-sm text-slate-600">Compare our plans, then complete your account and practice details. Your first 6 months are free and no card is required to start.</p>
+            <p className="mt-2 text-sm text-slate-600">Compare our plans, then complete your account and practice details. Your first 3 months are free and no card is required to start.</p>
             <Link href="/#pricing" className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#064071] px-5 py-3 font-semibold text-white">View pricing plans</Link>
           </div>
         )}
@@ -110,7 +110,7 @@ export default function RegisterPage({ searchParams }: { searchParams: Promise<R
               </div>
               <p className="shrink-0 text-right font-semibold text-[#064071]">{formatPlanPrice(selectedPlan, billing)}<span className="block text-[11px] font-normal text-slate-500">{billing === 'annual' ? 'per year' : 'per month'}</span></p>
             </div>
-            <p className="mt-3 border-t border-teal-200 pt-3 text-xs text-[#087b75]">First 6 months free · No card required</p>
+            <p className="mt-3 border-t border-teal-200 pt-3 text-xs text-[#087b75]">First 3 months free · No card required</p>
           </div>
         )}
         <fieldset hidden={role === 'VET' && !selectedPlan} disabled={submitting || (role === 'VET' && !selectedPlan)} className="space-y-5">
