@@ -12,6 +12,7 @@ import { toSlug } from '../../shared/utils/slug.js'
 import { deleteR2Object } from '../upload/upload.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
+import { calloutAreasRouter } from './callout-areas.routes.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import { frontendReturnUrl } from '../../shared/utils/frontend-url.js'
 import { STRIPE_APP } from '../subscriptions/stripe-catalog.service.js'
@@ -131,6 +132,7 @@ function mapAnimalTypeConflict(error: unknown): never {
 
 export const vetRouter = Router()
 vetRouter.use(authenticate, requireRole('VET'))
+vetRouter.use('/callout-areas', calloutAreasRouter)
 
 vetRouter.get('/dashboard', async (request, response) => {
   const practice = await prisma.practice.findUnique({ where: { ownerId: request.user!.userId } })

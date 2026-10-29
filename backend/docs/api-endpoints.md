@@ -24,6 +24,8 @@ All JSON endpoints use the shared `{ success, data, message, error }` envelope. 
 | Applications | `POST /api/jobs/:id/apply`, `GET /api/jobs/applications/mine` | Signed-in applicant; one application per job; no self-application |
 | Applicants | `GET /api/jobs/:id/applications` | Hiring VET or ADMIN only |
 | Application status | `PATCH /api/jobs/applications/:id` | Hiring VET/ADMIN: SHORTLISTED, REJECTED, HIRED; applicant: WITHDRAWN |
+| Call-out areas | `GET/POST /api/vet/callout-areas`, `PUT/DELETE /api/vet/callout-areas/:id` | VET/own practice only. PUT requires complete area details |
+| Public call-out areas | `GET /api/practices/:slug` includes `calloutAreas` | Active areas only; location, description, postcodes, weekdays (0 Monday–6 Sunday), GBP standard/reduced min/max |
 | Reviews | `GET /api/reviews/me`, `POST /api/reviews`, `PUT/DELETE /api/reviews/:id` | PET_OWNER/author |
 | Reviews | `POST /api/reviews/:id/reply` | VET/own practice |
 | Reviews | `POST/DELETE /api/reviews/:id/helpful` | User |

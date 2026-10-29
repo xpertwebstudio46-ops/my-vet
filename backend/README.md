@@ -44,6 +44,30 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 
 ## Environment
 
+### Call-out areas and zone days
+
+Apply migration `20261029010000_callout_areas` with `npm run db:migrate:deploy`
+in the backend environment before using the feature. Railway runs committed
+migrations during deployment. No seed or reset is required.
+
+Vets manage their areas at `/vet-dashboard/callout-areas` (also linked from
+Services). Each area supports a name/location, notes, postcode districts or full
+postcodes, selected weekdays, standard and reduced minimum/maximum GBP costs,
+and a publish toggle. Weekdays use 0 for Monday through 6 for Sunday. For a fixed
+price use equal minimum and maximum; zero is displayed as Free. At least one
+weekday is required, and reduced prices cannot exceed corresponding standard
+prices. Ownership is enforced on all management endpoints.
+
+Published areas appear in Services on `/vet-search/:slug`, including an area
+map, weekday indicators, prices and postcode badges. Selecting a card changes
+the map location. The map locates the named area; it does not define a service
+boundary. Hidden/deleted areas do not appear in the public response.
+
+Manual check: add Birmingham with B1/B2 postcodes, Monday/Wednesday availability,
+standard GBP 45–75 and reduced GBP 0–20. Check the public card, map, days and
+Free–GBP 20 price. Edit, hide/publish and delete the area, refreshing the public
+profile after each change. A different vet must not be able to update/delete it.
+
 ### Jobs and applications
 
 The jobs feature adds migration `20261029000000_jobs`. Apply committed migrations

@@ -1,5 +1,6 @@
 import {
   Bell,
+  MapPin,
   BriefcaseBusiness,
   BarChart3,
   Building2,
@@ -64,6 +65,7 @@ export const vetNavSections: Array<{
         href: '/vet-dashboard/services',
         icon: Stethoscope,
       },
+      { label: 'Call-out areas', href: '/vet-dashboard/callout-areas', icon: MapPin },
       {
         label: 'Animal Types',
         href: '/vet-dashboard/animal-type',

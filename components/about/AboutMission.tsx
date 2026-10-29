@@ -20,13 +20,13 @@ export default function AboutMissionSection() {
         {/* Content */}
         <div className="mt-8 grid items-center gap-8 sm:mt-12 lg:mt-14 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
           {/* Left Image */}
-          <div className="overflow-hidden rounded-3xl">
+          <div className="relative h-[420px] overflow-hidden rounded-3xl sm:h-[540px] lg:h-full lg:min-h-[640px] lg:self-stretch">
             <Image
               src="/images/mission.png"
               alt="Veterinarian with Dog"
-              width={650}
-              height={500}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 90vw, 48vw"
+              className="object-cover"
             />
           </div>
 

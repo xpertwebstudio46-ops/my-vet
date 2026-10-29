@@ -83,6 +83,7 @@ const searchSchema = paginationSchema.extend({
 function publicInclude() {
   return {
     services: { where: { active: true }, orderBy: { sortOrder: 'asc' as const } },
+    calloutAreas: { where: { active: true }, orderBy: [{ createdAt: 'asc' as const }, { id: 'asc' as const }] },
     facilities: { where: { active: true } },
     animalTypes: { include: { animalType: true } },
     openingHours: { orderBy: { dayOfWeek: 'asc' as const } },

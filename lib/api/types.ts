@@ -85,6 +85,7 @@ export interface Practice {
   membershipType: PracticeMembershipType;
   branchCount: number;
   services?: PracticeService[];
+  calloutAreas?: import('../callout-areas').CalloutArea[];
   facilities?: Array<{ id: string; name: string; description: string | null; icon: string | null }>;
   animalTypes?: PracticeAnimalType[];
   openingHours?: OpeningHours[];

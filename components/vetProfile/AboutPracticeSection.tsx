@@ -4,12 +4,14 @@ import { useState, type ReactNode } from "react";
 import { CheckCircle2, Stethoscope } from "lucide-react";
 import Image from "next/image";
 import type { PracticeMembershipType } from "@/lib/api/types";
+import type { CalloutArea } from '@/lib/callout-areas';
+import CalloutAreas from './CalloutAreas';
 import { practiceMembershipBadgeImage, practiceMembershipLabel } from "@/lib/practice-cards";
 
 type Service = { id: string; name: string; description: string | null; price: string | null; currency: string };
 type Facility = { id: string; name: string; description: string | null };
 
-export default function AboutPracticeSection({ name, membershipType, description, mission, whatWeDo, careOptions, services, facilities, animalTypes, vetComparison }: {
+export default function AboutPracticeSection({ name, membershipType, description, mission, whatWeDo, careOptions, services, facilities, animalTypes, vetComparison, calloutAreas = [] }: {
   name: string;
   membershipType: PracticeMembershipType;
   description: string;
@@ -17,6 +19,7 @@ export default function AboutPracticeSection({ name, membershipType, description
   whatWeDo?: string | null;
   careOptions: string[];
   services: Service[];
+  calloutAreas?: CalloutArea[];
   facilities: Facility[];
   animalTypes: string[];
   vetComparison?: ReactNode;
@@ -87,6 +90,7 @@ export default function AboutPracticeSection({ name, membershipType, description
             <div className="min-w-0"><p className="text-sm font-semibold text-slate-900">{service.name}</p><p className="mt-0.5 text-xs text-slate-500">{service.description ?? (service.price ? `From ${service.currency} ${service.price}` : "Contact the practice for details")}</p></div>
           </div>
         ))}</div> : <p className="rounded-xl border bg-white p-4 text-sm text-slate-500">This practice has not published its service list yet.</p>}
+        {!!calloutAreas.length && <CalloutAreas areas={calloutAreas} />}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-8">

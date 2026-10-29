@@ -271,6 +271,7 @@ model Practice {
   profileViews           ProfileView[]
   contactActions         ContactAction[]
   jobs                   Job[]
+  calloutAreas           CalloutArea[]
 
   @@index([status])
   @@index([membershipType])
@@ -289,6 +290,25 @@ model ServiceCategory {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   services    Service[]
+}
+
+model CalloutArea {
+  id           String   @id @default(cuid())
+  practiceId   String
+  location     String
+  description  String?
+  postcodes    String[] @default([])
+  days         Int[]
+  standardMin  Decimal @db.Decimal(10, 2)
+  standardMax  Decimal @db.Decimal(10, 2)
+  reducedMin   Decimal @db.Decimal(10, 2)
+  reducedMax   Decimal @db.Decimal(10, 2)
+  active       Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  practice     Practice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@index([practiceId, active])
 }
 
 model Service {
