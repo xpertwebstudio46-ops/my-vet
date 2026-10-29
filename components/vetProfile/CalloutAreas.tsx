@@ -33,9 +33,9 @@ export default function CalloutAreas({ areas }: { areas: CalloutArea[] }) {
           <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-teal-700">Open map <ExternalLink size={13} /></a>
         </div>
       </div>
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-5 grid gap-5 xl:grid-cols-2">
         {areas.map((area) => (
-          <article key={area.id} className={`flex min-w-0 flex-col rounded-xl border p-4 ${selected.id === area.id ? 'border-teal-400 bg-teal-50/30 ring-1 ring-teal-100' : 'border-slate-200 bg-white'}`}>
+          <article key={area.id} className={`flex min-w-0 flex-col rounded-xl border p-5 sm:p-6 ${selected.id === area.id ? 'border-teal-400 bg-teal-50/30 ring-1 ring-teal-100' : 'border-slate-200 bg-white'}`}>
             <h4 className="break-words text-sm font-bold text-slate-900">{area.location}</h4>
             {area.description && <p className="mt-2 whitespace-pre-line break-words text-xs leading-relaxed text-slate-500">{area.description}</p>}
             <p className="mb-2 mt-4 text-xs font-medium text-slate-600">Available days</p>
