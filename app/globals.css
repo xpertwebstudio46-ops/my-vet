@@ -304,8 +304,8 @@ body {
     display: none;
   }
   .site-header-row {
-    justify-content: space-around;
-    gap: 32px;
+    justify-content: space-between;
+    gap: clamp(32px, 3vw, 64px);
   }
 }
 

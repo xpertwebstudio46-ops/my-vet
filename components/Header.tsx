@@ -48,8 +48,8 @@ const Header = () => {
                         </picture>
                     </Link>
 
-                    <div className="site-header-desktop hidden items-center justify-center gap-2">
-                        <nav className="flex items-center gap-4 2xl:gap-6">
+                    <div className="site-header-desktop hidden min-w-0 flex-1 items-center justify-between gap-6 2xl:gap-10">
+                        <nav className="flex flex-1 items-center justify-between gap-4 2xl:gap-6">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.label}
@@ -61,7 +61,7 @@ const Header = () => {
                             ))}
                         </nav>
 
-                        <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex shrink-0 items-center gap-4">
                             {user ? (
                                 <Link
                                     href={dashboardForRole(user.role)}
