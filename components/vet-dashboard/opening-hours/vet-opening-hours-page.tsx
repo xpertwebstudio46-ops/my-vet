@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/dashboard/ui";
 import { apiClient, ApiClientError } from "@/lib/api/client";
+import { type EmergencyDay, emptyEmergencyWeek } from '@/lib/emergency-hours';
+import { EmergencyWeeklyEditor } from './emergency-weekly-editor';
 
 type Hours = {
   id?: string;
@@ -21,6 +23,7 @@ type Holiday = {
   note: string | null;
 };
 type Emergency = {
+  weeklyHours: EmergencyDay[];
   inHoursPhone?: string | null;
   outOfHoursPhone?: string | null;
   enabled: boolean;
@@ -48,6 +51,7 @@ export function VetOpeningHoursPage() {
   const [hours, setHours] = useState<Hours[]>(defaults);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [emergency, setEmergency] = useState<Emergency>({
+    weeklyHours: emptyEmergencyWeek(),
     enabled: false,
     phone: null,
     calloutAddress: null,
@@ -65,7 +69,7 @@ export function VetOpeningHoursPage() {
       .then((result) => {
         if (result.openingHours.length === 7) setHours(result.openingHours);
         setHolidays(result.holidayHours);
-        if (result.emergencyHours) setEmergency(result.emergencyHours);
+        if (result.emergencyHours) setEmergency({ ...result.emergencyHours, weeklyHours: result.emergencyHours.weeklyHours?.length === 7 ? result.emergencyHours.weeklyHours : emptyEmergencyWeek() });
       })
       .catch((caught) =>
         setError(
@@ -83,6 +87,11 @@ export function VetOpeningHoursPage() {
     );
   }
   async function save() {
+    setError(''); setMessage('');
+    if (emergency.weeklyHours.some((day) => !day.isClosed && !day.is24Hours && (!day.opensAt || !day.closesAt || day.opensAt === day.closesAt))) {
+      setError('Emergency hours: provide different start and end times for each available day, or choose 24-hour cover.');
+      return;
+    }
     try {
       await Promise.all([
         apiClient("/api/vet/opening-hours", {
@@ -293,6 +302,7 @@ export function VetOpeningHoursPage() {
             rows={4}
             className="rounded-md border p-3 text-sm"
           />
+          <EmergencyWeeklyEditor value={emergency.weeklyHours} onChange={(weeklyHours) => setEmergency((current) => ({ ...current, weeklyHours }))} />
         </Card>
       </div>
     </div>

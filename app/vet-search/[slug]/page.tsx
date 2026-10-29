@@ -62,7 +62,7 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
             <LeaveReviewForm practiceId={practice.id} />
           </div>
           <div className="min-w-0 flex flex-col gap-6">
-            <ContactInfoCard practiceId={practice.id} address={address} phone={practice.phone} openingHours={practice.openingHours ?? []} />
+            <ContactInfoCard practiceId={practice.id} address={address} phone={practice.phone} openingHours={practice.openingHours ?? []} emergencyHours={practice.emergencyHours} />
           </div>
         </div>
       </div>

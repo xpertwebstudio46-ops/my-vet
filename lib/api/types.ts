@@ -90,7 +90,7 @@ export interface Practice {
   animalTypes?: PracticeAnimalType[];
   openingHours?: OpeningHours[];
   holidayHours?: Array<{ id: string; date: string; isClosed: boolean; opensAt: string | null; closesAt: string | null; note: string | null }>;
-  emergencyHours?: { inHoursPhone?: string | null; outOfHoursPhone?: string | null; enabled: boolean; phone: string | null; calloutAddress: string | null; instructions: string | null } | null;
+  emergencyHours?: { weeklyHours?: import('../emergency-hours').EmergencyDay[]; inHoursPhone?: string | null; outOfHoursPhone?: string | null; enabled: boolean; phone: string | null; calloutAddress: string | null; instructions: string | null } | null;
   galleryMedia?: Array<{ id: string; url: string; altText: string | null; caption: string | null; mediaType: "IMAGE" | "VIDEO" }>;
   pricing?: Array<{ id: string; kind: "SERVICE" | "HEALTH_PACKAGE"; name: string; section: string; description: string | null; price: string; currency: string; vatMode: "INC_VAT" | "EX_VAT"; billingPeriod: "ONE_OFF" | "MONTHLY" | "YEARLY" | null }>;
   teamMembers?: Array<{ id: string; name: string; role: string; bio: string | null; imageUrl: string | null; qualifications: string | null }>;

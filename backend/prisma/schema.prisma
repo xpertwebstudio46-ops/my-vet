@@ -420,6 +420,7 @@ model HolidayHours {
 }
 
 model EmergencyHours {
+  weeklyHours Json @default("[]")
   inHoursPhone String?
   outOfHoursPhone String?
   id          String   @id @default(cuid())

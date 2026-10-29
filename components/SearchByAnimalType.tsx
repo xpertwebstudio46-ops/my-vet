@@ -4,42 +4,42 @@ import Link from 'next/link'
 const categories = [
   {
     id: 1,
-    icon: '/images/icon-2.png',
+    icon: '/images/dog.png',
     title: 'Small Animal Vets',
     href: '/vet-search?animalType=small-animals',
     description: 'Find trusted dog & cat veterinary care near you',
   },
   {
     id: 2,
-    icon: '/images/icon-1.png',
+    icon: '/images/cow-2.png',
     title: 'Equine Specialists',
     href: '/vet-search?animalType=equine',
     description: 'Specialist equine veterinary professionals',
   },
   {
     id: 3,
-    icon: '/images/icon-3.png',
+    icon: '/images/parot.png',
     title: 'Farm Animal Vets',
     href: '/vet-search?animalType=farm-animals',
     description: 'Farm livestock health & emergency care services',
   },
   {
     id: 4,
-    icon: '/images/icon-4.png',
+    icon: '/images/telescope.png',
     title: 'Exotic Animal Care',
     href: '/vet-search?animalType=exotics',
     description: 'Specialized care for reptiles, birds, and exotics',
   },
   {
     id: 5,
-    icon: '/images/icon-5.png',
+    icon: '/images/phone.png',
     title: 'Emergency 24/7 Vets',
     href: '/vet-search?service=Emergency+Care',
     description: 'Immediate out-of-hours emergency care',
   },
   {
     id: 6,
-    icon: '/images/icon-6.png',
+    icon: '/images/horse.png',
     title: 'Holistic & Therapy',
     href: '/vet-search?service=Holistic',
     description: 'Alternative therapies and rehabilitation',
@@ -81,9 +81,9 @@ const SearchByAnimalType = () => {
                 <Image
                   src={cat.icon}
                   alt={cat.title}
-                  width={62}
-                  height={62}
-                  className="object-contain"
+                  width={662}
+                  height={762}
+                  className="object-cover"
                 />
               </div>
 

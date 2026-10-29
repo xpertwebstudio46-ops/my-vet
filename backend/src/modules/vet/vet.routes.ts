@@ -13,6 +13,7 @@ import { deleteR2Object } from '../upload/upload.service.js'
 import { deleteUploadedAssetByUrl, markUploadAttached, requireUploadForAttachment } from '../upload/asset-attachment.service.js'
 import { getOwnedPractice } from './helpers.js'
 import { calloutAreasRouter } from './callout-areas.routes.js'
+import { emergencyWeeklyHoursSchema } from './emergency-weekly-hours.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
 import { frontendReturnUrl } from '../../shared/utils/frontend-url.js'
 import { STRIPE_APP } from '../subscriptions/stripe-catalog.service.js'
@@ -78,6 +79,7 @@ const holidaySchema = z.object({
   note: z.string().trim().max(300).nullable().optional(),
 })
 const emergencySchema = z.object({
+  weeklyHours: emergencyWeeklyHoursSchema.optional(),
   inHoursPhone: z.string().trim().max(30).nullable().optional(),
   outOfHoursPhone: z.string().trim().max(30).nullable().optional(),
   enabled: z.boolean().optional(),
