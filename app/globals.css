@@ -555,6 +555,39 @@ body {
   }
 }
 
+/* Size the Jobs cutouts by their visible content, preserving natural proportions. */
+.jobs-hero-cutout {
+  width: auto !important;
+  max-width: none !important;
+  height: var(--jobs-cutout-height) !important;
+  top: auto !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  right: auto !important;
+  object-fit: contain;
+  transform: translateX(var(--jobs-cutout-centre));
+}
+
+.jobs-hero-cutout--1 {
+  --jobs-cutout-height: 107.07%;
+  --jobs-cutout-centre: -47.4%;
+}
+
+.jobs-hero-cutout--2 {
+  --jobs-cutout-height: 103.47%;
+  --jobs-cutout-centre: -53.77%;
+}
+
+.jobs-hero-cutout--3 {
+  --jobs-cutout-height: 104.83%;
+  --jobs-cutout-centre: -46.09%;
+}
+
+.jobs-hero-cutout--4 {
+  --jobs-cutout-height: 106.61%;
+  --jobs-cutout-centre: -45.8%;
+}
+
 .hero-image-slide {
   animation: heroImageFade4 12s ease-in-out infinite;
   opacity: 0;
