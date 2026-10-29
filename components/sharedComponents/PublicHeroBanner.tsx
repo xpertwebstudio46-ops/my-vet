@@ -27,6 +27,7 @@ type PublicHeroBannerProps = {
         src: string
         alt?: string
         className?: string
+        unoptimized?: boolean
     }[]
     rightImageBottomClassName?: string
     innerLayout?: boolean
@@ -148,6 +149,7 @@ export function PublicHeroBanner({
                                     src={slide.src}
                                     alt={slide.alt ?? rightImageAlt}
                                     fill
+                                    unoptimized={slide.unoptimized}
                                     sizes="(min-width: 1024px) 60vw, 100vw"
                                     className={`${isImageSlider ? `hero-image-slide hero-image-slide-${index + 1}` : ''} object-contain ${innerLayout ? 'object-bottom lg:object-right-bottom' : 'object-right-bottom'} ${slide.className ?? ''}`}
                                     priority={index === 0}
