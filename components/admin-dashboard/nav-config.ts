@@ -1,5 +1,6 @@
 import {
   Bell,
+  BriefcaseBusiness,
   BarChart3,
   Building2,
   ClipboardCheck,
@@ -42,6 +43,7 @@ export const adminNavSections: Array<{
     {
       heading: 'Directory',
       items: [
+        { label: 'Jobs & applications', href: '/admin-dashboard/jobs', icon: BriefcaseBusiness },
         {
           label: 'Veterinary Practice',
           href: '/admin-dashboard/veterinary-practice',

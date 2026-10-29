@@ -14,6 +14,7 @@ const navLinks = [
     { label: 'Directory', href: '/directory' },
     { label: 'Price & Comparison', href: '/price-comparison' },
     { label: 'Reviews', href: '/review' },
+    { label: 'Jobs', href: '/jobs' },
     { label: 'Blog', href: '/blog' },
     { label: 'Sponsorship', href: '/sponsorship' },
 ]

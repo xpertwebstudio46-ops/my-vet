@@ -13,6 +13,7 @@ import { petsRouter } from './modules/pets/pets.routes.js'
 import { notificationsRouter } from './modules/notifications/notifications.routes.js'
 import { appointmentsRouter } from './modules/appointments/appointments.routes.js'
 import { reviewsRouter } from './modules/reviews/reviews.routes.js'
+import { jobsRouter } from './modules/jobs/jobs.routes.js'
 import { vetRouter } from './modules/vet/vet.routes.js'
 import { uploadRouter } from './modules/upload/upload.routes.js'
 import { subscriptionsRouter } from './modules/subscriptions/subscriptions.routes.js'
@@ -57,6 +58,7 @@ export function createApp() {
   app.use('/api/notifications', notificationsRouter)
   app.use('/api/appointments', appointmentsRouter)
   app.use('/api/reviews', reviewsRouter)
+  app.use('/api/jobs', jobsRouter)
   app.use('/api/vet', vetRouter)
   app.use('/api/upload', uploadRouter)
   app.use('/api/subscriptions', subscriptionsRouter)

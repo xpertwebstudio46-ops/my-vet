@@ -124,7 +124,7 @@ export default function HowWe() {
           {/* Left — vet image */}
           <div className="relative w-full h-[400px] sm:h-[520px] lg:h-auto lg:min-h-[620px] lg:self-stretch rounded-[24px] overflow-hidden">
             <Image
-              src="/images/picture1.png"
+              src="/images/Picture1.png"
               alt="Vets grooming a dog"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"

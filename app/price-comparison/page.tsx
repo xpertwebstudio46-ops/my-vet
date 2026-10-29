@@ -14,8 +14,6 @@ export default function PriceComparisonPage() {
       <PublicHeroBanner
         title={<>Compare veterinary <span className="text-[#13b8a8]">prices</span></>}
         description="Explore veterinary service pricing and consumer information to help you compare care options for your pets."
-        rightImageSrc="/images/meji.png"
-        rightImageAlt="Pet owners with their dogs and horse"
       />
       <PriceComparisonSection />
       <Footer />

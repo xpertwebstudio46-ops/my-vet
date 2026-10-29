@@ -44,6 +44,29 @@ Set the Railway service root directory to `/backend`. The checked-in `railway.js
 
 ## Environment
 
+### Jobs and applications
+
+The jobs feature adds migration `20261029000000_jobs`. Apply committed migrations
+with `npm run db:migrate:deploy` in the backend environment before testing. Railway
+already runs this command during deployment. No seed or database reset is needed.
+
+- Public board: `/jobs`; filters include keyword, city/location/postcode, and job type.
+- Approved practice account: `/vet-dashboard/jobs` to publish, edit and close roles,
+  review applications, and shortlist, reject or hire applicants.
+- Signed-in applicants: apply on a job detail page using contact details, a cover
+  letter and an optional HTTPS CV/portfolio link. Track or withdraw from
+  `/jobs?tab=applications`.
+- Admins: `/admin-dashboard/jobs` to view all roles/applicants and close or edit jobs.
+- Notifications are saved in the same transaction as posting/applying and emitted
+  through the existing real-time notification system. Admins receive job posts and
+  applications; practices receive applications; applicants receive confirmations
+  and hiring status updates. Expired/closed roles cannot accept applications.
+
+Manual check: publish a role as an approved vet, check the admin notification and
+public search results, then apply from a different signed-in account. Check the
+practice and admin notifications, shortlist the applicant and check their status.
+Close the role and confirm it no longer appears in public search.
+
 | Variable | Required | Secret | Purpose |
 | --- | --- | --- | --- |
 | `NODE_ENV` | Yes | No | `development`, `test`, or `production` |

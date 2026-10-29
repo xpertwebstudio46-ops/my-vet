@@ -18,6 +18,12 @@ All JSON endpoints use the shared `{ success, data, message, error }` envelope. 
 | Appointments | `GET /api/appointments/vet`, `PATCH /api/appointments/:id/confirm`, `PATCH /api/appointments/:id/complete` | VET/own practice |
 | Reviews | `GET /api/reviews/practice/:practiceId` | Public approved reviews |
 | Homepage reviews | `GET /api/reviews?page=1&limit=24` | Public approved reviews for published practices and active accounts |
+| Jobs | `GET /api/jobs?q=&location=&type=&page=1&limit=12`, `GET /api/jobs/:id` | Public open, unexpired jobs from approved practices |
+| Jobs | `GET /api/jobs/mine`, `POST /api/jobs`, `PATCH /api/jobs/:id` | VET/own practice; posting requires an approved practice. ADMIN can edit/close jobs |
+| Jobs administration | `GET /api/jobs/admin?page=1&limit=20` | ADMIN; includes application counts |
+| Applications | `POST /api/jobs/:id/apply`, `GET /api/jobs/applications/mine` | Signed-in applicant; one application per job; no self-application |
+| Applicants | `GET /api/jobs/:id/applications` | Hiring VET or ADMIN only |
+| Application status | `PATCH /api/jobs/applications/:id` | Hiring VET/ADMIN: SHORTLISTED, REJECTED, HIRED; applicant: WITHDRAWN |
 | Reviews | `GET /api/reviews/me`, `POST /api/reviews`, `PUT/DELETE /api/reviews/:id` | PET_OWNER/author |
 | Reviews | `POST /api/reviews/:id/reply` | VET/own practice |
 | Reviews | `POST/DELETE /api/reviews/:id/helpful` | User |

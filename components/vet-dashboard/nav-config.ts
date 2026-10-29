@@ -1,5 +1,6 @@
 import {
   Bell,
+  BriefcaseBusiness,
   BarChart3,
   Building2,
   CalendarCheck,
@@ -37,6 +38,7 @@ export const vetNavSections: Array<{
       { label: 'Bookings', href: '/vet-dashboard/bookings', icon: CalendarCheck },
       { label: 'Analytics', href: '/vet-dashboard/analytics', icon: BarChart3 },
       { label: 'Reviews', href: '/vet-dashboard/reviews', icon: Star },
+      { label: 'Jobs & applicants', href: '/vet-dashboard/jobs', icon: BriefcaseBusiness },
     ],
   },
   {
