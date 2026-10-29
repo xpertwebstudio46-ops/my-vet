@@ -529,6 +529,32 @@ body {
   }
 }
 
+@media (min-width: 1282px) {
+  /* Keep navigation beyond the 280px logo cutout at every desktop width. */
+  .site-header-logo {
+    flex-basis: 256px;
+  }
+
+  .site-header-desktop {
+    gap: clamp(20px, 2vw, 40px);
+  }
+
+  .site-header-desktop nav {
+    min-width: 0;
+    gap: clamp(10px, 1.2vw, 24px);
+  }
+
+  .site-header-nav-link {
+    font-size: clamp(12px, 0.95vw, 17px);
+  }
+
+  .site-header-action {
+    padding: 0.75rem clamp(12px, 1.2vw, 24px);
+    font-size: clamp(12px, 0.85vw, 15px);
+    white-space: nowrap;
+  }
+}
+
 .hero-image-slide {
   animation: heroImageFade4 12s ease-in-out infinite;
   opacity: 0;

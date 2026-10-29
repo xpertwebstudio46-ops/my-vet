@@ -1,6 +1,5 @@
-import Image from "next/image";
-
-
+import Image from 'next/image'
+import { Check, Search, ShieldCheck, Eye } from 'lucide-react'
 
 const benefits = [
   'Verified veterinary practices',
@@ -14,138 +13,60 @@ const benefits = [
   'Easy side-by-side comparison of vets near you, by price, specialism and location',
 ];
 
-function CheckIcon() {
-  return (
-    <span
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-      style={{ backgroundColor: "#e6f7f5" }}
-    >
-      <svg
-        className="h-3.5 w-3.5"
-        style={{ color: "#13b8a8" }}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={3}
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-    </span>
-  );
-}
+
+const groups = [
+  { title: 'A community you can trust', icon: ShieldCheck, items: benefits.slice(0, 3) },
+  { title: 'Clear information. Confident choices.', icon: Eye, items: benefits.slice(3, 6) },
+  { title: 'Your next vet, easier to find', icon: Search, items: benefits.slice(6) },
+]
 
 export default function HowWe() {
   return (
-    <section className="py-10 sm:py-12 lg:py-14">
-      <div className="mx-auto max-w-[90%]">
-        {/* Heading */}
-        <div className="mb-8 text-center sm:mb-10">
-          <div className="flex flex-col items-center gap-2">
-
-            {/* Top Wave */}
-            <svg
-              viewBox="0 0 180 12"
-              className="w-30 h-3"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 6
-                  Q10 0 20 6
-                  T40 6
-                  T60 6
-                  T80 6
-                  T100 6
-                  T120 6
-                  T140 6
-                  T160 6
-                  T180 6"
-                stroke="#000"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="1 8"
-              />
-            </svg>
-
-            {/* Badge */}
-            <div className="flex items-center gap-2">
-              <Image
-                src="/images/bones.png"
-                alt=""
-                width={400}
-                height={400}
-                className="w-6 h-6"
-              />
-              <span className="text-sm font-semibold text-[#13b8a8]">
-                How We Help
-              </span>
-            </div>
-
-            {/* Bottom Wave */}
-            <svg
-              viewBox="0 0 180 12"
-              className="w-30 h-3"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 6
-                  Q10 0 20 6
-                  T40 6
-                  T60 6
-                  T80 6
-                  T100 6
-                  T120 6
-                  T140 6
-                  T160 6
-                  T180 6"
-                stroke="#000"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="1 8"
-              />
-            </svg>
-
-          </div>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0d2e5e]">
+    <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mb-9 max-w-3xl text-center sm:mb-12">
+          <span className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-2 text-xs font-semibold tracking-wide text-teal-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
+            How we help
+          </span>
+          <h2 className="mt-4 font-heading text-3xl font-bold leading-tight text-[#064071] sm:text-4xl">
             Why Pet Owners and Vets Use My Vet
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Find, compare and connect with trusted veterinary practices near you
+          <p className="mt-4 text-base leading-relaxed text-slate-500">
+            Find, compare and connect with trusted veterinary practices near you.
           </p>
         </div>
 
-        {/* Content */}
-        <div className="relative grid lg:grid-cols-2 gap-8 items-start">
-          {/* Left — vet image */}
-          <div className="relative w-full h-[400px] sm:h-[520px] lg:h-auto lg:min-h-[620px] lg:self-stretch rounded-[24px] overflow-hidden">
+        <div className="grid items-stretch gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
+          <div className="relative isolate min-h-[340px] overflow-hidden rounded-3xl bg-slate-100 sm:min-h-[440px] lg:min-h-[600px]">
             <Image
               src="/images/Picture1.png"
-              alt="Vets grooming a dog"
+              alt="Veterinary team caring for a dog"
               fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 480px"
               className="object-cover"
             />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#062c4e]/95 via-[#062c4e]/60 to-transparent px-6 pb-7 pt-24 sm:px-8 sm:pb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-200">Better connected care</p>
+              <p className="mt-3 max-w-xs font-heading text-2xl font-bold leading-snug text-white sm:text-3xl">
+                Trusted practices.<br />Informed pet owners.
+              </p>
+            </div>
           </div>
 
-          {/* Right — step cards */}
           <div className="flex min-w-0 flex-col gap-4">
-            {Array.from({ length: Math.ceil(benefits.length / 2) }, (_, index) => (
-              <div key={index} className="relative rounded-[20px] bg-[#f4f5f7]">
-                <svg width="64" height="52" viewBox="0 0 64 52" aria-hidden="true" className="pointer-events-none absolute right-0 top-0">
-                  <path d="M0 0H64V52Q64 36 48 36H36Q20 36 20 20V16Q20 0 4 0Z" fill="white" />
-                </svg>
-                <span className="absolute top-1 right-2 flex h-6 w-7 items-center justify-center text-sm font-bold text-[#0d2e5e]">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <ul className="space-y-3 p-5 pr-[72px] text-sm sm:text-base font-medium leading-relaxed text-[#0d2e5e]">
-                  {benefits.slice(index * 2, index * 2 + 2).map((benefit) => (
-                    <li key={benefit} className="flex items-start gap-3">
-                      <CheckIcon />
+            {groups.map(({ title, icon: Icon, items }) => (
+              <div key={title} className="flex-1 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-5 sm:p-6">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-600 shadow-sm ring-1 ring-teal-100">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="text-base font-bold leading-snug text-[#064071] sm:text-lg">{title}</h3>
+                </div>
+                <ul className="space-y-3">
+                  {items.map((benefit) => (
+                    <li key={benefit} className="flex items-start gap-3 text-sm leading-relaxed text-slate-600">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" strokeWidth={2.5} aria-hidden="true" />
                       <span>{benefit}</span>
                     </li>
                   ))}
@@ -153,19 +74,8 @@ export default function HowWe() {
               </div>
             ))}
           </div>
-
-          {/* Decorative cat illustration — overlaps bottom-right of the image / step 3 */}
-          <div className="hidden sm:block absolute -bottom-10 right-6  w-23 h-42 pointer-events-none">
-            <Image
-              src="/images/shape-cat.png"
-              alt=""
-              fill
-              sizes="100px"
-              className="object-contain"
-            />
-          </div>
         </div>
       </div>
     </section>
-  );
+  )
 }
