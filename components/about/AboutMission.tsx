@@ -1,10 +1,5 @@
 import Image from "next/image";
-import { CheckCircle2 } from "lucide-react";
 
-const missionPoints = [
-  "Safe & Supervised Environment — Your pet's safety is our top priority. All play and care areas are professionally supervised and sanitized daily.",
-  "Personalized Attention — We treat every pet as an individual, tailoring care, feeding, and activities to their specific needs and temperament.",
-];
 
 export default function AboutMissionSection() {
   return (
@@ -41,39 +36,22 @@ export default function AboutMissionSection() {
               Our Mission
             </h3>
 
-            <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+            <div className="mt-5 space-y-5 text-sm font-sans leading-7 text-[#4E4E4E]">
+            <p>
               Our mission is to become the UK’s leading veterinary and pet owner directory a trusted platform where people can review, compare, and find the dedicated care their pets deserve.
             </p>
-            <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-              <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-                For pet owners, My Vet makes it simple to create your very own unique online pet profile for your pets and search and create a shortlist of your most favoured vets specific for the pets you have such as exotic pets, equine or household pets, search locally. Store your favourite vet, by location, specialism and compare prices and options, it also provides you with the ability to access and write real reviews and experiences from other owners helping every family make confident, informed decisions about their animal’s well being.
+            <p>
+                For pet owners, My Vet makes it simple to create your very own unique online pet profile for your pets and search and create a shortlist of your most favoured vets specific for the pets you have such as exotic pets, equine or household pets, search locally.
               </p>
-            </p>
-            <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
+              <p>
+                Store your favourite vet, by location, specialism and compare prices and options, it also provides you with the ability to access and write real reviews and experiences from other owners helping every family make confident, informed decisions about their animal’s well being.
+              </p>
+            <p>
               Together, our aim is to build a transparent, modern, and community driven space that connects pet owners with the right veterinary care, every time
             </p>
 
-            {/* <p className=" text-[14px] font-sans font-normal leading-6 text-[#4E4E4E]">
-          Together, our aim is to build a transparent, modern, and communitydriven space that connects pet owners with the right veterinary care, every time
-            </p> */}
+            </div>
 
-
-            {/* <div className="mt-8 space-y-6">
-              {missionPoints.map((point) => (
-                <div key={point} className="flex items-start gap-4">
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E7FAF8]">
-                    <CheckCircle2
-                      size={18}
-                      className="text-[#10B7A6]"
-                    />
-                  </div>
-
-                  <p className="text-sm leading-7 text-[#606060]">
-                    {point}
-                  </p>
-                </div>
-              ))}
-            </div> */}
           </div>
         </div>
       </div>
