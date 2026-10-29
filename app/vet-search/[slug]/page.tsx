@@ -3,7 +3,6 @@ import Header from "@/components/Header";
 import AboutPracticeSection from "@/components/vetProfile/AboutPracticeSection";
 import ContactInfoCard from "@/components/vetProfile/ContactInfoCard";
 import LeaveReviewForm from "@/components/vetProfile/LeaveReviewForm";
-import LocationMap from "@/components/vetProfile/LocationMap";
 import PetOwnerReviews from "@/components/vetProfile/PetOwnerReviews";
 import VetProfile from "@/components/vetProfile/ProfileHero";
 import { PublicPracticeDetails } from "@/components/vetProfile/PublicPracticeDetails";
@@ -31,7 +30,6 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
     .map((item) => ({ service: item.name, price: Number(item.price), benchmarkPrice: null }));
   const address = [practice.addressLine1, practice.addressLine2, practice.city, practice.county, practice.postcode, "United Kingdom"].filter(Boolean).join(", ");
   const [description, mission] = (practice.description ?? "Contact this practice to learn more about its veterinary care.").split(/\n\n/, 2);
-  const mapEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
   const reviewCards = reviews.items.map((review) => ({
     id: review.id,
     name: `${review.user.firstName} ${review.user.lastName.slice(0, 1)}.`,
@@ -65,7 +63,6 @@ export default async function VetProfilePage({ params }: { params: Promise<{ slu
           </div>
           <div className="min-w-0 flex flex-col gap-6">
             <ContactInfoCard practiceId={practice.id} address={address} phone={practice.phone} openingHours={practice.openingHours ?? []} />
-            <LocationMap mapEmbedSrc={mapEmbedSrc} />
           </div>
         </div>
       </div>

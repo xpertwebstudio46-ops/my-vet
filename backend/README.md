@@ -59,12 +59,11 @@ weekday is required, and reduced prices cannot exceed corresponding standard
 prices. Ownership is enforced on all management endpoints.
 
 Published areas appear in Services on `/vet-search/:slug`, including an area
-map, weekday indicators, prices and postcode badges. Selecting a card changes
-the map location. The map locates the named area; it does not define a service
-boundary. Hidden/deleted areas do not appear in the public response.
+weekday indicators, prices and postcode badges. Hidden/deleted areas do not
+appear in the public response.
 
 Manual check: add Birmingham with B1/B2 postcodes, Monday/Wednesday availability,
-standard GBP 45–75 and reduced GBP 0–20. Check the public card, map, days and
+standard GBP 45–75 and reduced GBP 0–20. Check the public card, days and
 Free–GBP 20 price. Edit, hide/publish and delete the area, refreshing the public
 profile after each change. A different vet must not be able to update/delete it.
 
