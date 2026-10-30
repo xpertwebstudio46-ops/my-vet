@@ -9,6 +9,7 @@ import { ApiError } from '../../shared/utils/api-error.js'
 import { sendSuccess } from '../../shared/utils/api-response.js'
 import { paginationSchema, paginated, paginationToPrisma } from '../../shared/utils/pagination.js'
 import { createNotification, emitNotifications } from '../../shared/services/notification.service.js'
+import { jobApplicationRateLimiter } from '../../shared/middleware/rate-limiter.js'
 
 const jobType = z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'LOCUM'])
 const idSchema = z.object({ id: z.string().min(1) })
@@ -23,7 +24,7 @@ const jobSchema = z.object({
 })
 const applicationSchema = z.object({
   name: z.string().trim().min(2).max(150),
-  email: z.email().max(254),
+  email: z.email().max(254).transform((value) => value.toLowerCase()),
   phone: z.string().trim().max(40).optional(),
   coverLetter: z.string().trim().min(30).max(15000),
   cvUrl: z.union([z.url().refine((value) => value.startsWith('https://'), 'Use an HTTPS link'), z.literal('')]).optional(),
@@ -101,10 +102,11 @@ jobsRouter.patch('/applications/:id', authenticate, validateParams(idSchema), va
   if (application.status === 'WITHDRAWN') throw new ApiError(409, 'APPLICATION_WITHDRAWN', 'This application has been withdrawn')
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.jobApplication.update({ where: { id }, data: { status } })
-    const notification = await createNotification(tx, { userId: status === 'WITHDRAWN' ? application.job.practice.ownerId : application.userId, category: 'SYSTEM', title: 'Job application updated', message: `${application.job.title}: ${status.toLowerCase()}.`, actionUrl: status === 'WITHDRAWN' ? '/vet-dashboard/jobs' : '/jobs?tab=applications', entityType: 'JOB_APPLICATION', entityId: id })
+    const recipientId = status === 'WITHDRAWN' ? application.job.practice.ownerId : application.userId
+    const notification = recipientId ? await createNotification(tx, { userId: recipientId, category: 'SYSTEM', title: 'Job application updated', message: `${application.job.title}: ${status.toLowerCase()}.`, actionUrl: status === 'WITHDRAWN' ? '/vet-dashboard/jobs' : '/jobs?tab=applications', entityType: 'JOB_APPLICATION', entityId: id }) : null
     return { updated, notification }
   })
-  emitNotifications([result.notification])
+  emitNotifications(result.notification ? [result.notification] : [])
   sendSuccess(res, result.updated)
 })
 
@@ -115,7 +117,7 @@ jobsRouter.get('/:id', validateParams(idSchema), async (req, res) => {
   sendSuccess(res, job)
 })
 
-jobsRouter.post('/:id/apply', authenticate, validateParams(idSchema), validateBody(applicationSchema), async (req, res) => {
+jobsRouter.post('/:id/apply', jobApplicationRateLimiter, (req, res, next) => req.get('authorization') ? authenticate(req, res, next) : next(), validateParams(idSchema), validateBody(applicationSchema), async (req, res) => {
   const { id } = req.validatedParams as z.infer<typeof idSchema>
   const input = req.validatedBody as z.infer<typeof applicationSchema>
   const result = await prisma.$transaction(async (tx) => {
@@ -123,12 +125,12 @@ jobsRouter.post('/:id/apply', authenticate, validateParams(idSchema), validateBo
     await tx.$queryRaw`SELECT id FROM "Job" WHERE id = ${id} FOR UPDATE`
     const job = await tx.job.findFirst({ where: { AND: [{ id }, publicWhere()] }, include: { practice: true } })
     if (!job) throw new ApiError(409, 'JOB_CLOSED', 'This job is no longer accepting applications')
-    if (job.practice.ownerId === req.user!.userId || req.user!.role === 'ADMIN') throw new ApiError(403, 'FORBIDDEN', 'Apply using an applicant account, not the hiring practice or admin account')
-    if (await tx.jobApplication.findUnique({ where: { jobId_userId: { jobId: id, userId: req.user!.userId } } })) throw new ApiError(409, 'ALREADY_APPLIED', 'You have already applied to this job')
-    const application = await tx.jobApplication.create({ data: { ...input, cvUrl: input.cvUrl || null, jobId: id, userId: req.user!.userId } })
+    if (req.user && (job.practice.ownerId === req.user.userId || req.user.role === 'ADMIN')) throw new ApiError(403, 'FORBIDDEN', 'Apply using an applicant account, not the hiring practice or admin account')
+    if (await tx.jobApplication.findFirst({ where: { jobId: id, OR: [{ email: { equals: input.email, mode: 'insensitive' } }, ...(req.user ? [{ userId: req.user.userId }] : [])] } })) throw new ApiError(409, 'ALREADY_APPLIED', 'An application for this job has already been submitted with these details')
+    const application = await tx.jobApplication.create({ data: { ...input, cvUrl: input.cvUrl || null, jobId: id, userId: req.user?.userId ?? null } })
     const notifications = await notifyAdmins(tx, 'New job application', `${input.name} applied for ${job.title} at ${job.practice.name}.`, id)
     notifications.push(await createNotification(tx, { userId: job.practice.ownerId, category: 'SYSTEM', title: 'New job application', message: `${input.name} applied for ${job.title}.`, actionUrl: '/vet-dashboard/jobs', entityType: 'JOB_APPLICATION', entityId: application.id }))
-    notifications.push(await createNotification(tx, { userId: req.user!.userId, category: 'SYSTEM', title: 'Application submitted', message: `Your application for ${job.title} has been sent to ${job.practice.name}.`, actionUrl: '/jobs?tab=applications', entityType: 'JOB_APPLICATION', entityId: application.id }))
+    if (req.user) notifications.push(await createNotification(tx, { userId: req.user.userId, category: 'SYSTEM', title: 'Application submitted', message: `Your application for ${job.title} has been sent to ${job.practice.name}.`, actionUrl: '/jobs?tab=applications', entityType: 'JOB_APPLICATION', entityId: application.id }))
     return { application, notifications }
   })
   emitNotifications(result.notifications)

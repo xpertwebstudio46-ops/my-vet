@@ -1,0 +1,1 @@
+ALTER TABLE "JobApplication" ALTER COLUMN "userId" DROP NOT NULL;
