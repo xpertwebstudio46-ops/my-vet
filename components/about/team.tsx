@@ -19,8 +19,8 @@ const members = [
     },
     {
         id: 2,
-        thumb: "/images/person-2.png",
-        image: "/images/center-big.png",
+        thumb: "/images/David Smith.png",
+        image: "/images/david.png",
         name: "David Smith",
         role: "Practice Director",
         description:
@@ -28,8 +28,8 @@ const members = [
     },
     {
         id: 3,
-        thumb: "/images/person-3.png",
-        image: "/images/center-big.png",
+        thumb: "/images/Emma Brown.png",
+        image: "/images/emma.png",
         name: "Emma Brown",
         role: "Equine Vet",
         description:
@@ -37,8 +37,8 @@ const members = [
     },
     {
         id: 4,
-        thumb: "/images/person-3.png",
-        image: "/images/center-big.png",
+        thumb: "/images/Mary Douglas.png",
+        image: "/images/mary.png",
         name: "Mary Douglas",
         role: "Small Animal Vet",
         description:
@@ -128,9 +128,9 @@ export default function TeamMembers() {
                 </div>
 
                 <h2 className="text-[32px] font-bold max-w-xl leading-tight text-[#064071] font-heading sm:text-[40px]">
-                    Loyal,
-                    <span className="text-[#01AEAD]"> Passionate,</span>
-                    and Driven change to Find, Manage and Review
+                Find
+                    <span className="text-[#01AEAD]"> Manage </span>
+                      and Review
                 </h2>
 
                 <p className="mt-5 text-gray-500 max-w-xl font-sans font-normal text-[16px]">

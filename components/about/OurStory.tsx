@@ -89,7 +89,7 @@ export default function OurStorySection() {
                     </h2>
 
                     <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-500">
-                        For over 12 years, MY VET has been helping pet owners connect with
+                         MY VET has been build to help pet owners connect with
                         trusted veterinary practices. We make it easier to find reliable
                         care so every pet gets the attention they deserve.
                     </p>
@@ -124,7 +124,7 @@ export default function OurStorySection() {
                 {/* Right Image */}
                 <div className="flex justify-center lg:justify-end">
                     <Image
-                        src="/images/cat-and-dog.png"
+                        src="/images/mg.png"
                         alt="Cat and Dog"
                         width={550}
                         height={550}
