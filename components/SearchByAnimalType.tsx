@@ -11,21 +11,21 @@ const categories = [
   },
   {
     id: 2,
-    icon: '/images/cow-2.png',
+    icon: '/images/horse.png',
     title: 'Equine Specialists',
     href: '/vet-search?animalType=equine',
     description: 'Specialist equine veterinary professionals',
   },
   {
     id: 3,
-    icon: '/images/parot.png',
+    icon: '/images/cow-2.png',
     title: 'Farm Animal Vets',
     href: '/vet-search?animalType=farm-animals',
     description: 'Farm livestock health & emergency care services',
   },
   {
     id: 4,
-    icon: '/images/telescope.png',
+    icon: '/images/parot.png',
     title: 'Exotic Animal Care',
     href: '/vet-search?animalType=exotics',
     description: 'Specialized care for reptiles, birds, and exotics',
@@ -39,7 +39,7 @@ const categories = [
   },
   {
     id: 6,
-    icon: '/images/horse.png',
+    icon: '/images/telescope.png',
     title: 'Holistic & Therapy',
     href: '/vet-search?service=Holistic',
     description: 'Alternative therapies and rehabilitation',
